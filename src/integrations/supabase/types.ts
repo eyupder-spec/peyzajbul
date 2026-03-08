@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      lead_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          firm_id: string
+          id: string
+          lead_id: string
+          purchased_at: string
+          status: string
+          stripe_session_id: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          firm_id: string
+          id?: string
+          lead_id: string
+          purchased_at?: string
+          status?: string
+          stripe_session_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          firm_id?: string
+          id?: string
+          lead_id?: string
+          purchased_at?: string
+          status?: string
+          stripe_session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_purchases_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           address: string | null

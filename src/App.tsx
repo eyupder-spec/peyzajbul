@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Firmalar from "./pages/Firmalar";
+import FirmaDetay from "./pages/FirmaDetay";
+import Iller from "./pages/Iller";
+import IlFirmalari from "./pages/IlFirmalari";
 import Hesabim from "./pages/Hesabim";
 import FirmaPanel from "./pages/FirmaPanel";
 import FirmaGiris from "./pages/FirmaGiris";
@@ -25,6 +28,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/firmalar" element={<Firmalar />} />
+          <Route path="/firma/:slug" element={<FirmaDetay />} />
+          <Route path="/iller" element={<Iller />} />
+          <Route path="/iller/:slug" element={<IlFirmalari />} />
           <Route path="/hesabim" element={<Hesabim />} />
           <Route path="/firma/giris" element={<FirmaGiris />} />
           <Route path="/firma/panel" element={<FirmaPanel />} />

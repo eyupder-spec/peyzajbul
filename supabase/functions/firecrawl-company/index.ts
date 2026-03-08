@@ -32,7 +32,6 @@ Deno.serve(async (req) => {
 
     console.log('Scraping company info from:', formattedUrl);
 
-    // Use Firecrawl with JSON extraction
     const response = await fetch('https://api.firecrawl.dev/v1/scrape', {
       method: 'POST',
       headers: {
@@ -41,29 +40,25 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         url: formattedUrl,
-        formats: [
-          {
-            type: 'json',
-            prompt: 'Extract company information from this website. Find: company name, phone number(s), email address(es), physical address, city, description/about text, and list of services they offer. Return in Turkish if available.',
-            schema: {
-              type: 'object',
-              properties: {
-                company_name: { type: 'string', description: 'Company name' },
-                phone: { type: 'string', description: 'Primary phone number' },
-                email: { type: 'string', description: 'Primary email address' },
-                address: { type: 'string', description: 'Physical address' },
-                city: { type: 'string', description: 'City name in Turkish' },
-                description: { type: 'string', description: 'Company description or about text' },
-                services: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'List of services the company offers',
-                },
+        formats: ['extract'],
+        extract: {
+          prompt: 'Extract company information from this website. Find: company name, phone number(s), email address(es), physical address, city, description/about text, and list of services they offer. Return in Turkish if available.',
+          schema: {
+            type: 'object',
+            properties: {
+              company_name: { type: 'string' },
+              phone: { type: 'string' },
+              email: { type: 'string' },
+              address: { type: 'string' },
+              city: { type: 'string' },
+              description: { type: 'string' },
+              services: {
+                type: 'array',
+                items: { type: 'string' },
               },
             },
           },
-        ],
-        onlyMainContent: false,
+        },
       }),
     });
 
@@ -77,8 +72,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Extract the JSON data from the response
-    const extracted = data?.data?.json || data?.json || null;
+    const extracted = data?.data?.extract || data?.extract || null;
 
     if (!extracted) {
       return new Response(

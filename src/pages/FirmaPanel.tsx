@@ -67,7 +67,7 @@ const FirmaPanel = () => {
   const statCards = [
     { title: "Gelen Leadler", value: stats.totalLeads, icon: Users, color: "text-primary" },
     { title: "Satın Alınan", value: stats.purchased, icon: ShoppingCart, color: "text-accent" },
-    { title: "Bu Ay Harcama", value: `$${stats.spent}`, icon: CreditCard, color: "text-destructive" },
+    { title: "Jeton Bakiyesi", value: stats.coinBalance, icon: Coins, color: "text-primary" },
     { title: "Dönüşüm Oranı", value: stats.totalLeads > 0 ? `${Math.round((stats.purchased / stats.totalLeads) * 100)}%` : "0%", icon: TrendingUp, color: "text-primary" },
   ];
 

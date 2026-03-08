@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TURKISH_CITIES } from "@/lib/leadFormData";
 import { SERVICE_LABELS } from "@/lib/categories";
+import { DISTRICTS_BY_CITY } from "@/lib/districts";
 
 const SERVICE_OPTIONS = SERVICE_LABELS;
 
@@ -23,7 +24,7 @@ export type FirmFormData = {
   city: string;
   district: string;
   address: string;
-  tax_number: string;
+  website: string;
   description: string;
   services: string[];
   is_approved: boolean;
@@ -42,7 +43,7 @@ const emptyForm: FirmFormData = {
   city: "",
   district: "",
   address: "",
-  tax_number: "",
+  website: "",
   description: "",
   services: [],
   is_approved: true,
@@ -70,6 +71,8 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
   const [newServiceDesc, setNewServiceDesc] = useState("");
 
   const update = (partial: Partial<FirmFormData>) => setForm((p) => ({ ...p, ...partial }));
+
+  const availableDistricts = form.city ? (DISTRICTS_BY_CITY[form.city] || []) : [];
 
   const toggleService = (s: string) => {
     setForm((p) => ({
@@ -123,7 +126,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           city: form.city,
           district: form.district || null,
           address: form.address || null,
-          tax_number: form.tax_number || null,
+          website: form.website || null,
           description: form.description || null,
           services: form.services,
           is_approved: form.is_approved,
@@ -136,7 +139,6 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
         if (error) throw error;
         toast.success("Firma güncellendi!");
       } else {
-        // Create user first, then insert firm
         const tempPassword = Math.random().toString(36).slice(-10) + "A1!";
         const { data: authData, error: authError } = await supabase.functions.invoke("create-firm-user", {
           body: { email: form.email, password: tempPassword, company_name: form.company_name },
@@ -152,7 +154,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           city: form.city,
           district: form.district || null,
           address: form.address || null,
-          tax_number: form.tax_number || null,
+          website: form.website || null,
           description: form.description || null,
           services: form.services,
           is_approved: form.is_approved,
@@ -214,15 +216,15 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
               <Input value={form.phone} onChange={(e) => update({ phone: e.target.value })} />
             </div>
             <div className="space-y-1.5">
-              <Label>Vergi No</Label>
-              <Input value={form.tax_number} onChange={(e) => update({ tax_number: e.target.value })} />
+              <Label>Web Sitesi</Label>
+              <Input placeholder="https://firma.com" value={form.website} onChange={(e) => update({ website: e.target.value })} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>İl *</Label>
-              <Select value={form.city} onValueChange={(val) => update({ city: val })}>
+              <Select value={form.city} onValueChange={(val) => update({ city: val, district: "" })}>
                 <SelectTrigger><SelectValue placeholder="İl seçin" /></SelectTrigger>
                 <SelectContent>
                   {TURKISH_CITIES.map((c) => (
@@ -233,7 +235,14 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
             </div>
             <div className="space-y-1.5">
               <Label>İlçe</Label>
-              <Input value={form.district} onChange={(e) => update({ district: e.target.value })} />
+              <Select value={form.district} onValueChange={(val) => update({ district: val })} disabled={!form.city}>
+                <SelectTrigger><SelectValue placeholder={form.city ? "İlçe seçin" : "Önce il seçin"} /></SelectTrigger>
+                <SelectContent>
+                  {availableDistricts.map((d) => (
+                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

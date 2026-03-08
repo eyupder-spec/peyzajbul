@@ -45,6 +45,7 @@ const emptyForm: FirmFormData = {
   district: "",
   address: "",
   website: "",
+  slug: "",
   description: "",
   services: [],
   is_approved: true,

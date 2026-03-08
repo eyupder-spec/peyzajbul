@@ -15,6 +15,7 @@ import FirmaLeadler from "./pages/FirmaLeadler";
 import FirmaJeton from "./pages/FirmaJeton";
 import FirmaPremium from "./pages/FirmaPremium";
 import FirmaGaleri from "./pages/FirmaGaleri";
+import FirmaProfil from "./pages/FirmaProfil";
 import AdminGiris from "./pages/AdminGiris";
 import AdminPanel from "./pages/AdminPanel";
 import Kategoriler from "./pages/Kategoriler";

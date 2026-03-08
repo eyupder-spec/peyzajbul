@@ -273,7 +273,7 @@ const FirmaLeadler = () => {
                           <Eye className="h-4 w-4 mr-1" /> Önizle
                         </Button>
                         <Button size="sm" className="flex-1" onClick={() => handlePurchase(lead.id)} disabled={purchasing}>
-                          <ShoppingCart className="h-4 w-4 mr-1" /> $20
+                          <Coins className="h-4 w-4 mr-1" /> 20 Jeton
                         </Button>
                       </div>
                     )}

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Crown, Image, MapPin, Star, FileText, Check } from "lucide-react";
 import { toast } from "sonner";
 
-const PREMIUM_COST = 50; // jetons per month
+const PREMIUM_COST = 20; // jetons per month
 
 const PREMIUM_FEATURES = [
   { icon: Image, label: "Fotoğraf Galerisi", desc: "Projelerinizi görsellerle sergileyin" },

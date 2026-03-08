@@ -157,6 +157,7 @@ export type Database = {
           services: string[] | null
           slug: string | null
           tax_number: string | null
+          telegram_chat_id: string | null
           updated_at: string
           user_id: string
           website: string | null
@@ -182,6 +183,7 @@ export type Database = {
           services?: string[] | null
           slug?: string | null
           tax_number?: string | null
+          telegram_chat_id?: string | null
           updated_at?: string
           user_id: string
           website?: string | null
@@ -207,6 +209,7 @@ export type Database = {
           services?: string[] | null
           slug?: string | null
           tax_number?: string | null
+          telegram_chat_id?: string | null
           updated_at?: string
           user_id?: string
           website?: string | null

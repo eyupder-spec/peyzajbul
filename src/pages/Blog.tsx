@@ -108,7 +108,7 @@ const Blog = () => {
                     <div className="flex items-center gap-2 mb-2">
                       {post.category_slug && (
                         <Badge variant="secondary" className="text-xs">
-                          {categories.find((c) => c.slug === post.category_slug)?.name || post.category_slug}
+                          {CATEGORIES.find((c) => c.slug === post.category_slug)?.label || post.category_slug}
                         </Badge>
                       )}
                       {post.city_slug && (

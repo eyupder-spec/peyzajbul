@@ -54,6 +54,22 @@ const FirmaDetay = () => {
       <Helmet>
         <title>{firm.company_name} | {firm.city} Peyzaj Firması</title>
         <meta name="description" content={`${firm.company_name} - ${firm.city} ilinde hizmet veren profesyonel peyzaj firması. ${firm.services?.join(", ")}`} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": firm.company_name,
+          "description": firm.description || `${firm.city} ilinde peyzaj hizmeti veren firma`,
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": firm.city,
+            ...(firm.district && { "addressRegion": firm.district }),
+            "addressCountry": "TR"
+          },
+          "telephone": firm.phone,
+          "email": firm.email,
+          ...(avgRating && { "aggregateRating": { "@type": "AggregateRating", "ratingValue": avgRating, "reviewCount": reviews?.length } }),
+          "url": `https://peyzaj-rehberi-turkiye.lovable.app/firma/${slug}`
+        })}</script>
       </Helmet>
       <Navbar />
       <main className="flex-1 pt-16">

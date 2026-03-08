@@ -25,6 +25,19 @@ const KategoriDetay = () => {
       <Helmet>
         <title>{category.seoTitle}</title>
         <meta name="description" content={category.seoDescription} />
+        <link rel="canonical" href={`https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/${category.slug}`} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "name": category.label,
+          "description": category.seoDescription,
+          "areaServed": { "@type": "Country", "name": "Türkiye" },
+          "provider": {
+            "@type": "Organization",
+            "name": "Peyzaj Rehberi"
+          },
+          "url": `https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/${category.slug}`
+        })}</script>
       </Helmet>
       <Navbar />
       <main className="flex-1 pt-16">

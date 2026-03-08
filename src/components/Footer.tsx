@@ -30,6 +30,7 @@ const Footer = () => {
               <Link to="/firma/giris" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Firma Girişi</Link>
               <a href="#nasil-calisir" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Nasıl Çalışır</a>
               <Link to="/iller" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İller</Link>
+              <Link to="/changelog" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Yenilikler (Changelog)</Link>
             </div>
           </div>
           <div>

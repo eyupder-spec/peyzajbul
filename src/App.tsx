@@ -53,6 +53,7 @@ const App = () => (
           <Route path="/firma/profil" element={<FirmaProfil />} />
           <Route path="/admin/giris" element={<AdminGiris />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/changelog" element={<Changelog />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

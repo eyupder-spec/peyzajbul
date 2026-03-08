@@ -147,9 +147,9 @@ const FirmaPanel = () => {
 
       // Fetch leads
       const { data: leadsData } = await supabase
-        .from("leads")
+        .from("leads_for_firms" as any)
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false }) as { data: Lead[] | null };
 
       setLeads(leadsData || []);
 
@@ -299,12 +299,8 @@ const FirmaPanel = () => {
                               <td className="px-4 py-3 text-sm text-foreground">{lead.service_type}</td>
                               <td className="px-4 py-3 text-sm text-foreground">{lead.budget}</td>
                               <td className="px-4 py-3 text-sm text-foreground">{lead.city}</td>
-                              <td className="px-4 py-3 text-sm text-foreground">
-                                {isPurchased ? lead.full_name : maskName(lead.full_name)}
-                              </td>
-                              <td className="px-4 py-3 text-sm text-foreground">
-                                {isPurchased ? lead.phone : maskPhone(lead.phone)}
-                              </td>
+                              <td className="px-4 py-3 text-sm text-foreground">{lead.full_name}</td>
+                              <td className="px-4 py-3 text-sm text-foreground">{lead.phone}</td>
                               <td className="px-4 py-3">
                                 <Tooltip>
                                   <TooltipTrigger asChild>
@@ -381,8 +377,8 @@ const FirmaPanel = () => {
                           <div className="grid grid-cols-2 gap-2 text-sm">
                             <div><span className="text-muted-foreground">İl:</span> {lead.city}</div>
                             <div><span className="text-muted-foreground">Bütçe:</span> {lead.budget}</div>
-                            <div><span className="text-muted-foreground">Ad:</span> {isPurchased ? lead.full_name : maskName(lead.full_name)}</div>
-                            <div><span className="text-muted-foreground">Tel:</span> {isPurchased ? lead.phone : maskPhone(lead.phone)}</div>
+                            <div><span className="text-muted-foreground">Ad:</span> {lead.full_name}</div>
+                            <div><span className="text-muted-foreground">Tel:</span> {lead.phone}</div>
                           </div>
                           {!isPurchased && (
                             <div className="flex gap-2 pt-2">
@@ -444,11 +440,11 @@ const FirmaPanel = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Ad Soyad</p>
-                    <p className="font-medium text-foreground">{maskName(selectedLead.full_name)}</p>
+                    <p className="font-medium text-foreground">{selectedLead.full_name}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Telefon</p>
-                    <p className="font-medium text-foreground">{maskPhone(selectedLead.phone)}</p>
+                    <p className="font-medium text-foreground">{selectedLead.phone}</p>
                   </div>
                 </div>
               </div>

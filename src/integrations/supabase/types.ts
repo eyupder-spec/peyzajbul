@@ -53,6 +53,13 @@ export type Database = {
             referencedRelation: "leads"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "coin_transactions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads_for_firms"
+            referencedColumns: ["id"]
+          },
         ]
       }
       firm_gallery: {
@@ -245,6 +252,13 @@ export type Database = {
             referencedRelation: "leads"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lead_purchases_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads_for_firms"
+            referencedColumns: ["id"]
+          },
         ]
       }
       leads: {
@@ -330,7 +344,66 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leads_for_firms: {
+        Row: {
+          address: string | null
+          assigned_firms: string[] | null
+          budget: string | null
+          city: string | null
+          created_at: string | null
+          district: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          lead_score: number | null
+          phone: string | null
+          project_size: string | null
+          service_type: string | null
+          status: string | null
+          timeline: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          assigned_firms?: string[] | null
+          budget?: string | null
+          city?: string | null
+          created_at?: string | null
+          district?: string | null
+          email?: never
+          full_name?: never
+          id?: string | null
+          lead_score?: number | null
+          phone?: never
+          project_size?: string | null
+          service_type?: string | null
+          status?: string | null
+          timeline?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          assigned_firms?: string[] | null
+          budget?: string | null
+          city?: string | null
+          created_at?: string | null
+          district?: string | null
+          email?: never
+          full_name?: never
+          id?: string | null
+          lead_score?: number | null
+          phone?: never
+          project_size?: string | null
+          service_type?: string | null
+          status?: string | null
+          timeline?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {

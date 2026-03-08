@@ -9,7 +9,7 @@ import Navbar from "@/components/Navbar";
 const FirmaPanel = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ totalLeads: 0, purchased: 0, spent: 0 });
+  const [stats, setStats] = useState({ totalLeads: 0, purchased: 0, coinBalance: 0 });
 
   useEffect(() => {
     const checkAccess = async () => {

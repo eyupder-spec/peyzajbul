@@ -25,6 +25,7 @@ export type FirmFormData = {
   district: string;
   address: string;
   website: string;
+  slug: string;
   description: string;
   services: string[];
   is_approved: boolean;

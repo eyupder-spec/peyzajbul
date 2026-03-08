@@ -595,9 +595,8 @@ const AdminPanel = () => {
                   <tr>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Firma Adı</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">İl</th>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Telefon</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Premium</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Hizmetler</th>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Satın Almalar</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Durum</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Aksiyon</th>
                   </tr>

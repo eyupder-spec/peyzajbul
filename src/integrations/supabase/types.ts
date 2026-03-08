@@ -144,6 +144,7 @@ export type Database = {
           is_active: boolean
           is_approved: boolean
           is_premium: boolean
+          logo_url: string | null
           phone: string
           premium_until: string | null
           services: string[] | null
@@ -168,6 +169,7 @@ export type Database = {
           is_active?: boolean
           is_approved?: boolean
           is_premium?: boolean
+          logo_url?: string | null
           phone: string
           premium_until?: string | null
           services?: string[] | null
@@ -192,6 +194,7 @@ export type Database = {
           is_active?: boolean
           is_approved?: boolean
           is_premium?: boolean
+          logo_url?: string | null
           phone?: string
           premium_until?: string | null
           services?: string[] | null

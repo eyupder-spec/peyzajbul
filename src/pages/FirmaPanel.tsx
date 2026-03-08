@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ShoppingCart, CreditCard, TrendingUp } from "lucide-react";
+import { Users, ShoppingCart, Coins, TrendingUp } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 const FirmaPanel = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ totalLeads: 0, purchased: 0, spent: 0 });
+  const [stats, setStats] = useState({ totalLeads: 0, purchased: 0, coinBalance: 0 });
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -24,10 +24,10 @@ const FirmaPanel = () => {
 
       if (!roles || roles.length === 0) { navigate("/"); return; }
 
-      // Check firm approval
+      // Check firm approval & get balance
       const { data: firm } = await supabase
         .from("firms")
-        .select("is_approved")
+        .select("is_approved, coin_balance")
         .eq("user_id", user.id)
         .single();
 
@@ -46,7 +46,7 @@ const FirmaPanel = () => {
       setStats({
         totalLeads: totalLeads || 0,
         purchased: purchases?.length || 0,
-        spent: (purchases?.length || 0) * 20,
+        coinBalance: firm.coin_balance || 0,
       });
       setLoading(false);
     };
@@ -67,7 +67,7 @@ const FirmaPanel = () => {
   const statCards = [
     { title: "Gelen Leadler", value: stats.totalLeads, icon: Users, color: "text-primary" },
     { title: "Satın Alınan", value: stats.purchased, icon: ShoppingCart, color: "text-accent" },
-    { title: "Bu Ay Harcama", value: `$${stats.spent}`, icon: CreditCard, color: "text-destructive" },
+    { title: "Jeton Bakiyesi", value: stats.coinBalance, icon: Coins, color: "text-primary" },
     { title: "Dönüşüm Oranı", value: stats.totalLeads > 0 ? `${Math.round((stats.purchased / stats.totalLeads) * 100)}%` : "0%", icon: TrendingUp, color: "text-primary" },
   ];
 
@@ -78,9 +78,14 @@ const FirmaPanel = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-foreground">Firma Paneli</h1>
-            <Button onClick={() => navigate("/firma/leadler")} variant="default">
-              Leadleri Gör
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button onClick={() => navigate("/firma/jeton")} variant="outline">
+                <Coins className="h-4 w-4 mr-2" /> Jeton Yükle
+              </Button>
+              <Button onClick={() => navigate("/firma/leadler")} variant="default">
+                Leadleri Gör
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

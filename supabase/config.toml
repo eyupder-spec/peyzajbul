@@ -2,3 +2,9 @@ project_id = "tfydaaxgaomdvthclcse"
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+[functions.create-coin-checkout]
+verify_jwt = false
+
+[functions.spend-coins]
+verify_jwt = false

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
-import { ShoppingCart, Eye, ArrowLeft } from "lucide-react";
+import { Coins, Eye, ArrowLeft } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
 
@@ -66,6 +66,7 @@ const FirmaLeadler = () => {
   const [loading, setLoading] = useState(true);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [purchasing, setPurchasing] = useState(false);
+  const [coinBalance, setCoinBalance] = useState(0);
   const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
@@ -89,6 +90,13 @@ const FirmaLeadler = () => {
 
       if (!roles || roles.length === 0) { navigate("/"); return; }
 
+      const { data: firm } = await supabase
+        .from("firms")
+        .select("coin_balance")
+        .eq("user_id", user.id)
+        .single();
+      setCoinBalance(firm?.coin_balance || 0);
+
       const { data: leadsData } = await supabase
         .from("leads")
         .select("*")
@@ -108,15 +116,21 @@ const FirmaLeadler = () => {
   }, [navigate]);
 
   const handlePurchase = async (leadId: string) => {
+    if (coinBalance < 20) {
+      toast({ title: "Yetersiz Jeton", description: "Lütfen jeton yükleyin.", variant: "destructive" });
+      navigate("/firma/jeton");
+      return;
+    }
     setPurchasing(true);
     try {
-      const { data, error } = await supabase.functions.invoke("create-lead-checkout", {
+      const { data, error } = await supabase.functions.invoke("spend-coins", {
         body: { lead_id: leadId },
       });
       if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
+      if (data?.error) throw new Error(data.error);
+      setCoinBalance(data.new_balance);
+      setPurchasedLeadIds((prev) => new Set([...prev, leadId]));
+      toast({ title: "Lead açıldı!", description: `Kalan bakiye: ${data.new_balance} jeton` });
     } catch (err: any) {
       toast({ title: "Hata", description: err.message, variant: "destructive" });
     } finally {
@@ -140,11 +154,17 @@ const FirmaLeadler = () => {
       <Navbar />
       <div className="min-h-screen pt-20 bg-background">
         <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center gap-4 mb-8">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/firma/panel")}>
-              <ArrowLeft className="h-5 w-5" />
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/firma/panel")}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <h1 className="text-3xl font-bold text-foreground">Lead Listesi</h1>
+            </div>
+            <Button variant="outline" onClick={() => navigate("/firma/jeton")} className="gap-2">
+              <Coins className="h-4 w-4" />
+              <span className="font-semibold">{coinBalance} Jeton</span>
             </Button>
-            <h1 className="text-3xl font-bold text-foreground">Lead Listesi</h1>
           </div>
 
           {/* Desktop table */}
@@ -219,7 +239,7 @@ const FirmaLeadler = () => {
                                 <Eye className="h-4 w-4 mr-1" /> Önizle
                               </Button>
                               <Button size="sm" onClick={() => handlePurchase(lead.id)} disabled={purchasing}>
-                                <ShoppingCart className="h-4 w-4 mr-1" /> $20
+                                <Coins className="h-4 w-4 mr-1" /> 20 Jeton
                               </Button>
                             </div>
                           )}
@@ -259,7 +279,7 @@ const FirmaLeadler = () => {
                           <Eye className="h-4 w-4 mr-1" /> Önizle
                         </Button>
                         <Button size="sm" className="flex-1" onClick={() => handlePurchase(lead.id)} disabled={purchasing}>
-                          <ShoppingCart className="h-4 w-4 mr-1" /> $20
+                          <Coins className="h-4 w-4 mr-1" /> 20 Jeton
                         </Button>
                       </div>
                     )}
@@ -349,8 +369,8 @@ const FirmaLeadler = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedLead(null)}>Kapat</Button>
             <Button onClick={() => { if (selectedLead) handlePurchase(selectedLead.id); }} disabled={purchasing}>
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              Ödemeye Geç ($20)
+              <Coins className="h-4 w-4 mr-2" />
+              Lead Aç (20 Jeton)
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -302,6 +302,9 @@ const FirmaPanel = () => {
                               <td className="px-4 py-3 text-sm text-foreground">
                                 {isPurchased ? lead.full_name : maskName(lead.full_name)}
                               </td>
+                              <td className="px-4 py-3 text-sm text-foreground">
+                                {isPurchased ? lead.phone : maskPhone(lead.phone)}
+                              </td>
                               <td className="px-4 py-3">
                                 <Tooltip>
                                   <TooltipTrigger asChild>

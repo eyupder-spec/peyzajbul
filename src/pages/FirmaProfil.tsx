@@ -124,6 +124,7 @@ const FirmaProfil = () => {
 
       setFirmId(firm.id);
       setFirmName(firm.company_name);
+      setLogoUrl(firm.logo_url || null);
       setForm({
         id: firm.id,
         company_name: firm.company_name,

@@ -73,6 +73,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
   const [crawlUrl, setCrawlUrl] = useState("");
   const [newServiceTitle, setNewServiceTitle] = useState("");
   const [newServiceDesc, setNewServiceDesc] = useState("");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   // Re-initialize form when dialog opens with different data
   useEffect(() => {

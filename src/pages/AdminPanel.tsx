@@ -651,7 +651,7 @@ const AdminPanel = () => {
                                   <span>📧 {firm.email}</span>
                                   <span>📞 {firm.phone}</span>
                                   <span>📍 {firm.city}{firm.district ? ` / ${firm.district}` : ""}</span>
-                                  {firm.tax_number && <span>🏢 VN: {firm.tax_number}</span>}
+                                  {firm.website && <span>🌐 {firm.website}</span>}
                                 </div>
                                 {firm.services.length > 0 && (
                                   <div className="flex flex-wrap gap-1 mt-1">

@@ -168,7 +168,8 @@ const AdminPanel = () => {
   const weekLeads = leads.filter((l) => new Date(l.created_at) >= weekAgo).length;
   const monthLeads = leads.filter((l) => new Date(l.created_at).getMonth() === now.getMonth()).length;
   const totalRevenue = purchases.length * 20;
-  const firmCount = roles.filter((r) => r.role === "firm").length;
+  const firmCount = firmsData.filter((f) => f.is_approved).length;
+  const pendingFirmCount = firmsData.filter((f) => !f.is_approved).length;
   const conversionRate = leads.length > 0 ? Math.round((purchases.length / leads.length) * 100) : 0;
 
   const filteredLeads = leads.filter((l) => {
@@ -176,8 +177,6 @@ const AdminPanel = () => {
     if (filterStatus !== "all" && l.status !== filterStatus) return false;
     return true;
   });
-
-  const firms = roles.filter((r) => r.role === "firm");
 
   return (
     <div className="min-h-screen bg-background">

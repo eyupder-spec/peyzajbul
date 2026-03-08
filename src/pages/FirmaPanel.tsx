@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ShoppingCart, Coins, TrendingUp } from "lucide-react";
+import { Users, ShoppingCart, Coins, TrendingUp, Crown, Image } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 const FirmaPanel = () => {
@@ -25,13 +25,14 @@ const FirmaPanel = () => {
       if (!roles || roles.length === 0) { navigate("/"); return; }
 
       // Check firm approval & get balance
-      const { data: firm } = await supabase
+      const { data: firmData } = await supabase
         .from("firms")
-        .select("is_approved, coin_balance")
+        .select("is_approved, coin_balance, is_premium, premium_until")
         .eq("user_id", user.id)
         .single();
 
-      if (!firm?.is_approved) { navigate("/firma/giris"); return; }
+      if (!firmData?.is_approved) { navigate("/firma/giris"); return; }
+      const firm = firmData;
 
       // Fetch stats
       const { count: totalLeads } = await supabase
@@ -78,7 +79,13 @@ const FirmaPanel = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-foreground">Firma Paneli</h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <Button onClick={() => navigate("/firma/premium")} variant="outline">
+                <Crown className="h-4 w-4 mr-2" /> Premium
+              </Button>
+              <Button onClick={() => navigate("/firma/galeri")} variant="outline">
+                <Image className="h-4 w-4 mr-2" /> Galeri
+              </Button>
               <Button onClick={() => navigate("/firma/jeton")} variant="outline">
                 <Coins className="h-4 w-4 mr-2" /> Jeton Yükle
               </Button>

@@ -55,6 +55,79 @@ export type Database = {
           },
         ]
       }
+      firm_gallery: {
+        Row: {
+          caption: string | null
+          created_at: string
+          firm_id: string
+          id: string
+          image_url: string
+          sort_order: number | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          firm_id: string
+          id?: string
+          image_url: string
+          sort_order?: number | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          firm_id?: string
+          id?: string
+          image_url?: string
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "firm_gallery_firm_id_fkey"
+            columns: ["firm_id"]
+            isOneToOne: false
+            referencedRelation: "firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      firm_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          firm_id: string
+          id: string
+          is_approved: boolean
+          rating: number
+          reviewer_name: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          firm_id: string
+          id?: string
+          is_approved?: boolean
+          rating: number
+          reviewer_name: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          firm_id?: string
+          id?: string
+          is_approved?: boolean
+          rating?: number
+          reviewer_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "firm_reviews_firm_id_fkey"
+            columns: ["firm_id"]
+            isOneToOne: false
+            referencedRelation: "firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       firms: {
         Row: {
           address: string | null
@@ -63,12 +136,16 @@ export type Database = {
           company_name: string
           created_at: string
           description: string | null
+          detailed_services: Json | null
           district: string | null
           email: string
+          google_maps_url: string | null
           id: string
           is_active: boolean
           is_approved: boolean
+          is_premium: boolean
           phone: string
+          premium_until: string | null
           services: string[] | null
           tax_number: string | null
           updated_at: string
@@ -81,12 +158,16 @@ export type Database = {
           company_name: string
           created_at?: string
           description?: string | null
+          detailed_services?: Json | null
           district?: string | null
           email: string
+          google_maps_url?: string | null
           id?: string
           is_active?: boolean
           is_approved?: boolean
+          is_premium?: boolean
           phone: string
+          premium_until?: string | null
           services?: string[] | null
           tax_number?: string | null
           updated_at?: string
@@ -99,12 +180,16 @@ export type Database = {
           company_name?: string
           created_at?: string
           description?: string | null
+          detailed_services?: Json | null
           district?: string | null
           email?: string
+          google_maps_url?: string | null
           id?: string
           is_active?: boolean
           is_approved?: boolean
+          is_premium?: boolean
           phone?: string
+          premium_until?: string | null
           services?: string[] | null
           tax_number?: string | null
           updated_at?: string

@@ -13,6 +13,8 @@ import FirmaPanel from "./pages/FirmaPanel";
 import FirmaGiris from "./pages/FirmaGiris";
 import FirmaLeadler from "./pages/FirmaLeadler";
 import FirmaJeton from "./pages/FirmaJeton";
+import FirmaPremium from "./pages/FirmaPremium";
+import FirmaGaleri from "./pages/FirmaGaleri";
 import AdminGiris from "./pages/AdminGiris";
 import AdminPanel from "./pages/AdminPanel";
 import Kategoriler from "./pages/Kategoriler";
@@ -40,6 +42,8 @@ const App = () => (
           <Route path="/firma/panel" element={<FirmaPanel />} />
           <Route path="/firma/leadler" element={<FirmaLeadler />} />
           <Route path="/firma/jeton" element={<FirmaJeton />} />
+          <Route path="/firma/premium" element={<FirmaPremium />} />
+          <Route path="/firma/galeri" element={<FirmaGaleri />} />
           <Route path="/admin/giris" element={<AdminGiris />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="*" element={<NotFound />} />

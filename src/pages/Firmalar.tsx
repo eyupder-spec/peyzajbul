@@ -96,6 +96,7 @@ const Firmalar = () => {
                     district={firm.district}
                     services={firm.services || []}
                     description={firm.description}
+                    is_premium={firm.is_premium}
                   />
                 ))}
               </div>

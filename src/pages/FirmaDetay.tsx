@@ -3,18 +3,23 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Mail, ArrowLeft, Building2 } from "lucide-react";
+import { MapPin, Phone, Mail, ArrowLeft, Building2, Crown, Star, Image as ImageIcon } from "lucide-react";
 import { extractFirmIdFromSlug } from "@/lib/firmUtils";
-import { useApprovedFirms } from "@/hooks/useFirms";
+import { useApprovedFirms, useFirmGallery, useFirmReviews } from "@/hooks/useFirms";
 import { getCitySlug } from "@/lib/cities";
 import { Helmet } from "react-helmet-async";
+import { useState } from "react";
 
 const FirmaDetay = () => {
   const { slug } = useParams<{ slug: string }>();
   const shortId = slug ? extractFirmIdFromSlug(slug) : "";
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const { data: firms, isLoading } = useApprovedFirms();
   const firm = firms?.find((f) => f.id.startsWith(shortId));
+
+  const { data: gallery } = useFirmGallery(firm?.id || "");
+  const { data: reviews } = useFirmReviews(firm?.id || "");
 
   if (isLoading) {
     return (
@@ -40,6 +45,9 @@ const FirmaDetay = () => {
   }
 
   const citySlug = getCitySlug(firm.city);
+  const avgRating = reviews && reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : null;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -63,10 +71,25 @@ const FirmaDetay = () => {
                 <Building2 className="h-8 w-8 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="font-heading text-2xl md:text-3xl font-bold text-primary-foreground">{firm.company_name}</h1>
-                <div className="flex items-center gap-1 text-primary-foreground/70 mt-1">
-                  <MapPin className="h-4 w-4" />
-                  {firm.city}{firm.district ? ` / ${firm.district}` : ""}
+                <div className="flex items-center gap-3">
+                  <h1 className="font-heading text-2xl md:text-3xl font-bold text-primary-foreground">{firm.company_name}</h1>
+                  {firm.is_premium && (
+                    <Badge className="bg-yellow-500/90 text-white gap-1">
+                      <Crown className="h-3.5 w-3.5" /> Premium
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 mt-1">
+                  <div className="flex items-center gap-1 text-primary-foreground/70">
+                    <MapPin className="h-4 w-4" />
+                    {firm.city}{firm.district ? ` / ${firm.district}` : ""}
+                  </div>
+                  {avgRating && (
+                    <div className="flex items-center gap-1 text-yellow-400">
+                      <Star className="h-4 w-4 fill-current" />
+                      <span className="text-primary-foreground/80 text-sm">{avgRating} ({reviews?.length} değerlendirme)</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -76,12 +99,43 @@ const FirmaDetay = () => {
         <div className="container mx-auto px-4 py-10">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
+              {/* Gallery - Premium Only */}
+              {firm.is_premium && gallery && gallery.length > 0 && (
+                <div className="bg-card rounded-lg border border-border p-6">
+                  <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <ImageIcon className="h-5 w-5 text-primary" /> Galeri
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {gallery.map((img) => (
+                      <button
+                        key={img.id}
+                        onClick={() => setSelectedImage(img.image_url)}
+                        className="aspect-[4/3] rounded-lg overflow-hidden group relative"
+                      >
+                        <img
+                          src={img.image_url}
+                          alt={img.caption || "Proje fotoğrafı"}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                        {img.caption && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {img.caption}
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {firm.description && (
                 <div className="bg-card rounded-lg border border-border p-6">
                   <h2 className="font-heading text-xl font-semibold text-foreground mb-3">Hakkında</h2>
                   <p className="text-muted-foreground leading-relaxed">{firm.description}</p>
                 </div>
               )}
+
               <div className="bg-card rounded-lg border border-border p-6">
                 <h2 className="font-heading text-xl font-semibold text-foreground mb-3">Sunulan Hizmetler</h2>
                 <div className="flex flex-wrap gap-2">
@@ -93,6 +147,45 @@ const FirmaDetay = () => {
                   )}
                 </div>
               </div>
+
+              {/* Detailed Services - Premium Only */}
+              {firm.is_premium && firm.detailed_services && (firm.detailed_services as any[]).length > 0 && (
+                <div className="bg-card rounded-lg border border-border p-6">
+                  <h2 className="font-heading text-xl font-semibold text-foreground mb-4">Detaylı Hizmetler</h2>
+                  <div className="space-y-4">
+                    {(firm.detailed_services as any[]).map((ds: any, i: number) => (
+                      <div key={i} className="border-l-2 border-primary/30 pl-4">
+                        <h3 className="font-heading font-semibold text-foreground">{ds.title}</h3>
+                        <p className="text-sm text-muted-foreground mt-1">{ds.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Reviews */}
+              {reviews && reviews.length > 0 && (
+                <div className="bg-card rounded-lg border border-border p-6">
+                  <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Star className="h-5 w-5 text-yellow-500" /> Müşteri Değerlendirmeleri
+                  </h2>
+                  <div className="space-y-4">
+                    {reviews.map((review) => (
+                      <div key={review.id} className="border-b border-border last:border-0 pb-4 last:pb-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-semibold text-foreground">{review.reviewer_name}</span>
+                          <div className="flex items-center gap-0.5">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star key={i} className={`h-4 w-4 ${i < review.rating ? "text-yellow-500 fill-current" : "text-muted"}`} />
+                            ))}
+                          </div>
+                        </div>
+                        {review.comment && <p className="text-sm text-muted-foreground">{review.comment}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -113,6 +206,23 @@ const FirmaDetay = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Google Maps - Premium Only */}
+              {firm.is_premium && firm.google_maps_url && (
+                <div className="bg-card rounded-lg border border-border overflow-hidden">
+                  <iframe
+                    src={firm.google_maps_url}
+                    width="100%"
+                    height="250"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Firma konumu"
+                  />
+                </div>
+              )}
+
               <Link to={`/iller/${citySlug}-peyzaj-firmalari`}>
                 <Button variant="outline" className="w-full">
                   {firm.city} İlindeki Diğer Firmalar
@@ -122,6 +232,14 @@ const FirmaDetay = () => {
           </div>
         </div>
       </main>
+
+      {/* Lightbox */}
+      {selectedImage && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
+          <img src={selectedImage} alt="Büyük görünüm" className="max-w-full max-h-[90vh] object-contain rounded-lg" />
+        </div>
+      )}
+
       <Footer />
     </div>
   );

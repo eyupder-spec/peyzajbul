@@ -295,11 +295,14 @@ const FirmaLeadler = () => {
                         {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
                       </Badge>
                     </div>
-                    {!isPurchased && getFomoMessage(leadPurchaseCounts[lead.id] || 0) && (
-                      <span className={`inline-flex items-center text-xs font-medium px-2 py-1 rounded border mt-1 ${getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.className}`}>
-                        🔥 {getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.text}
-                      </span>
-                    )}
+                    {!isPurchased && (() => {
+                      const fomo = getFomoMessage(leadPurchaseCounts[lead.id] || 0);
+                      return (
+                        <span className={`inline-flex items-center text-xs font-medium px-2 py-1 rounded border mt-1 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ${fomo.className}`}>
+                          {fomo.icon} {fomo.text}
+                        </span>
+                      );
+                    })()}
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="grid grid-cols-2 gap-2 text-sm">

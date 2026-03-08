@@ -363,8 +363,8 @@ const FirmaLeadler = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedLead(null)}>Kapat</Button>
             <Button onClick={() => { if (selectedLead) handlePurchase(selectedLead.id); }} disabled={purchasing}>
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              Ödemeye Geç ($20)
+              <Coins className="h-4 w-4 mr-2" />
+              Lead Aç (20 Jeton)
             </Button>
           </DialogFooter>
         </DialogContent>

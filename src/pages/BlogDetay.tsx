@@ -49,8 +49,8 @@ const BlogDetay = () => {
 
       // Match by service category
       if (post?.category_slug) {
-        const catObj = categories.find((c) => c.slug === post.category_slug);
-        if (catObj) query = query.contains("services", [catObj.name]);
+        const catObj = CATEGORIES.find((c) => c.slug === post.category_slug);
+        if (catObj) query = query.contains("services", [catObj.label]);
       }
 
       const { data } = await query;

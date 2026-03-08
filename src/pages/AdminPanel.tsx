@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle, Plus, Coins } from "lucide-react";
+import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
 

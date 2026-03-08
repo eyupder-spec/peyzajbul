@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import FirmCard from "@/components/FirmCard";
 import { useApprovedFirms } from "@/hooks/useFirms";
 import { CITIES } from "@/lib/cities";
+import { SERVICE_LABELS } from "@/lib/categories";
 import { Helmet } from "react-helmet-async";
 
 const Firmalar = () => {

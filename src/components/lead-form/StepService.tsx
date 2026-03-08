@@ -1,4 +1,5 @@
 import { LeadFormData } from "@/lib/leadFormData";
+import { CATEGORIES } from "@/lib/categories";
 
 interface StepServiceProps {
   data: LeadFormData;
@@ -6,11 +7,7 @@ interface StepServiceProps {
 }
 
 const services = [
-  { value: "bahce-duzenleme", label: "Bahçe Düzenleme", icon: "🌿" },
-  { value: "agac-budama", label: "Ağaç Budama & Bakım", icon: "🌳" },
-  { value: "sulama-sistemi", label: "Sulama Sistemi", icon: "💧" },
-  { value: "peyzaj-tasarimi", label: "Peyzaj Tasarımı", icon: "🪨" },
-  { value: "cim-serimi", label: "Çim Serimi", icon: "🏡" },
+  ...CATEGORIES.slice(0, 9).map((c) => ({ value: c.slug, label: c.label, icon: c.icon })),
   { value: "diger", label: "Diğer", icon: "🔧" },
 ];
 

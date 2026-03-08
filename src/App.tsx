@@ -15,6 +15,8 @@ import FirmaLeadler from "./pages/FirmaLeadler";
 import FirmaJeton from "./pages/FirmaJeton";
 import AdminGiris from "./pages/AdminGiris";
 import AdminPanel from "./pages/AdminPanel";
+import Kategoriler from "./pages/Kategoriler";
+import KategoriDetay from "./pages/KategoriDetay";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/firmalar" element={<Firmalar />} />
           <Route path="/firma/:slug" element={<FirmaDetay />} />
+          <Route path="/kategoriler" element={<Kategoriler />} />
+          <Route path="/kategoriler/:slug" element={<KategoriDetay />} />
           <Route path="/iller" element={<Iller />} />
           <Route path="/iller/:slug" element={<IlFirmalari />} />
           <Route path="/hesabim" element={<Hesabim />} />

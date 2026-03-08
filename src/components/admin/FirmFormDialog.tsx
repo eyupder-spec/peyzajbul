@@ -157,6 +157,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
         if (authError) throw authError;
         if (!authData?.user_id) throw new Error("Kullanıcı oluşturulamadı.");
 
+        const firmSlug = generateFirmSlug(form.company_name, authData.user_id);
         const { error } = await supabase.from("firms").insert({
           user_id: authData.user_id,
           company_name: form.company_name,
@@ -166,6 +167,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           district: form.district || null,
           address: form.address || null,
           website: form.website || null,
+          slug: firmSlug,
           description: form.description || null,
           services: form.services,
           is_approved: form.is_approved,

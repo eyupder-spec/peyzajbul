@@ -76,6 +76,7 @@ type FirmData = {
   website: string;
   description: string;
   services: string[];
+  telegram_chat_id: string;
 };
 
 const FirmaProfil = () => {
@@ -99,6 +100,7 @@ const FirmaProfil = () => {
     website: "",
     description: "",
     services: [],
+    telegram_chat_id: "",
   });
 
   useEffect(() => {
@@ -115,7 +117,7 @@ const FirmaProfil = () => {
 
       const { data: firm } = await supabase
         .from("firms")
-        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved, logo_url")
+        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved, logo_url, telegram_chat_id")
         .eq("user_id", user.id)
         .single();
 
@@ -136,6 +138,7 @@ const FirmaProfil = () => {
         website: firm.website || "",
         description: firm.description || "",
         services: firm.services || [],
+        telegram_chat_id: (firm as any).telegram_chat_id || "",
       });
       setLoading(false);
     };
@@ -195,8 +198,9 @@ const FirmaProfil = () => {
         website: form.website || null,
         description: form.description || null,
         services: form.services,
+        telegram_chat_id: form.telegram_chat_id || null,
         is_approved: false, // Goes back to pending approval
-      }).eq("id", firmId);
+      } as any).eq("id", firmId);
 
       if (error) throw error;
 
@@ -329,6 +333,19 @@ const FirmaProfil = () => {
                   <div className="space-y-1.5">
                     <Label>Açıklama</Label>
                     <Textarea value={form.description} onChange={(e) => update({ description: e.target.value })} rows={3} />
+                  </div>
+
+                  {/* Telegram Bildirim */}
+                  <div className="space-y-1.5">
+                    <Label>Telegram Chat ID (Bildirim)</Label>
+                    <Input
+                      placeholder="Örn: 123456789"
+                      value={form.telegram_chat_id}
+                      onChange={(e) => update({ telegram_chat_id: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Yeni lead geldiğinde Telegram'dan bildirim almak için: @userinfobot'a mesaj atıp Chat ID'nizi öğrenin, ardından @PeyzajRehberiBot'u başlatın.
+                    </p>
                   </div>
 
                   <div className="space-y-1.5">

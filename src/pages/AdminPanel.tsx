@@ -123,12 +123,32 @@ const AdminPanel = () => {
     setEditingStatus(null);
   };
 
-  const handleToggleFirmActive = async (userId: string, currentRole: string) => {
-    // Toggle by deleting/re-adding firm role
-    if (currentRole === "firm") {
-      await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "firm");
-      setRoles((prev) => prev.filter((r) => !(r.user_id === userId && r.role === "firm")));
-      toast({ title: "Firma devre dışı bırakıldı" });
+  const handleApproveFirm = async (firmId: string) => {
+    const { error } = await supabase.from("firms").update({ is_approved: true }).eq("id", firmId);
+    if (error) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    } else {
+      setFirmsData((prev) => prev.map((f) => f.id === firmId ? { ...f, is_approved: true } : f));
+      toast({ title: "Firma onaylandı!" });
+    }
+  };
+
+  const handleRejectFirm = async (firmId: string, userId: string) => {
+    // Delete firm record and remove firm role
+    await supabase.from("firms").delete().eq("id", firmId);
+    await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "firm");
+    setFirmsData((prev) => prev.filter((f) => f.id !== firmId));
+    setRoles((prev) => prev.filter((r) => !(r.user_id === userId && r.role === "firm")));
+    toast({ title: "Firma başvurusu reddedildi" });
+  };
+
+  const handleToggleFirmActive = async (firmId: string, currentActive: boolean) => {
+    const { error } = await supabase.from("firms").update({ is_active: !currentActive }).eq("id", firmId);
+    if (error) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    } else {
+      setFirmsData((prev) => prev.map((f) => f.id === firmId ? { ...f, is_active: !currentActive } : f));
+      toast({ title: currentActive ? "Firma devre dışı bırakıldı" : "Firma aktifleştirildi" });
     }
   };
 

@@ -248,11 +248,14 @@ const FirmaLeadler = () => {
                             <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
                               {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
                             </Badge>
-                            {!isPurchased && getFomoMessage(leadPurchaseCounts[lead.id] || 0) && (
-                              <span className={`inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded border ${getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.className}`}>
-                                🔥 {getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.text}
-                              </span>
-                            )}
+                            {!isPurchased && (() => {
+                              const fomo = getFomoMessage(leadPurchaseCounts[lead.id] || 0);
+                              return (
+                                <span className={`inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded border animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ${fomo.className}`}>
+                                  {fomo.icon} {fomo.text}
+                                </span>
+                              );
+                            })()}
                           </div>
                         </td>
                         <td className="px-4 py-3">

@@ -106,7 +106,7 @@ const FirmaLeadler = () => {
       setCoinBalance(firm?.coin_balance || 0);
 
       const { data: leadsData } = await supabase
-        .from("leads")
+        .from("leads_for_firms" as any)
         .select("*")
         .order("created_at", { ascending: false });
 

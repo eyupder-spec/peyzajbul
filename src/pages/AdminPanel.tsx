@@ -477,6 +477,14 @@ const AdminPanel = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Firm form dialog */}
+      <FirmFormDialog
+        open={firmFormOpen}
+        onClose={() => { setFirmFormOpen(false); setEditingFirm(null); }}
+        onSaved={() => checkAdmin()}
+        initialData={editingFirm}
+      />
     </div>
   );
 };

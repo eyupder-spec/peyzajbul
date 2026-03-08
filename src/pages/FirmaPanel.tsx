@@ -440,11 +440,11 @@ const FirmaPanel = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Ad Soyad</p>
-                    <p className="font-medium text-foreground">{maskName(selectedLead.full_name)}</p>
+                    <p className="font-medium text-foreground">{selectedLead.full_name}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Telefon</p>
-                    <p className="font-medium text-foreground">{maskPhone(selectedLead.phone)}</p>
+                    <p className="font-medium text-foreground">{selectedLead.phone}</p>
                   </div>
                 </div>
               </div>

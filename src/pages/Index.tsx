@@ -16,10 +16,10 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <Hero onTeklifAl={() => setFormOpen(true)} />
+      <FeaturedFirms />
       <HowItWorks />
       <PopularCategories />
       <FeaturedCities />
-      <FeaturedFirms />
       <TrustBadges />
       <Footer />
       <LeadFormModal open={formOpen} onClose={() => setFormOpen(false)} />

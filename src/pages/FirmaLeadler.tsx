@@ -244,9 +244,16 @@ const FirmaLeadler = () => {
                           </Tooltip>
                         </td>
                         <td className="px-4 py-3">
-                          <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
-                            {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
-                          </Badge>
+                          <div className="flex flex-col gap-1">
+                            <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
+                              {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
+                            </Badge>
+                            {!isPurchased && getFomoMessage(leadPurchaseCounts[lead.id] || 0) && (
+                              <span className={`inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded border ${getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.className}`}>
+                                🔥 {getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.text}
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           {isPurchased ? (

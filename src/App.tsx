@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Firmalar from "./pages/Firmalar";
 import Hesabim from "./pages/Hesabim";
+import FirmaPanel from "./pages/FirmaPanel";
+import FirmaLeadler from "./pages/FirmaLeadler";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +22,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/firmalar" element={<Firmalar />} />
           <Route path="/hesabim" element={<Hesabim />} />
+          <Route path="/firma/panel" element={<FirmaPanel />} />
+          <Route path="/firma/leadler" element={<FirmaLeadler />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

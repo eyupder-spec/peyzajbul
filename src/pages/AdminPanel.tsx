@@ -29,6 +29,7 @@ type Firm = {
   email: string;
   city: string;
   district: string | null;
+  address: string | null;
   website: string | null;
   description: string | null;
   services: string[];

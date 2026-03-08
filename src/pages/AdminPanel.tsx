@@ -73,6 +73,10 @@ const AdminPanel = () => {
   // Status edit
   const [editingStatus, setEditingStatus] = useState<{ id: string; status: string } | null>(null);
 
+  // Firm form dialog
+  const [firmFormOpen, setFirmFormOpen] = useState(false);
+  const [editingFirm, setEditingFirm] = useState<FirmFormData | null>(null);
+
   const checkAdmin = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { navigate("/admin/giris"); return; }

@@ -293,7 +293,7 @@ const FirmaDetay = () => {
                     const coordMatch = url.match(/!2d([\d.]+)!3d([\d.]+)/) || url.match(/q=([\d.-]+),([\d.-]+)/);
                     const destination = coordMatch
                       ? `${coordMatch[2]},${coordMatch[1]}`
-                      : encodeURIComponent(firm.address ? `${firm.address}, ${firm.city}` : `${firm.company_name}, ${firm.city}`);
+                      : encodeURIComponent(`${firm.company_name}, ${firm.city}`);
                     return (
                       <a
                         href={`https://www.google.com/maps/dir/?api=1&destination=${destination}`}

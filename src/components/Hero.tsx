@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
+import heroBg from "@/assets/hero-bg.jpg";
 
 interface HeroProps {
   onTeklifAl: () => void;
@@ -9,8 +10,15 @@ interface HeroProps {
 const Hero = ({ onTeklifAl }: HeroProps) => {
   return (
     <section className="relative pt-16">
-      <div className="bg-primary">
-        <div className="container mx-auto px-4 py-20 md:py-32 text-center">
+      <div className="relative bg-primary overflow-hidden">
+        <img
+          src={heroBg}
+          alt="Peyzaj bahçe tasarımı"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-primary/70" />
+        <div className="container mx-auto px-4 py-20 md:py-32 text-center relative z-10">
           <h1 className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6 leading-tight animate-fade-in">
             Türkiye'nin En İyi Peyzaj
             <br />

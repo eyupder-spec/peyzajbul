@@ -28,6 +28,10 @@ export type FirmFormData = {
   is_approved: boolean;
   is_active: boolean;
   user_id?: string;
+  is_premium?: boolean;
+  premium_until?: string;
+  google_maps_url?: string;
+  detailed_services?: { title: string; description: string }[];
 };
 
 const emptyForm: FirmFormData = {

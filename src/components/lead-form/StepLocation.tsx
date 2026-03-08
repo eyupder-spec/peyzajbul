@@ -1,4 +1,5 @@
 import { LeadFormData, TURKISH_CITIES } from "@/lib/leadFormData";
+import { DISTRICTS_BY_CITY } from "@/lib/districts";
 
 interface StepLocationProps {
   data: LeadFormData;
@@ -6,6 +7,8 @@ interface StepLocationProps {
 }
 
 const StepLocation = ({ data, onChange }: StepLocationProps) => {
+  const availableDistricts = data.city ? (DISTRICTS_BY_CITY[data.city] || []) : [];
+
   return (
     <div>
       <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
@@ -19,7 +22,7 @@ const StepLocation = ({ data, onChange }: StepLocationProps) => {
           <label className="block text-sm font-medium text-foreground mb-1.5 font-body">İl *</label>
           <select
             value={data.city}
-            onChange={(e) => onChange({ city: e.target.value })}
+            onChange={(e) => onChange({ city: e.target.value, district: "" })}
             className="w-full px-4 py-2.5 rounded-md border border-input bg-background text-sm font-body focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">İl seçiniz</option>
@@ -30,13 +33,17 @@ const StepLocation = ({ data, onChange }: StepLocationProps) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-foreground mb-1.5 font-body">İlçe</label>
-          <input
-            type="text"
+          <select
             value={data.district}
             onChange={(e) => onChange({ district: e.target.value })}
-            placeholder="İlçe adı"
-            className="w-full px-4 py-2.5 rounded-md border border-input bg-background text-sm font-body focus:outline-none focus:ring-2 focus:ring-ring"
-          />
+            disabled={!data.city}
+            className="w-full px-4 py-2.5 rounded-md border border-input bg-background text-sm font-body focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+          >
+            <option value="">{data.city ? "İlçe seçiniz" : "Önce il seçiniz"}</option>
+            {availableDistricts.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-foreground mb-1.5 font-body">Açık Adres (opsiyonel)</label>

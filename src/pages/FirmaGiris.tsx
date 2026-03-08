@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { Building2, LogIn, UserPlus, CheckCircle } from "lucide-react";
 import { TURKISH_CITIES } from "@/lib/leadFormData";
+import { DISTRICTS_BY_CITY } from "@/lib/districts";
 
 const SERVICE_OPTIONS = [
   "Bahçe Düzenleme",
@@ -22,6 +23,42 @@ const SERVICE_OPTIONS = [
   "Çim Serimi",
   "Diğer",
 ];
+
+type FormErrors = Record<string, string>;
+
+const validateEmail = (email: string): string | null => {
+  if (!email.trim()) return "E-posta adresi zorunludur.";
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!re.test(email)) return "Geçerli bir e-posta adresi girin.";
+  return null;
+};
+
+const validatePhone = (phone: string): string | null => {
+  if (!phone.trim()) return "Telefon numarası zorunludur.";
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 10 || digits.length > 11) return "Telefon numarası 10-11 haneli olmalıdır.";
+  if (!digits.startsWith("05") && !digits.startsWith("5")) return "Telefon numarası 05 ile başlamalıdır.";
+  return null;
+};
+
+const validatePassword = (password: string): string | null => {
+  if (!password) return "Şifre zorunludur.";
+  if (password.length < 8) return "Şifre en az 8 karakter olmalıdır.";
+  if (!/[A-Z]/.test(password)) return "Şifre en az 1 büyük harf içermelidir.";
+  if (!/[0-9]/.test(password)) return "Şifre en az 1 rakam içermelidir.";
+  return null;
+};
+
+const validateWebsite = (url: string): string | null => {
+  if (!url.trim()) return null; // optional
+  try {
+    const u = new URL(url.startsWith("http") ? url : `https://${url}`);
+    if (!u.hostname.includes(".")) return "Geçerli bir web adresi girin.";
+    return null;
+  } catch {
+    return "Geçerli bir web adresi girin (örn: https://firma.com).";
+  }
+};
 
 const FirmaGiris = () => {
   const navigate = useNavigate();
@@ -41,9 +78,29 @@ const FirmaGiris = () => {
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
   const [address, setAddress] = useState("");
-  const [taxNumber, setTaxNumber] = useState("");
+  const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
   const [services, setServices] = useState<string[]>([]);
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const availableDistricts = city ? (DISTRICTS_BY_CITY[city] || []) : [];
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    const emailErr = validateEmail(signupEmail);
+    if (emailErr) newErrors.email = emailErr;
+    const phoneErr = validatePhone(phone);
+    if (phoneErr) newErrors.phone = phoneErr;
+    const passErr = validatePassword(signupPassword);
+    if (passErr) newErrors.password = passErr;
+    const webErr = validateWebsite(website);
+    if (webErr) newErrors.website = webErr;
+    if (!companyName.trim()) newErrors.companyName = "Firma adı zorunludur.";
+    if (!city) newErrors.city = "İl seçimi zorunludur.";
+    if (services.length === 0) newErrors.services = "En az bir hizmet türü seçin.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +126,6 @@ const FirmaGiris = () => {
         throw new Error("Bu hesap firma hesabı değil.");
       }
 
-      // Check if firm is approved
       const { data: firm } = await supabase
         .from("firms")
         .select("is_approved")
@@ -92,14 +148,8 @@ const FirmaGiris = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!companyName.trim() || !phone.trim() || !city) {
-      toast({ title: "Hata", description: "Zorunlu alanları doldurun.", variant: "destructive" });
-      return;
-    }
-    if (services.length === 0) {
-      toast({ title: "Hata", description: "En az bir hizmet türü seçin.", variant: "destructive" });
-      return;
-    }
+    if (!validateForm()) return;
+
     setLoading(true);
     try {
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -113,11 +163,13 @@ const FirmaGiris = () => {
       if (signUpError) throw signUpError;
 
       if (signUpData.user) {
-        // Assign firm role
         const { error: roleError } = await supabase.functions.invoke("assign-firm-role");
         if (roleError) throw roleError;
 
-        // Create firm record (unapproved by default)
+        const websiteValue = website.trim()
+          ? (website.startsWith("http") ? website.trim() : `https://${website.trim()}`)
+          : null;
+
         const { error: firmError } = await supabase.from("firms").insert({
           user_id: signUpData.user.id,
           company_name: companyName,
@@ -126,14 +178,13 @@ const FirmaGiris = () => {
           city,
           district: district || null,
           address: address || null,
-          tax_number: taxNumber || null,
+          website: websiteValue,
           description: description || null,
           services,
           is_approved: false,
         });
         if (firmError) throw firmError;
 
-        // Sign out — they need admin approval first
         await supabase.auth.signOut();
         setSignupSuccess(true);
       }
@@ -148,6 +199,12 @@ const FirmaGiris = () => {
     setServices((prev) =>
       prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
     );
+    if (errors.services) setErrors((p) => ({ ...p, services: "" }));
+  };
+
+  const FieldError = ({ field }: { field: string }) => {
+    if (!errors[field]) return null;
+    return <p className="text-sm text-destructive mt-1">{errors[field]}</p>;
   };
 
   if (signupSuccess) {
@@ -211,27 +268,29 @@ const FirmaGiris = () => {
 
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4 mt-4">
-                  {/* Company info */}
                   <div className="space-y-2">
                     <Label htmlFor="company-name">Firma Adı *</Label>
-                    <Input id="company-name" placeholder="Örn: Yeşil Peyzaj Ltd." value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+                    <Input id="company-name" placeholder="Örn: Yeşil Peyzaj Ltd." value={companyName} onChange={(e) => { setCompanyName(e.target.value); if (errors.companyName) setErrors((p) => ({ ...p, companyName: "" })); }} />
+                    <FieldError field="companyName" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label htmlFor="signup-phone">Telefon *</Label>
-                      <Input id="signup-phone" type="tel" placeholder="05XX XXX XX XX" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                      <Input id="signup-phone" type="tel" placeholder="05XX XXX XX XX" value={phone} onChange={(e) => { setPhone(e.target.value); if (errors.phone) setErrors((p) => ({ ...p, phone: "" })); }} />
+                      <FieldError field="phone" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="tax-number">Vergi No</Label>
-                      <Input id="tax-number" placeholder="Opsiyonel" value={taxNumber} onChange={(e) => setTaxNumber(e.target.value)} />
+                      <Label htmlFor="website">Web Sitesi</Label>
+                      <Input id="website" type="url" placeholder="https://firma.com" value={website} onChange={(e) => { setWebsite(e.target.value); if (errors.website) setErrors((p) => ({ ...p, website: "" })); }} />
+                      <FieldError field="website" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label>İl *</Label>
-                      <Select value={city} onValueChange={setCity}>
+                      <Select value={city} onValueChange={(val) => { setCity(val); setDistrict(""); if (errors.city) setErrors((p) => ({ ...p, city: "" })); }}>
                         <SelectTrigger><SelectValue placeholder="İl seçin" /></SelectTrigger>
                         <SelectContent>
                           {TURKISH_CITIES.map((c) => (
@@ -239,10 +298,18 @@ const FirmaGiris = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                      <FieldError field="city" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="district">İlçe</Label>
-                      <Input id="district" placeholder="İlçe" value={district} onChange={(e) => setDistrict(e.target.value)} />
+                      <Label>İlçe</Label>
+                      <Select value={district} onValueChange={setDistrict} disabled={!city}>
+                        <SelectTrigger><SelectValue placeholder={city ? "İlçe seçin" : "Önce il seçin"} /></SelectTrigger>
+                        <SelectContent>
+                          {availableDistricts.map((d) => (
+                            <SelectItem key={d} value={d}>{d}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
@@ -264,6 +331,7 @@ const FirmaGiris = () => {
                         </label>
                       ))}
                     </div>
+                    <FieldError field="services" />
                   </div>
 
                   <div className="space-y-2">
@@ -275,11 +343,13 @@ const FirmaGiris = () => {
                     <p className="text-sm font-medium text-muted-foreground">Hesap Bilgileri</p>
                     <div className="space-y-2">
                       <Label htmlFor="signup-email">E-posta *</Label>
-                      <Input id="signup-email" type="email" placeholder="firma@ornek.com" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} required />
+                      <Input id="signup-email" type="email" placeholder="firma@ornek.com" value={signupEmail} onChange={(e) => { setSignupEmail(e.target.value); if (errors.email) setErrors((p) => ({ ...p, email: "" })); }} />
+                      <FieldError field="email" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signup-password">Şifre *</Label>
-                      <Input id="signup-password" type="password" placeholder="Min. 6 karakter" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} minLength={6} required />
+                      <Input id="signup-password" type="password" placeholder="Min. 8 karakter, 1 büyük harf, 1 rakam" value={signupPassword} onChange={(e) => { setSignupPassword(e.target.value); if (errors.password) setErrors((p) => ({ ...p, password: "" })); }} />
+                      <FieldError field="password" />
                     </div>
                   </div>
 

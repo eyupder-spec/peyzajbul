@@ -29,7 +29,7 @@ type Firm = {
   email: string;
   city: string;
   district: string | null;
-  tax_number: string | null;
+  website: string | null;
   description: string | null;
   services: string[];
   is_approved: boolean;
@@ -651,7 +651,7 @@ const AdminPanel = () => {
                                   <span>📧 {firm.email}</span>
                                   <span>📞 {firm.phone}</span>
                                   <span>📍 {firm.city}{firm.district ? ` / ${firm.district}` : ""}</span>
-                                  {firm.tax_number && <span>🏢 VN: {firm.tax_number}</span>}
+                                  {firm.website && <span>🌐 {firm.website}</span>}
                                 </div>
                                 {firm.services.length > 0 && (
                                   <div className="flex flex-wrap gap-1 mt-1">
@@ -724,7 +724,7 @@ const AdminPanel = () => {
                                   city: firm.city,
                                   district: firm.district || "",
                                   address: "",
-                                  tax_number: firm.tax_number || "",
+                                  website: (firm as any).website || "",
                                   description: firm.description || "",
                                   services: firm.services,
                                   is_approved: firm.is_approved,

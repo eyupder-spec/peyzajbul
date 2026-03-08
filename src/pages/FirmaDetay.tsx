@@ -13,6 +13,8 @@ import { useState } from "react";
 const FirmaDetay = () => {
   const { slug } = useParams<{ slug: string }>();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showPhone, setShowPhone] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
 
   const { data: firms, isLoading } = useApprovedFirms();
   // Try matching by slug first, then fall back to short ID

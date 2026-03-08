@@ -85,8 +85,12 @@ const FirmaDetay = () => {
               <span className="text-primary-foreground">{firm.company_name}</span>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-xl bg-primary-foreground/10 flex items-center justify-center">
-                <Building2 className="h-8 w-8 text-primary-foreground" />
+              <div className="w-16 h-16 rounded-xl bg-primary-foreground/10 flex items-center justify-center overflow-hidden">
+                {firm.logo_url ? (
+                  <img src={firm.logo_url} alt={firm.company_name} className="w-full h-full object-cover" />
+                ) : (
+                  <Building2 className="h-8 w-8 text-primary-foreground" />
+                )}
               </div>
               <div>
                 <div className="flex items-center gap-3">

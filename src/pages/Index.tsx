@@ -31,6 +31,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Peyzaj Rehberi – Türkiye'nin En İyi Peyzaj Firmaları</title>
+        <meta name="description" content="Türkiye genelinde en iyi peyzaj firmalarını karşılaştırın. 81 ilde bahçe tasarımı, peyzaj mimarlığı, sulama sistemleri ve daha fazlası. Ücretsiz teklif alın." />
+        <link rel="canonical" href="https://peyzaj-rehberi-turkiye.lovable.app/" />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
       <Navbar />
       <Hero onTeklifAl={() => setFormOpen(true)} />
       <FeaturedFirms />

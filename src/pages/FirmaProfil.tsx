@@ -198,8 +198,9 @@ const FirmaProfil = () => {
         website: form.website || null,
         description: form.description || null,
         services: form.services,
+        telegram_chat_id: form.telegram_chat_id || null,
         is_approved: false, // Goes back to pending approval
-      }).eq("id", firmId);
+      } as any).eq("id", firmId);
 
       if (error) throw error;
 

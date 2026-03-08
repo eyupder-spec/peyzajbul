@@ -123,6 +123,20 @@ const FirmaPanel = () => {
   const [purchasing, setPurchasing] = useState(false);
   const [userId, setUserId] = useState("");
 
+  // Realtime browser + sound notifications
+  useLeadNotifications(userId || null, () => {
+    // Refresh leads on new lead
+    const refreshLeads = async () => {
+      const { data: leadsData } = await supabase
+        .from("leads_for_firms" as any)
+        .select("*")
+        .order("created_at", { ascending: false }) as { data: Lead[] | null };
+      setLeads(leadsData || []);
+      setStats(prev => ({ ...prev, totalLeads: leadsData?.length || 0 }));
+    };
+    refreshLeads();
+  });
+
   useEffect(() => {
     const checkAccess = async () => {
       const { data: { user } } = await supabase.auth.getUser();

@@ -281,6 +281,7 @@ const FirmaPanel = () => {
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Bütçe</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">İl</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Ad Soyad</th>
+                          <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Telefon</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Skor</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Durum</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Aksiyon</th>

@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Firmalar from "./pages/Firmalar";
 import Hesabim from "./pages/Hesabim";
 import FirmaPanel from "./pages/FirmaPanel";
+import FirmaGiris from "./pages/FirmaGiris";
 import FirmaLeadler from "./pages/FirmaLeadler";
 import NotFound from "./pages/NotFound";
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/firmalar" element={<Firmalar />} />
           <Route path="/hesabim" element={<Hesabim />} />
+          <Route path="/firma/giris" element={<FirmaGiris />} />
           <Route path="/firma/panel" element={<FirmaPanel />} />
           <Route path="/firma/leadler" element={<FirmaLeadler />} />
           <Route path="*" element={<NotFound />} />

@@ -13,7 +13,7 @@ const Navbar = () => {
     { label: "Ana Sayfa", to: "/" },
     { label: "Firmalar", to: "/firmalar" },
     { label: "Nasıl Çalışır", to: "/#nasil-calisir" },
-    { label: "Firma Girişi", to: "/#firma-girisi" },
+    { label: "Firma Girişi", to: "/firma/giris" },
   ];
 
   return (

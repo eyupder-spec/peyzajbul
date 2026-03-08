@@ -32,6 +32,7 @@ const FeaturedFirms = () => {
                 services={firm.services || []}
                 description={firm.description}
                 is_premium={firm.is_premium}
+                slug={firm.slug}
               />
             ))}
           </div>

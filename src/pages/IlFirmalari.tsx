@@ -83,6 +83,7 @@ const IlFirmalari = () => {
                   district={firm.district}
                   services={firm.services || []}
                   description={firm.description}
+                  slug={firm.slug}
                 />
               ))}
             </div>

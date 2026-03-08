@@ -79,7 +79,13 @@ const FirmaPanel = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-foreground">Firma Paneli</h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <Button onClick={() => navigate("/firma/premium")} variant="outline">
+                <Crown className="h-4 w-4 mr-2" /> Premium
+              </Button>
+              <Button onClick={() => navigate("/firma/galeri")} variant="outline">
+                <Image className="h-4 w-4 mr-2" /> Galeri
+              </Button>
               <Button onClick={() => navigate("/firma/jeton")} variant="outline">
                 <Coins className="h-4 w-4 mr-2" /> Jeton Yükle
               </Button>

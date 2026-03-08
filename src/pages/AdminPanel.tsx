@@ -317,9 +317,14 @@ const AdminPanel = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-foreground">Firma Yönetimi</h2>
-              {pendingFirmCount > 0 && (
-                <Badge variant="destructive">{pendingFirmCount} onay bekliyor</Badge>
-              )}
+              <div className="flex items-center gap-3">
+                {pendingFirmCount > 0 && (
+                  <Badge variant="destructive">{pendingFirmCount} onay bekliyor</Badge>
+                )}
+                <Button onClick={() => { setEditingFirm(null); setFirmFormOpen(true); }}>
+                  <Plus className="h-4 w-4 mr-2" /> Firma Ekle
+                </Button>
+              </div>
             </div>
 
             {/* Pending approvals */}

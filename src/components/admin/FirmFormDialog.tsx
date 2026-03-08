@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { generateFirmSlug } from "@/lib/firmUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ export type FirmFormData = {
   district: string;
   address: string;
   website: string;
+  slug: string;
   description: string;
   services: string[];
   is_approved: boolean;
@@ -44,6 +46,7 @@ const emptyForm: FirmFormData = {
   district: "",
   address: "",
   website: "",
+  slug: "",
   description: "",
   services: [],
   is_approved: true,
@@ -134,6 +137,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           district: form.district || null,
           address: form.address || null,
           website: form.website || null,
+          slug: form.slug || null,
           description: form.description || null,
           services: form.services,
           is_approved: form.is_approved,
@@ -153,6 +157,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
         if (authError) throw authError;
         if (!authData?.user_id) throw new Error("Kullanıcı oluşturulamadı.");
 
+        const firmSlug = generateFirmSlug(form.company_name, authData.user_id);
         const { error } = await supabase.from("firms").insert({
           user_id: authData.user_id,
           company_name: form.company_name,
@@ -162,6 +167,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           district: form.district || null,
           address: form.address || null,
           website: form.website || null,
+          slug: firmSlug,
           description: form.description || null,
           services: form.services,
           is_approved: form.is_approved,
@@ -257,6 +263,18 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
             <Label>Adres</Label>
             <Input value={form.address} onChange={(e) => update({ address: e.target.value })} />
           </div>
+
+          {isEdit && (
+            <div className="space-y-1.5">
+              <Label>Slug (URL yolu)</Label>
+              <Input
+                value={form.slug}
+                onChange={(e) => update({ slug: e.target.value })}
+                placeholder="firma-adi-12345678"
+              />
+              <p className="text-xs text-muted-foreground">Firmanın URL'de görünen benzersiz tanımlayıcısı. Dikkatli değiştirin.</p>
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <Label>Açıklama</Label>

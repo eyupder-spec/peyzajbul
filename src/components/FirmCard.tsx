@@ -12,10 +12,11 @@ type FirmCardProps = {
   services: string[];
   description?: string | null;
   is_premium?: boolean;
+  slug?: string | null;
 };
 
-const FirmCard = ({ id, company_name, city, district, services, description, is_premium }: FirmCardProps) => {
-  const slug = generateFirmSlug(company_name, id);
+const FirmCard = ({ id, company_name, city, district, services, description, is_premium, slug: dbSlug }: FirmCardProps) => {
+  const slug = dbSlug || generateFirmSlug(company_name, id);
 
   return (
     <div className={`bg-card rounded-lg border p-6 hover:shadow-lg transition-shadow group flex flex-col relative ${is_premium ? "border-primary/50 ring-1 ring-primary/20" : "border-border"}`}>

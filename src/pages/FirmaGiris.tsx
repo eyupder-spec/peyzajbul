@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { generateFirmSlug } from "@/lib/firmUtils";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -170,6 +171,8 @@ const FirmaGiris = () => {
           ? (website.startsWith("http") ? website.trim() : `https://${website.trim()}`)
           : null;
 
+        const firmSlug = generateFirmSlug(companyName, signUpData.user.id);
+
         const { error: firmError } = await supabase.from("firms").insert({
           user_id: signUpData.user.id,
           company_name: companyName,
@@ -182,6 +185,7 @@ const FirmaGiris = () => {
           description: description || null,
           services,
           is_approved: false,
+          slug: firmSlug,
         });
         if (firmError) throw firmError;
 

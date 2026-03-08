@@ -12,11 +12,11 @@ import { useState } from "react";
 
 const FirmaDetay = () => {
   const { slug } = useParams<{ slug: string }>();
-  const shortId = slug ? extractFirmIdFromSlug(slug) : "";
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const { data: firms, isLoading } = useApprovedFirms();
-  const firm = firms?.find((f) => f.id.startsWith(shortId));
+  // Try matching by slug first, then fall back to short ID
+  const firm = firms?.find((f) => f.slug === slug) || firms?.find((f) => f.id.startsWith(slug ? extractFirmIdFromSlug(slug) : ""));
 
   const { data: gallery } = useFirmGallery(firm?.id || "");
   const { data: reviews } = useFirmReviews(firm?.id || "");

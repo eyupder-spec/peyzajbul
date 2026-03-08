@@ -12,6 +12,7 @@ import {
 
 const FIRMA_MENU = [
   { title: "Özet", key: "panel", icon: FileText, path: "/firma/panel" },
+  { title: "Profil", key: "profil", icon: FileText, path: "/firma/profil" },
   { title: "Leadler", key: "leadler", icon: Users, path: "/firma/leadler" },
   { title: "Jeton Yükle", key: "jeton", icon: Coins, path: "/firma/jeton" },
   { title: "Premium", key: "premium", icon: Crown, path: "/firma/premium" },

@@ -147,6 +147,7 @@ export type Database = {
           phone: string
           premium_until: string | null
           services: string[] | null
+          slug: string | null
           tax_number: string | null
           updated_at: string
           user_id: string
@@ -170,6 +171,7 @@ export type Database = {
           phone: string
           premium_until?: string | null
           services?: string[] | null
+          slug?: string | null
           tax_number?: string | null
           updated_at?: string
           user_id: string
@@ -193,6 +195,7 @@ export type Database = {
           phone?: string
           premium_until?: string | null
           services?: string[] | null
+          slug?: string | null
           tax_number?: string | null
           updated_at?: string
           user_id?: string

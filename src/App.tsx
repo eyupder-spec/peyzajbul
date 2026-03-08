@@ -23,6 +23,7 @@ import KategoriDetay from "./pages/KategoriDetay";
 import Blog from "./pages/Blog";
 import BlogDetay from "./pages/BlogDetay";
 import Changelog from "./pages/Changelog";
+import FirmaSahiplen from "./pages/FirmaSahiplen";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/firma/profil" element={<FirmaProfil />} />
           <Route path="/admin/giris" element={<AdminGiris />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/firma/sahiplen/:firmId" element={<FirmaSahiplen />} />
           <Route path="/changelog" element={<Changelog />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

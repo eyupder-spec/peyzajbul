@@ -95,6 +95,50 @@ export type Database = {
         }
         Relationships: []
       }
+      claim_requests: {
+        Row: {
+          created_at: string
+          firm_id: string
+          id: string
+          note: string | null
+          phone: string
+          status: string
+          tax_number: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          firm_id: string
+          id?: string
+          note?: string | null
+          phone: string
+          status?: string
+          tax_number?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          firm_id?: string
+          id?: string
+          note?: string | null
+          phone?: string
+          status?: string
+          tax_number?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_requests_firm_id_fkey"
+            columns: ["firm_id"]
+            isOneToOne: false
+            referencedRelation: "firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coin_transactions: {
         Row: {
           amount: number
@@ -231,6 +275,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_approved: boolean
+          is_claimed: boolean
           is_premium: boolean
           logo_url: string | null
           phone: string
@@ -257,6 +302,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_approved?: boolean
+          is_claimed?: boolean
           is_premium?: boolean
           logo_url?: string | null
           phone: string
@@ -283,6 +329,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_approved?: boolean
+          is_claimed?: boolean
           is_premium?: boolean
           logo_url?: string | null
           phone?: string

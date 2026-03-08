@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import PopularCategories from "@/components/PopularCategories";
+import FeaturedCities from "@/components/FeaturedCities";
 import FeaturedFirms from "@/components/FeaturedFirms";
 import TrustBadges from "@/components/TrustBadges";
 import Footer from "@/components/Footer";

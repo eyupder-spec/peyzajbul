@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      firms: {
+        Row: {
+          address: string | null
+          city: string
+          company_name: string
+          created_at: string
+          description: string | null
+          district: string | null
+          email: string
+          id: string
+          is_active: boolean
+          is_approved: boolean
+          phone: string
+          services: string[] | null
+          tax_number: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          city: string
+          company_name: string
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          email: string
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          phone: string
+          services?: string[] | null
+          tax_number?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          city?: string
+          company_name?: string
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          email?: string
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          phone?: string
+          services?: string[] | null
+          tax_number?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lead_purchases: {
         Row: {
           amount: number

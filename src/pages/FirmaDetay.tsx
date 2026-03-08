@@ -299,6 +299,14 @@ const FirmaDetay = () => {
                 </div>
               )}
 
+              {!(firm as any).is_claimed && (
+                <Link to={`/firma/sahiplen/${firm.id}`}>
+                  <Button variant="gold" className="w-full gap-2">
+                    <Building2 className="h-4 w-4" /> Bu İşletme Senin Mi?
+                  </Button>
+                </Link>
+              )}
+
               <Link to={`/iller/${citySlug}-peyzaj-firmalari`}>
                 <Button variant="outline" className="w-full">
                   {firm.city} İlindeki Diğer Firmalar

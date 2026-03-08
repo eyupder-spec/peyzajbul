@@ -772,6 +772,9 @@ const AdminPanel = () => {
               </div>
             )}
 
+            {/* Claims */}
+            {tab === "claims" && <AdminClaimTab />}
+
             {/* Blog */}
             {tab === "blog" && <AdminBlogTab />}
 

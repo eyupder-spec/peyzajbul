@@ -151,8 +151,30 @@ const FirmaProfil = () => {
       services: p.services.includes(s) ? p.services.filter((x) => x !== s) : [...p.services, s],
     }));
   };
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !firmId) return;
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${firmId}/logo.${ext}`;
+      // Remove old logo if exists
+      await supabase.storage.from("firm-logos").remove([path]);
+      const { error: uploadError } = await supabase.storage.from("firm-logos").upload(path, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from("firm-logos").getPublicUrl(path);
+      const url = publicUrl + "?t=" + Date.now();
+      await supabase.from("firms").update({ logo_url: url }).eq("id", firmId);
+      setLogoUrl(url);
+      toast({ title: "Logo güncellendi!" });
+    } catch (err: any) {
+      toast({ title: "Logo yüklenemedi", description: err.message, variant: "destructive" });
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
 
-  const handleSave = async () => {
+
     if (!form.company_name || !form.phone || !form.email || !form.city) {
       toast({ title: "Hata", description: "Firma adı, telefon, e-posta ve il zorunludur.", variant: "destructive" });
       return;

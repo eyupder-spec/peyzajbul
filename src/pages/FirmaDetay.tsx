@@ -287,15 +287,25 @@ const FirmaDetay = () => {
                       title="Firma konumu"
                     />
                   </div>
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(firm.company_name + " " + firm.city)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="outline" size="sm" className="w-full gap-2">
-                      <MapPin className="h-4 w-4" /> Yol Tarifi Al
-                    </Button>
-                  </a>
+                  {(() => {
+                    // Extract coordinates from embed URL (e.g. !2d28.979!3d41.015 or q=41.015,28.979)
+                    const url = firm.google_maps_url || "";
+                    const coordMatch = url.match(/!2d([\d.]+)!3d([\d.]+)/) || url.match(/q=([\d.-]+),([\d.-]+)/);
+                    const destination = coordMatch
+                      ? `${coordMatch[2]},${coordMatch[1]}`
+                      : encodeURIComponent(`${firm.company_name}, ${firm.city}`);
+                    return (
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${destination}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button variant="outline" size="sm" className="w-full gap-2">
+                          <MapPin className="h-4 w-4" /> Yol Tarifi Al
+                        </Button>
+                      </a>
+                    );
+                  })()}
                 </div>
               )}
 

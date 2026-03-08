@@ -65,6 +65,8 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
   const [saving, setSaving] = useState(false);
   const [crawling, setCrawling] = useState(false);
   const [crawlUrl, setCrawlUrl] = useState("");
+  const [newServiceTitle, setNewServiceTitle] = useState("");
+  const [newServiceDesc, setNewServiceDesc] = useState("");
 
   const update = (partial: Partial<FirmFormData>) => setForm((p) => ({ ...p, ...partial }));
 

@@ -90,6 +90,13 @@ const FirmaLeadler = () => {
 
       if (!roles || roles.length === 0) { navigate("/"); return; }
 
+      const { data: firm } = await supabase
+        .from("firms")
+        .select("coin_balance")
+        .eq("user_id", user.id)
+        .single();
+      setCoinBalance(firm?.coin_balance || 0);
+
       const { data: leadsData } = await supabase
         .from("leads")
         .select("*")

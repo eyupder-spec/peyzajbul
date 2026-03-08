@@ -100,6 +100,7 @@ const FirmaProfil = () => {
     website: "",
     description: "",
     services: [],
+    telegram_chat_id: "",
   });
 
   useEffect(() => {

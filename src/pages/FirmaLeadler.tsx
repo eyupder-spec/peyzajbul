@@ -328,9 +328,21 @@ const FirmaLeadler = () => {
 
               <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground">Lead Skoru:</p>
-                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getScoreColor(selectedLead.lead_score)}`}>
-                  {selectedLead.lead_score || 0}
-                </span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium cursor-help ${getScoreBadge(selectedLead.lead_score).className}`}>
+                      {getScoreBadge(selectedLead.lead_score).emoji} {selectedLead.lead_score || 0} — {getScoreBadge(selectedLead.lead_score).label}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    {getScoreBreakdown(selectedLead).map((item, i) => (
+                      <div key={i} className="flex justify-between text-xs gap-4">
+                        <span>{item.label}</span>
+                        <span className="font-mono">+{item.points}</span>
+                      </div>
+                    ))}
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           )}

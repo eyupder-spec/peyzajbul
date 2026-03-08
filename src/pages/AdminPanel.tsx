@@ -18,6 +18,7 @@ import { getScoreBadge } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
 import AdminBlogTab from "@/components/admin/AdminBlogTab";
 import AdminChangelogTab from "@/components/admin/AdminChangelogTab";
+import AdminClaimTab from "@/components/admin/AdminClaimTab";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,

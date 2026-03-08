@@ -18,6 +18,7 @@ const Index = () => {
       <Hero onTeklifAl={() => setFormOpen(true)} />
       <HowItWorks />
       <PopularCategories />
+      <FeaturedCities />
       <FeaturedFirms />
       <TrustBadges />
       <Footer />

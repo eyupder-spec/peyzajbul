@@ -603,12 +603,17 @@ const AdminPanel = () => {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {firmsData.filter((f) => f.is_approved).map((firm) => {
-                    const firmPurchases = purchases.filter((p) => p.firm_id === firm.user_id);
                     return (
                       <tr key={firm.id} className="hover:bg-muted/50">
                         <td className="px-3 py-2 text-foreground font-medium">{firm.company_name}</td>
                         <td className="px-3 py-2 text-foreground">{firm.city}</td>
-                        <td className="px-3 py-2 text-foreground">{firm.phone}</td>
+                        <td className="px-3 py-2">
+                          {firm.is_premium ? (
+                            <Badge className="bg-yellow-500/90 text-white gap-1"><Crown className="h-3 w-3" /> Premium</Badge>
+                          ) : (
+                            <Badge variant="outline">Standart</Badge>
+                          )}
+                        </td>
                         <td className="px-3 py-2">
                           <div className="flex flex-wrap gap-1">
                             {firm.services.slice(0, 2).map((s) => (
@@ -617,15 +622,14 @@ const AdminPanel = () => {
                             {firm.services.length > 2 && <Badge variant="outline" className="text-xs">+{firm.services.length - 2}</Badge>}
                           </div>
                         </td>
-                        <td className="px-3 py-2 text-foreground">{firmPurchases.length} (${firmPurchases.length * 20})</td>
                         <td className="px-3 py-2">
                           <Badge variant={firm.is_active ? "default" : "destructive"}>
                             {firm.is_active ? "Aktif" : "Pasif"}
                           </Badge>
                         </td>
                         <td className="px-3 py-2">
-                          <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" onClick={() => {
+                          <div className="flex gap-1 flex-wrap">
+                            <Button size="sm" variant="ghost" title="Düzenle" onClick={() => {
                               setEditingFirm({
                                 id: firm.id,
                                 user_id: firm.user_id,
@@ -640,13 +644,29 @@ const AdminPanel = () => {
                                 services: firm.services,
                                 is_approved: firm.is_approved,
                                 is_active: firm.is_active,
+                                is_premium: firm.is_premium,
+                                premium_until: firm.premium_until || "",
+                                google_maps_url: firm.google_maps_url || "",
+                                detailed_services: firm.detailed_services || [],
                               });
                               setFirmFormOpen(true);
                             }}>
                               <Edit className="h-3 w-3" />
                             </Button>
+                            <Button size="sm" variant="ghost" title="Galeri" onClick={() => loadAdminGallery(firm.id)}>
+                              <Image className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant="ghost" title="Yorumlar" onClick={() => loadAdminReviews(firm.id)}>
+                              <Star className="h-3 w-3" />
+                            </Button>
                             <Button size="sm" variant={firm.is_active ? "destructive" : "default"} onClick={() => handleToggleFirmActive(firm.id, firm.is_active)}>
                               {firm.is_active ? "Devre Dışı" : "Aktifleştir"}
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                             </Button>
                           </div>
                         </td>

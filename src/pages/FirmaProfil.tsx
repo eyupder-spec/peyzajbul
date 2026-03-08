@@ -177,7 +177,7 @@ const FirmaProfil = () => {
 
       toast({
         title: "Bilgileriniz güncellendi",
-        description: "Değişiklikleriniz admin onayına gönderildi. Onaylanana kadar firmanız geçici olarak yayından kaldırılacaktır.",
+        description: "Değişiklikleriniz admin onayına gönderildi. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir.",
       });
       navigate("/firma/panel");
     } catch (err: any) {
@@ -218,7 +218,7 @@ const FirmaProfil = () => {
                 <h2 className="text-2xl font-bold text-foreground mb-2">Firma Bilgilerini Düzenle</h2>
                 <div className="flex items-start gap-2 bg-accent/10 border border-accent/30 rounded-lg p-3 text-sm text-accent-foreground">
                   <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
-                  <p>Bilgilerinizi güncelledikten sonra değişiklikler admin onayına gönderilecektir. Onaylanana kadar firmanız geçici olarak yayından kaldırılır.</p>
+                  <p>Bilgilerinizi güncelledikten sonra değişiklikler admin onayına gönderilecektir. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir.</p>
                 </div>
               </div>
 
@@ -320,7 +320,7 @@ const FirmaProfil = () => {
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Bilgilerinizi güncelledikten sonra firmanız admin onayına gönderilecek ve onaylanana kadar yayından geçici olarak kaldırılacaktır. Devam etmek istiyor musunuz?
+            Bilgilerinizi güncelledikten sonra firmanız admin onayına gönderilecektir. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir. Devam etmek istiyor musunuz?
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>İptal</Button>

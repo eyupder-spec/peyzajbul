@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { Users, ShoppingCart, Coins, TrendingUp, Crown, Image, FileText, LogOut, Eye } from "lucide-react";
+import { Users, ShoppingCart, Coins, TrendingUp, Crown, Image, FileText, LogOut, Eye, Bell } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
+import { useLeadNotifications } from "@/hooks/useLeadNotifications";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,

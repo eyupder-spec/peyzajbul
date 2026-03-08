@@ -66,6 +66,7 @@ const FirmaLeadler = () => {
   const [loading, setLoading] = useState(true);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [purchasing, setPurchasing] = useState(false);
+  const [coinBalance, setCoinBalance] = useState(0);
   const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {

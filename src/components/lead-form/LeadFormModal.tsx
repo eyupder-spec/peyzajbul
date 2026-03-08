@@ -7,10 +7,11 @@ import StepService from "./StepService";
 import StepOption from "./StepOption";
 import StepLocation from "./StepLocation";
 import StepContact from "./StepContact";
+import StepOtp from "./StepOtp";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
 
 const projectSizeOptions = [
   { value: "0-100", label: "0–100 m²" },
@@ -42,12 +43,31 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<LeadFormData>(initialFormData);
   const [loading, setLoading] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSending, setOtpSending] = useState(false);
   const navigate = useNavigate();
 
   if (!open) return null;
 
   const updateData = (partial: Partial<LeadFormData>) => {
     setData((prev) => ({ ...prev, ...partial }));
+  };
+
+  const sendOtp = async () => {
+    setOtpSending(true);
+    try {
+      const { data: res, error } = await supabase.functions.invoke("send-otp", {
+        body: { email: data.email },
+      });
+      if (error) throw error;
+      if (res?.error) throw new Error(res.error);
+      toast.success("Doğrulama kodu e-posta adresinize gönderildi!");
+    } catch (err: any) {
+      toast.error(err.message || "Kod gönderilemedi. Lütfen tekrar deneyin.");
+      throw err;
+    } finally {
+      setOtpSending(false);
+    }
   };
 
   const canNext = (): boolean => {
@@ -57,7 +77,8 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
       case 3: return !!data.budget;
       case 4: return !!data.timeline;
       case 5: return !!data.city;
-      case 6: return !!data.fullName && !!data.phone && !!data.email && !!data.password && data.password.length >= 6 && data.kvkkAccepted;
+      case 6: return !!data.fullName && !!data.phone && !!data.email && data.kvkkAccepted;
+      case 7: return otpCode.length === 6;
       default: return false;
     }
   };
@@ -65,23 +86,30 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // 1. Create user account
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: {
-            full_name: data.fullName,
-            phone: data.phone,
-          },
+      // Verify OTP and create account
+      const { data: verifyRes, error: verifyError } = await supabase.functions.invoke("verify-otp", {
+        body: {
+          email: data.email,
+          code: otpCode,
+          fullName: data.fullName,
+          phone: data.phone,
         },
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("Hesap oluşturulamadı.");
+      if (verifyError) throw verifyError;
+      if (verifyRes?.error) throw new Error(verifyRes.error);
 
-      // 2. Save lead
+      const userId = verifyRes.userId;
+
+      // Set session if returned
+      if (verifyRes.session) {
+        await supabase.auth.setSession({
+          access_token: verifyRes.session.access_token,
+          refresh_token: verifyRes.session.refresh_token,
+        });
+      }
+
+      // Save lead
       const { error: leadError } = await supabase.from("leads").insert({
         service_type: data.serviceType,
         project_size: data.projectSize,
@@ -93,7 +121,7 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
         full_name: data.fullName,
         phone: data.phone,
         email: data.email,
-        user_id: authData.user.id,
+        user_id: userId,
         status: "active",
       });
 
@@ -103,6 +131,7 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
       onClose();
       setStep(1);
       setData(initialFormData);
+      setOtpCode("");
       navigate("/hesabim");
     } catch (err: any) {
       toast.error(err.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
@@ -111,8 +140,16 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
     }
   };
 
-  const handleNext = () => {
-    if (step === TOTAL_STEPS) {
+  const handleNext = async () => {
+    if (step === 6) {
+      // Send OTP before moving to step 7
+      try {
+        await sendOtp();
+        setStep(7);
+      } catch {
+        // Error already shown via toast
+      }
+    } else if (step === TOTAL_STEPS) {
       handleSubmit();
     } else {
       setStep((s) => s + 1);
@@ -176,6 +213,15 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
           )}
           {step === 5 && <StepLocation data={data} onChange={updateData} />}
           {step === 6 && <StepContact data={data} onChange={updateData} />}
+          {step === 7 && (
+            <StepOtp
+              email={data.email}
+              otpCode={otpCode}
+              onOtpChange={setOtpCode}
+              onResend={sendOtp}
+              sending={otpSending}
+            />
+          )}
         </div>
       </div>
 
@@ -193,15 +239,17 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
           <Button
             variant="gold"
             onClick={handleNext}
-            disabled={!canNext() || loading}
+            disabled={!canNext() || loading || (step === 6 && otpSending)}
           >
-            {loading ? (
+            {(loading || (step === 6 && otpSending)) && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : step === TOTAL_STEPS ? null : (
-              null
             )}
-            {step === TOTAL_STEPS ? (loading ? "Gönderiliyor..." : "Teklif Al") : "Devam Et"}
-            {step < TOTAL_STEPS && <ArrowRight className="ml-2 h-4 w-4" />}
+            {step === TOTAL_STEPS
+              ? (loading ? "Gönderiliyor..." : "Teklif Al")
+              : step === 6
+                ? (otpSending ? "Kod Gönderiliyor..." : "Doğrulama Kodu Gönder")
+                : "Devam Et"}
+            {step < 6 && <ArrowRight className="ml-2 h-4 w-4" />}
           </Button>
         </div>
       </div>

@@ -210,14 +210,44 @@ const FirmaDetay = () => {
               <div className="bg-card rounded-lg border border-border p-6 space-y-4">
                 <h3 className="font-heading text-lg font-semibold text-foreground">İletişim</h3>
                 <div className="space-y-3">
-                  <a href={`tel:${firm.phone}`} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                    <Phone className="h-4 w-4 text-primary" />
-                    {firm.phone}
-                  </a>
-                  <a href={`mailto:${firm.email}`} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                    <Mail className="h-4 w-4 text-primary" />
-                    {firm.email}
-                  </a>
+                  {/* Phone */}
+                  {showPhone ? (
+                    <a href={`tel:${firm.phone}`} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                      <Phone className="h-4 w-4 text-primary" />
+                      {firm.phone}
+                    </a>
+                  ) : (
+                    <button onClick={() => setShowPhone(true)} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors w-full text-left">
+                      <Phone className="h-4 w-4 text-primary" />
+                      <span className="flex items-center gap-1.5">
+                        <Eye className="h-3.5 w-3.5" /> Telefonu Göster
+                      </span>
+                    </button>
+                  )}
+
+                  {/* Email */}
+                  {showEmail ? (
+                    <a href={`mailto:${firm.email}`} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                      <Mail className="h-4 w-4 text-primary" />
+                      {firm.email}
+                    </a>
+                  ) : (
+                    <button onClick={() => setShowEmail(true)} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors w-full text-left">
+                      <Mail className="h-4 w-4 text-primary" />
+                      <span className="flex items-center gap-1.5">
+                        <Eye className="h-3.5 w-3.5" /> E-postayı Göster
+                      </span>
+                    </button>
+                  )}
+
+                  {/* Website - Premium Only */}
+                  {firm.is_premium && firm.website && (
+                    <a href={firm.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                      <Globe className="h-4 w-4 text-primary" />
+                      {firm.website.replace(/^https?:\/\//, "")}
+                    </a>
+                  )}
+
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <MapPin className="h-4 w-4 text-primary" />
                     {firm.city}{firm.district ? ` / ${firm.district}` : ""}

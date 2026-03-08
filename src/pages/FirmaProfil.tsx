@@ -216,7 +216,7 @@ const FirmaProfil = () => {
             <div className="max-w-2xl mx-auto space-y-6">
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">Firma Bilgilerini Düzenle</h2>
-                <div className="flex items-start gap-2 bg-accent/10 border border-accent/30 rounded-lg p-3 text-sm text-accent-foreground">
+                <div className="flex items-start gap-2 bg-muted border border-border rounded-lg p-3 text-sm text-foreground">
                   <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
                   <p>Bilgilerinizi güncelledikten sonra değişiklikler admin onayına gönderilecektir. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir.</p>
                 </div>

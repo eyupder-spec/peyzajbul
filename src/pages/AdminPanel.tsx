@@ -69,6 +69,12 @@ const AdminPanel = () => {
   const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "jetonlar">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
+  const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
+  const [adminGallery, setAdminGallery] = useState<any[]>([]);
+  const [adminReviewsFirmId, setAdminReviewsFirmId] = useState<string | null>(null);
+  const [adminReviews, setAdminReviews] = useState<any[]>([]);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [galleryCaption, setGalleryCaption] = useState("");
 
   // Filters
   const [filterCity, setFilterCity] = useState("");

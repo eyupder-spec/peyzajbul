@@ -46,7 +46,7 @@ serve(async (req) => {
     // Get firm and check balance
     const { data: firm } = await supabaseAdmin
       .from("firms")
-      .select("id, coin_balance")
+      .select("id, coin_balance, company_name")
       .eq("user_id", user.id)
       .single();
 

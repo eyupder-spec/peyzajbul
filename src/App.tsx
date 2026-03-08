@@ -45,6 +45,7 @@ const App = () => (
           <Route path="/firma/jeton" element={<FirmaJeton />} />
           <Route path="/firma/premium" element={<FirmaPremium />} />
           <Route path="/firma/galeri" element={<FirmaGaleri />} />
+          <Route path="/firma/profil" element={<FirmaProfil />} />
           <Route path="/admin/giris" element={<AdminGiris />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="*" element={<NotFound />} />

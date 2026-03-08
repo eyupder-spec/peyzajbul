@@ -23,7 +23,7 @@ export function useApprovedFirms() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services")
+        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website")
         .eq("is_approved", true)
         .eq("is_active", true)
         .order("is_premium", { ascending: false })

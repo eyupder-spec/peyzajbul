@@ -76,6 +76,49 @@ serve(async (req) => {
       status: "paid",
     });
 
+    // Send notification email to lead owner (non-blocking)
+    try {
+      const { data: lead } = await supabaseAdmin
+        .from("leads")
+        .select("email, full_name, service_type, city")
+        .eq("id", lead_id)
+        .single();
+
+      if (lead?.email) {
+        const resendKey = Deno.env.get("RESEND_API_KEY");
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "Peyzaj Rehberi <onboarding@resend.dev>",
+            to: [lead.email],
+            subject: "Talebiniz İlgileniliyor! - Peyzaj Rehberi",
+            html: `
+              <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#ffffff;border-radius:12px;">
+                <h1 style="color:#1a1a1a;font-size:22px;margin-bottom:8px;">Harika Haber! 🎉</h1>
+                <p style="color:#333;font-size:15px;line-height:1.6;">
+                  Sayın <strong>${lead.full_name}</strong>,
+                </p>
+                <p style="color:#333;font-size:15px;line-height:1.6;">
+                  <strong>${firm.company_name || "Bir firma"}</strong> talebinizi aldı ve gün içerisinde sizinle iletişime geçecektir.
+                </p>
+                <div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:20px 0;">
+                  <p style="margin:4px 0;color:#555;font-size:14px;">📋 Hizmet: <strong>${lead.service_type}</strong></p>
+                  <p style="margin:4px 0;color:#555;font-size:14px;">📍 Şehir: <strong>${lead.city}</strong></p>
+                </div>
+                <p style="color:#999;font-size:12px;">Bu e-posta Peyzaj Rehberi tarafından otomatik olarak gönderilmiştir.</p>
+              </div>
+            `,
+          }),
+        });
+      }
+    } catch (emailErr) {
+      console.error("Lead notification email failed:", emailErr);
+    }
+
     return new Response(
       JSON.stringify({ success: true, new_balance: firm.coin_balance - LEAD_COST }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }

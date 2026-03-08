@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ShoppingCart, Coins, TrendingUp } from "lucide-react";
+import { Users, ShoppingCart, Coins, TrendingUp, Crown, Image } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 const FirmaPanel = () => {

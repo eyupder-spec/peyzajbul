@@ -27,6 +27,13 @@ type Lead = {
   status: string;
 };
 
+const getFomoMessage = (count: number): { text: string; className: string } | null => {
+  if (count === 0) return null;
+  if (count === 1) return { text: "1 firma teklif verdi", className: "text-amber-600 bg-amber-50 border-amber-200" };
+  if (count === 2) return { text: "2 firma teklif verdi — acele edin!", className: "text-orange-600 bg-orange-50 border-orange-200" };
+  return { text: `${count} firma teklif verdi — son şans!`, className: "text-red-600 bg-red-50 border-red-200" };
+};
+
 const maskName = (name: string) => {
   const parts = name.split(" ");
   return parts.map((p) => p[0] + "**").join(" ");
@@ -63,6 +70,7 @@ const FirmaLeadler = () => {
   const { toast } = useToast();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [purchasedLeadIds, setPurchasedLeadIds] = useState<Set<string>>(new Set());
+  const [leadPurchaseCounts, setLeadPurchaseCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [purchasing, setPurchasing] = useState(false);
@@ -110,6 +118,18 @@ const FirmaLeadler = () => {
         .eq("firm_id", user.id);
 
       setPurchasedLeadIds(new Set(purchases?.map((p) => p.lead_id) || []));
+
+      // Fetch all purchase counts per lead for FOMO
+      const { data: allPurchases } = await supabase
+        .from("lead_purchases")
+        .select("lead_id");
+
+      const counts: Record<string, number> = {};
+      allPurchases?.forEach((p) => {
+        counts[p.lead_id] = (counts[p.lead_id] || 0) + 1;
+      });
+      setLeadPurchaseCounts(counts);
+
       setLoading(false);
     };
     fetchData();
@@ -224,9 +244,16 @@ const FirmaLeadler = () => {
                           </Tooltip>
                         </td>
                         <td className="px-4 py-3">
-                          <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
-                            {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
-                          </Badge>
+                          <div className="flex flex-col gap-1">
+                            <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
+                              {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
+                            </Badge>
+                            {!isPurchased && getFomoMessage(leadPurchaseCounts[lead.id] || 0) && (
+                              <span className={`inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded border ${getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.className}`}>
+                                🔥 {getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.text}
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           {isPurchased ? (
@@ -265,6 +292,11 @@ const FirmaLeadler = () => {
                         {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
                       </Badge>
                     </div>
+                    {!isPurchased && getFomoMessage(leadPurchaseCounts[lead.id] || 0) && (
+                      <span className={`inline-flex items-center text-xs font-medium px-2 py-1 rounded border mt-1 ${getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.className}`}>
+                        🔥 {getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.text}
+                      </span>
+                    )}
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="grid grid-cols-2 gap-2 text-sm">
@@ -364,6 +396,12 @@ const FirmaLeadler = () => {
                   </TooltipContent>
                 </Tooltip>
               </div>
+
+              {selectedLead && !purchasedLeadIds.has(selectedLead.id) && getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0) && (
+                <div className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded border ${getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0)!.className}`}>
+                  🔥 {getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0)!.text}
+                </div>
+              )}
             </div>
           )}
           <DialogFooter>

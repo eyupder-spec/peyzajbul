@@ -714,6 +714,91 @@ const AdminPanel = () => {
         onSaved={() => checkAdmin()}
         initialData={editingFirm}
       />
+
+      {/* Admin Gallery Dialog */}
+      <Dialog open={!!adminGalleryFirmId} onOpenChange={() => setAdminGalleryFirmId(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Image className="h-5 w-5 text-primary" /> Galeri Yönetimi - {firmsData.find(f => f.id === adminGalleryFirmId)?.company_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Input
+                placeholder="Açıklama (opsiyonel)"
+                value={galleryCaption}
+                onChange={(e) => setGalleryCaption(e.target.value)}
+                className="flex-1"
+              />
+              <label className="cursor-pointer">
+                <input type="file" accept="image/*" onChange={handleAdminGalleryUpload} className="hidden" disabled={galleryUploading} />
+                <Button asChild disabled={galleryUploading}>
+                  <span>{galleryUploading ? "Yükleniyor..." : "Fotoğraf Ekle"}</span>
+                </Button>
+              </label>
+            </div>
+            {adminGallery.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {adminGallery.map((img) => (
+                  <div key={img.id} className="relative group aspect-[4/3] rounded-lg overflow-hidden border border-border">
+                    <img src={img.image_url} alt={img.caption || "Galeri"} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                      <Button variant="destructive" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleAdminGalleryDelete(img.id, img.image_url)}>
+                        <Trash2 className="h-4 w-4 mr-1" /> Sil
+                      </Button>
+                    </div>
+                    {img.caption && <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2">{img.caption}</div>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">Henüz fotoğraf yok.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin Reviews Dialog */}
+      <Dialog open={!!adminReviewsFirmId} onOpenChange={() => setAdminReviewsFirmId(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-yellow-500" /> Yorum Yönetimi - {firmsData.find(f => f.id === adminReviewsFirmId)?.company_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {adminReviews.length > 0 ? adminReviews.map((review) => (
+              <div key={review.id} className="border border-border rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-foreground">{review.reviewer_name}</span>
+                    <div className="flex items-center gap-0.5 mt-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={`h-3 w-3 ${i < review.rating ? "text-yellow-500 fill-current" : "text-muted"}`} />
+                      ))}
+                    </div>
+                  </div>
+                  <Badge variant={review.is_approved ? "default" : "secondary"}>
+                    {review.is_approved ? "Onaylı" : "Beklemede"}
+                  </Badge>
+                </div>
+                {review.comment && <p className="text-sm text-muted-foreground">{review.comment}</p>}
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => handleToggleReviewApproval(review.id, review.is_approved)}>
+                    {review.is_approved ? "Gizle" : "Onayla"}
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => handleDeleteReview(review.id)}>
+                    <Trash2 className="h-3 w-3 mr-1" /> Sil
+                  </Button>
+                </div>
+              </div>
+            )) : (
+              <p className="text-center text-muted-foreground py-8">Henüz yorum yok.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

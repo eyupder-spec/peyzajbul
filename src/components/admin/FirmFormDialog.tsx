@@ -10,13 +10,9 @@ import { Loader2, Globe, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TURKISH_CITIES } from "@/lib/leadFormData";
+import { SERVICE_LABELS } from "@/lib/categories";
 
-const SERVICE_OPTIONS = [
-  "Bahçe Tasarımı", "Peyzaj Mimarlığı", "Sulama Sistemleri", "Çim Serme",
-  "Ağaçlandırma", "Havuz Çevresi", "Çatı Bahçesi", "Park Düzenleme",
-  "Kentsel Peyzaj", "Peyzaj Aydınlatma", "Süs Havuzu", "Bahçe Bakımı",
-  "Doğal Peyzaj", "Dikey Bahçe",
-];
+const SERVICE_OPTIONS = SERVICE_LABELS;
 
 export type FirmFormData = {
   id?: string;

@@ -12,6 +12,7 @@ const Navbar = () => {
   const links = [
     { label: "Ana Sayfa", to: "/" },
     { label: "Firmalar", to: "/firmalar" },
+    { label: "Kategoriler", to: "/kategoriler" },
     { label: "Nasıl Çalışır", to: "/#nasil-calisir" },
     { label: "Firma Girişi", to: "/firma/giris" },
   ];

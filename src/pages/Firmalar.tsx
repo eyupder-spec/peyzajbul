@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import FirmCard from "@/components/FirmCard";
 import { useApprovedFirms } from "@/hooks/useFirms";
 import { CITIES } from "@/lib/cities";
+import { SERVICE_LABELS } from "@/lib/categories";
 import { Helmet } from "react-helmet-async";
 
 const Firmalar = () => {
@@ -13,10 +14,7 @@ const Firmalar = () => {
   const [cityFilter, setCityFilter] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
 
-  const allServices = useMemo(() => {
-    if (!firms) return [];
-    return [...new Set(firms.flatMap((f) => f.services || []))].sort();
-  }, [firms]);
+  const allServices = SERVICE_LABELS;
 
   const filtered = useMemo(() => {
     if (!firms) return [];

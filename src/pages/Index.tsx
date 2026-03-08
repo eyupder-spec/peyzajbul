@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
+import PopularCategories from "@/components/PopularCategories";
 import FeaturedFirms from "@/components/FeaturedFirms";
 import TrustBadges from "@/components/TrustBadges";
 import Footer from "@/components/Footer";
@@ -15,6 +16,7 @@ const Index = () => {
       <Navbar />
       <Hero onTeklifAl={() => setFormOpen(true)} />
       <HowItWorks />
+      <PopularCategories />
       <FeaturedFirms />
       <TrustBadges />
       <Footer />

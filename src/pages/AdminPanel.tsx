@@ -318,6 +318,137 @@ const AdminPanel = () => {
           </div>
         )}
 
+        {/* Jetonlar */}
+        {tab === "jetonlar" && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-foreground">Jeton Yönetimi</h2>
+
+            {/* Summary cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Toplam Jeton Satışı</CardTitle>
+                  <Coins className="h-5 w-5 text-primary" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-foreground">{totalCoinRevenue} jeton</p>
+                  <p className="text-xs text-muted-foreground">${totalCoinRevenue} gelir</p>
+                </CardContent>
+              </Card>
+              <Card className="border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Harcanan Jeton</CardTitle>
+                  <CreditCard className="h-5 w-5 text-accent" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-foreground">
+                    {coinTransactions.filter(t => t.type === "spend").reduce((sum: number, t: any) => sum + Math.abs(t.amount), 0)} jeton
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Toplam Bakiye (Tüm Firmalar)</CardTitle>
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-foreground">
+                    {firmsData.reduce((sum, f) => sum + (f as any).coin_balance, 0)} jeton
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Firm balances table */}
+            <h3 className="text-lg font-semibold text-foreground">Firma Bakiyeleri</h3>
+            <div className="rounded-lg border border-border overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Firma</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">İl</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Bakiye</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Toplam Yükleme</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Toplam Harcama</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">İşlem Sayısı</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Detay</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {firmsData.filter(f => f.is_approved).map((firm) => {
+                    const firmTx = coinTransactions.filter(t => t.firm_id === firm.id);
+                    const totalPurchased = firmTx.filter(t => t.type === "purchase").reduce((s: number, t: any) => s + t.amount, 0);
+                    const totalSpent = firmTx.filter(t => t.type === "spend").reduce((s: number, t: any) => s + Math.abs(t.amount), 0);
+                    return (
+                      <tr key={firm.id} className="hover:bg-muted/50">
+                        <td className="px-3 py-2 text-foreground font-medium">{firm.company_name}</td>
+                        <td className="px-3 py-2 text-foreground">{firm.city}</td>
+                        <td className="px-3 py-2">
+                          <Badge variant={(firm as any).coin_balance > 0 ? "default" : "destructive"}>
+                            {(firm as any).coin_balance} jeton
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2 text-foreground">{totalPurchased} jeton</td>
+                        <td className="px-3 py-2 text-foreground">{totalSpent} jeton</td>
+                        <td className="px-3 py-2 text-foreground">{firmTx.length}</td>
+                        <td className="px-3 py-2">
+                          <Button size="sm" variant="ghost" onClick={() => setSelectedFirmTransactions(selectedFirmTransactions === firm.id ? null : firm.id)}>
+                            {selectedFirmTransactions === firm.id ? "Gizle" : "Göster"}
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Selected firm transaction detail */}
+            {selectedFirmTransactions && (() => {
+              const firm = firmsData.find(f => f.id === selectedFirmTransactions);
+              const firmTx = coinTransactions.filter(t => t.firm_id === selectedFirmTransactions);
+              return (
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {firm?.company_name} - İşlem Geçmişi
+                  </h3>
+                  <div className="rounded-lg border border-border overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="text-left px-3 py-2 text-muted-foreground font-medium">Tarih</th>
+                          <th className="text-left px-3 py-2 text-muted-foreground font-medium">Tür</th>
+                          <th className="text-left px-3 py-2 text-muted-foreground font-medium">Miktar</th>
+                          <th className="text-left px-3 py-2 text-muted-foreground font-medium">Açıklama</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {firmTx.map((tx: any) => (
+                          <tr key={tx.id} className="hover:bg-muted/50">
+                            <td className="px-3 py-2 text-foreground">{new Date(tx.created_at).toLocaleString("tr-TR")}</td>
+                            <td className="px-3 py-2">
+                              <Badge variant={tx.type === "purchase" ? "default" : "secondary"}>
+                                {tx.type === "purchase" ? "Yükleme" : "Harcama"}
+                              </Badge>
+                            </td>
+                            <td className="px-3 py-2 text-foreground font-medium">
+                              {tx.type === "purchase" ? "+" : ""}{tx.amount} jeton
+                            </td>
+                            <td className="px-3 py-2 text-muted-foreground">{tx.description || "-"}</td>
+                          </tr>
+                        ))}
+                        {firmTx.length === 0 && (
+                          <tr><td colSpan={4} className="text-center py-4 text-muted-foreground">Henüz işlem yok</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
         {/* Firms */}
         {tab === "firms" && (
           <div className="space-y-6">

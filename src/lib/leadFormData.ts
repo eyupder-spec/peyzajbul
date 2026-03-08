@@ -22,7 +22,6 @@ export interface LeadFormData {
   fullName: string;
   phone: string;
   email: string;
-  password: string;
   kvkkAccepted: boolean;
 }
 
@@ -37,6 +36,5 @@ export const initialFormData: LeadFormData = {
   fullName: "",
   phone: "",
   email: "",
-  password: "",
   kvkkAccepted: false,
 };

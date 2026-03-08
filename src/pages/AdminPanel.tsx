@@ -61,7 +61,9 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "jetonlar">("dashboard");
+  const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
+  const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
 
   // Filters
   const [filterCity, setFilterCity] = useState("");

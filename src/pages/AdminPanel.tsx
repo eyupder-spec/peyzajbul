@@ -409,9 +409,31 @@ const AdminPanel = () => {
                           </Badge>
                         </td>
                         <td className="px-3 py-2">
-                          <Button size="sm" variant={firm.is_active ? "destructive" : "default"} onClick={() => handleToggleFirmActive(firm.id, firm.is_active)}>
-                            {firm.is_active ? "Devre Dışı" : "Aktifleştir"}
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="ghost" onClick={() => {
+                              setEditingFirm({
+                                id: firm.id,
+                                user_id: firm.user_id,
+                                company_name: firm.company_name,
+                                phone: firm.phone,
+                                email: firm.email,
+                                city: firm.city,
+                                district: firm.district || "",
+                                address: "",
+                                tax_number: firm.tax_number || "",
+                                description: firm.description || "",
+                                services: firm.services,
+                                is_approved: firm.is_approved,
+                                is_active: firm.is_active,
+                              });
+                              setFirmFormOpen(true);
+                            }}>
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant={firm.is_active ? "destructive" : "default"} onClick={() => handleToggleFirmActive(firm.id, firm.is_active)}>
+                              {firm.is_active ? "Devre Dışı" : "Aktifleştir"}
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     );

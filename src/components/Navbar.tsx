@@ -20,10 +20,13 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
-          <Link to="/" className="flex items-center gap-2">
-            <Leaf className="h-7 w-7 text-primary" />
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="relative">
+              <Leaf className="h-7 w-7 text-primary transition-transform duration-300 group-hover:scale-110" />
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-accent rounded-full animate-pulse" />
+            </div>
             <span className="font-heading text-xl font-bold text-primary">Peyzaj Rehberi</span>
           </Link>
 
@@ -39,7 +42,7 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            <Button variant="gold" size="default" onClick={() => setFormOpen(true)}>
+            <Button variant="gold" size="default" onClick={() => setFormOpen(true)} className="hover:scale-105 transition-transform">
               Teklif Al
             </Button>
           </div>

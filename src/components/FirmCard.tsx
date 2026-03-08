@@ -20,19 +20,19 @@ const FirmCard = ({ id, company_name, city, district, services, description, is_
   const slug = dbSlug || generateFirmSlug(company_name, id);
 
   return (
-    <div className={`bg-card rounded-lg border p-6 hover:shadow-lg transition-shadow group flex flex-col relative ${is_premium ? "border-primary/50 ring-1 ring-primary/20" : "border-border"}`}>
+    <div className={`bg-card rounded-xl border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col relative ${is_premium ? "border-accent/40 ring-1 ring-accent/20 bg-gradient-to-br from-card to-accent/5" : "border-border"}`}>
       {is_premium && (
         <div className="absolute top-3 right-3">
-          <Badge className="bg-primary text-primary-foreground gap-1 text-xs">
+          <Badge className="bg-accent text-accent-foreground gap-1 text-xs shadow-sm">
             <Crown className="h-3 w-3" /> Premium
           </Badge>
         </div>
       )}
-      <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 overflow-hidden ${is_premium ? "bg-primary/10" : "bg-secondary"}`}>
+      <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 overflow-hidden transition-transform duration-300 group-hover:scale-105 ${is_premium ? "bg-accent/10" : "bg-secondary"}`}>
         {logo_url ? (
           <img src={logo_url} alt={company_name} className="w-full h-full object-cover" />
         ) : (
-          <span className="font-heading text-lg font-bold text-primary">{company_name[0]}</span>
+          <span className="font-heading text-xl font-bold text-primary">{company_name[0]}</span>
         )}
       </div>
       <h3 className="font-heading text-lg font-semibold text-foreground mb-1">{company_name}</h3>
@@ -51,8 +51,8 @@ const FirmCard = ({ id, company_name, city, district, services, description, is_
       </div>
       <div className="mt-auto">
         <Link to={`/firma/${slug}`}>
-          <Button variant="outline" size="sm" className="w-full group-hover:border-primary group-hover:text-primary transition-colors">
-            Firmayı İncele <ArrowRight className="h-3.5 w-3.5 ml-1" />
+          <Button variant="outline" size="sm" className="w-full group-hover:border-primary group-hover:text-primary transition-all duration-300">
+            Firmayı İncele <ArrowRight className="h-3.5 w-3.5 ml-1 transition-transform duration-300 group-hover:translate-x-1" />
           </Button>
         </Link>
       </div>

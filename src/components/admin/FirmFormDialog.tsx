@@ -71,7 +71,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
   const [newServiceDesc, setNewServiceDesc] = useState("");
 
   // Re-initialize form when dialog opens with different data
-  React.useEffect(() => {
+  useEffect(() => {
     if (open) {
       setForm(initialData || emptyForm);
     }

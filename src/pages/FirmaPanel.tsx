@@ -24,10 +24,10 @@ const FirmaPanel = () => {
 
       if (!roles || roles.length === 0) { navigate("/"); return; }
 
-      // Check firm approval
+      // Check firm approval & get balance
       const { data: firm } = await supabase
         .from("firms")
-        .select("is_approved")
+        .select("is_approved, coin_balance")
         .eq("user_id", user.id)
         .single();
 
@@ -46,7 +46,7 @@ const FirmaPanel = () => {
       setStats({
         totalLeads: totalLeads || 0,
         purchased: purchases?.length || 0,
-        spent: (purchases?.length || 0) * 20,
+        coinBalance: firm.coin_balance || 0,
       });
       setLoading(false);
     };

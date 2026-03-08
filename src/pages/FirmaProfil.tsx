@@ -138,6 +138,7 @@ const FirmaProfil = () => {
         website: firm.website || "",
         description: firm.description || "",
         services: firm.services || [],
+        telegram_chat_id: (firm as any).telegram_chat_id || "",
       });
       setLoading(false);
     };

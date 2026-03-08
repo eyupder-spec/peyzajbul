@@ -27,11 +27,11 @@ type Lead = {
   status: string;
 };
 
-const getFomoMessage = (count: number): { text: string; className: string } | null => {
-  if (count === 0) return null;
-  if (count === 1) return { text: "1 firma teklif verdi", className: "text-amber-600 bg-amber-50 border-amber-200" };
-  if (count === 2) return { text: "2 firma teklif verdi — acele edin!", className: "text-orange-600 bg-orange-50 border-orange-200" };
-  return { text: `${count} firma teklif verdi — son şans!`, className: "text-red-600 bg-red-50 border-red-200" };
+const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
+  if (count === 0) return { text: "Henüz teklif yok — tam zamanı!", icon: "✅", className: "text-emerald-600 bg-emerald-50 border-emerald-200" };
+  if (count === 1) return { text: "1 firma teklif verdi — acele edin!", icon: "⚡", className: "text-amber-600 bg-amber-50 border-amber-200" };
+  if (count === 2) return { text: "2 firma teklif verdi — son şans!", icon: "🔥", className: "text-red-600 bg-red-50 border-red-200" };
+  return { text: "3 firma teklif verdi — kapasite doldu!", icon: "🚫", className: "text-muted-foreground bg-muted border-border opacity-70" };
 };
 
 const maskName = (name: string) => {
@@ -248,11 +248,14 @@ const FirmaLeadler = () => {
                             <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
                               {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
                             </Badge>
-                            {!isPurchased && getFomoMessage(leadPurchaseCounts[lead.id] || 0) && (
-                              <span className={`inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded border ${getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.className}`}>
-                                🔥 {getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.text}
-                              </span>
-                            )}
+                            {!isPurchased && (() => {
+                              const fomo = getFomoMessage(leadPurchaseCounts[lead.id] || 0);
+                              return (
+                                <span className={`inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded border animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ${fomo.className}`}>
+                                  {fomo.icon} {fomo.text}
+                                </span>
+                              );
+                            })()}
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -292,11 +295,14 @@ const FirmaLeadler = () => {
                         {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
                       </Badge>
                     </div>
-                    {!isPurchased && getFomoMessage(leadPurchaseCounts[lead.id] || 0) && (
-                      <span className={`inline-flex items-center text-xs font-medium px-2 py-1 rounded border mt-1 ${getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.className}`}>
-                        🔥 {getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.text}
-                      </span>
-                    )}
+                    {!isPurchased && (() => {
+                      const fomo = getFomoMessage(leadPurchaseCounts[lead.id] || 0);
+                      return (
+                        <span className={`inline-flex items-center text-xs font-medium px-2 py-1 rounded border mt-1 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ${fomo.className}`}>
+                          {fomo.icon} {fomo.text}
+                        </span>
+                      );
+                    })()}
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="grid grid-cols-2 gap-2 text-sm">
@@ -397,11 +403,14 @@ const FirmaLeadler = () => {
                 </Tooltip>
               </div>
 
-              {selectedLead && !purchasedLeadIds.has(selectedLead.id) && getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0) && (
-                <div className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded border ${getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0)!.className}`}>
-                  🔥 {getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0)!.text}
-                </div>
-              )}
+              {selectedLead && !purchasedLeadIds.has(selectedLead.id) && (() => {
+                const fomo = getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0);
+                return (
+                  <div className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded border animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ${fomo.className}`}>
+                    {fomo.icon} {fomo.text}
+                  </div>
+                );
+              })()}
             </div>
           )}
           <DialogFooter>

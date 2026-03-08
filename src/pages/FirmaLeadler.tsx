@@ -116,15 +116,21 @@ const FirmaLeadler = () => {
   }, [navigate]);
 
   const handlePurchase = async (leadId: string) => {
+    if (coinBalance < 20) {
+      toast({ title: "Yetersiz Jeton", description: "Lütfen jeton yükleyin.", variant: "destructive" });
+      navigate("/firma/jeton");
+      return;
+    }
     setPurchasing(true);
     try {
-      const { data, error } = await supabase.functions.invoke("create-lead-checkout", {
+      const { data, error } = await supabase.functions.invoke("spend-coins", {
         body: { lead_id: leadId },
       });
       if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
+      if (data?.error) throw new Error(data.error);
+      setCoinBalance(data.new_balance);
+      setPurchasedLeadIds((prev) => new Set([...prev, leadId]));
+      toast({ title: "Lead açıldı!", description: `Kalan bakiye: ${data.new_balance} jeton` });
     } catch (err: any) {
       toast({ title: "Hata", description: err.message, variant: "destructive" });
     } finally {

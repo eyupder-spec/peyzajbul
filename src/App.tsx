@@ -28,6 +28,8 @@ const App = () => (
           <Route path="/firma/giris" element={<FirmaGiris />} />
           <Route path="/firma/panel" element={<FirmaPanel />} />
           <Route path="/firma/leadler" element={<FirmaLeadler />} />
+          <Route path="/admin/giris" element={<AdminGiris />} />
+          <Route path="/admin" element={<AdminPanel />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -29,7 +29,7 @@ type Firm = {
   email: string;
   city: string;
   district: string | null;
-  tax_number: string | null;
+  website: string | null;
   description: string | null;
   services: string[];
   is_approved: boolean;

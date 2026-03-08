@@ -25,6 +25,11 @@ type Firm = {
   services: string[];
   is_approved: boolean;
   is_active: boolean;
+  is_premium: boolean;
+  premium_until: string | null;
+  google_maps_url: string | null;
+  detailed_services: any;
+  coin_balance: number;
   created_at: string;
 };
 

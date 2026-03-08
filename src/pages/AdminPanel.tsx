@@ -8,8 +8,24 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2 } from "lucide-react";
+import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
+
+type Firm = {
+  id: string;
+  user_id: string;
+  company_name: string;
+  phone: string;
+  email: string;
+  city: string;
+  district: string | null;
+  tax_number: string | null;
+  description: string | null;
+  services: string[];
+  is_approved: boolean;
+  is_active: boolean;
+  created_at: string;
+};
 
 type Lead = {
   id: string;

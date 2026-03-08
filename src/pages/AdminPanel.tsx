@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle, Plus } from "lucide-react";
+import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle, Plus, Coins } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
 
@@ -61,7 +61,9 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "jetonlar">("dashboard");
+  const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
+  const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
 
   // Filters
   const [filterCity, setFilterCity] = useState("");
@@ -90,17 +92,19 @@ const AdminPanel = () => {
     if (!adminRoles || adminRoles.length === 0) { navigate("/admin/giris"); return; }
 
     // Fetch all data
-    const [leadsRes, rolesRes, purchasesRes, firmsRes] = await Promise.all([
+    const [leadsRes, rolesRes, purchasesRes, firmsRes, coinTxRes] = await Promise.all([
       supabase.from("leads").select("*").order("created_at", { ascending: false }),
       supabase.from("user_roles").select("*"),
       supabase.from("lead_purchases").select("*"),
       supabase.from("firms").select("*").order("created_at", { ascending: false }),
+      supabase.from("coin_transactions").select("*").order("created_at", { ascending: false }),
     ]);
 
     setLeads(leadsRes.data || []);
     setRoles(rolesRes.data || []);
     setPurchases(purchasesRes.data || []);
     setFirmsData((firmsRes.data as Firm[]) || []);
+    setCoinTransactions(coinTxRes.data || []);
     setLoading(false);
   }, [navigate]);
 
@@ -172,6 +176,7 @@ const AdminPanel = () => {
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const weekLeads = leads.filter((l) => new Date(l.created_at) >= weekAgo).length;
   const monthLeads = leads.filter((l) => new Date(l.created_at).getMonth() === now.getMonth()).length;
+  const totalCoinRevenue = coinTransactions.filter(t => t.type === "purchase").reduce((sum: number, t: any) => sum + t.amount, 0);
   const totalRevenue = purchases.length * 20;
   const firmCount = firmsData.filter((f) => f.is_approved).length;
   const pendingFirmCount = firmsData.filter((f) => !f.is_approved).length;
@@ -196,6 +201,7 @@ const AdminPanel = () => {
             <Button variant={tab === "dashboard" ? "default" : "ghost"} size="sm" onClick={() => setTab("dashboard")}>Dashboard</Button>
             <Button variant={tab === "leads" ? "default" : "ghost"} size="sm" onClick={() => setTab("leads")}>Leadler</Button>
             <Button variant={tab === "firms" ? "default" : "ghost"} size="sm" onClick={() => setTab("firms")}>Firmalar</Button>
+            <Button variant={tab === "jetonlar" ? "default" : "ghost"} size="sm" onClick={() => setTab("jetonlar")}><Coins className="h-4 w-4 mr-1" />Jetonlar</Button>
             <Button variant="ghost" size="icon" onClick={handleLogout}><LogOut className="h-4 w-4" /></Button>
           </div>
         </div>
@@ -309,6 +315,137 @@ const AdminPanel = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* Jetonlar */}
+        {tab === "jetonlar" && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-foreground">Jeton Yönetimi</h2>
+
+            {/* Summary cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Toplam Jeton Satışı</CardTitle>
+                  <Coins className="h-5 w-5 text-primary" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-foreground">{totalCoinRevenue} jeton</p>
+                  <p className="text-xs text-muted-foreground">${totalCoinRevenue} gelir</p>
+                </CardContent>
+              </Card>
+              <Card className="border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Harcanan Jeton</CardTitle>
+                  <CreditCard className="h-5 w-5 text-accent" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-foreground">
+                    {coinTransactions.filter(t => t.type === "spend").reduce((sum: number, t: any) => sum + Math.abs(t.amount), 0)} jeton
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Toplam Bakiye (Tüm Firmalar)</CardTitle>
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-foreground">
+                    {firmsData.reduce((sum, f) => sum + (f as any).coin_balance, 0)} jeton
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Firm balances table */}
+            <h3 className="text-lg font-semibold text-foreground">Firma Bakiyeleri</h3>
+            <div className="rounded-lg border border-border overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Firma</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">İl</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Bakiye</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Toplam Yükleme</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Toplam Harcama</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">İşlem Sayısı</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Detay</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {firmsData.filter(f => f.is_approved).map((firm) => {
+                    const firmTx = coinTransactions.filter(t => t.firm_id === firm.id);
+                    const totalPurchased = firmTx.filter(t => t.type === "purchase").reduce((s: number, t: any) => s + t.amount, 0);
+                    const totalSpent = firmTx.filter(t => t.type === "spend").reduce((s: number, t: any) => s + Math.abs(t.amount), 0);
+                    return (
+                      <tr key={firm.id} className="hover:bg-muted/50">
+                        <td className="px-3 py-2 text-foreground font-medium">{firm.company_name}</td>
+                        <td className="px-3 py-2 text-foreground">{firm.city}</td>
+                        <td className="px-3 py-2">
+                          <Badge variant={(firm as any).coin_balance > 0 ? "default" : "destructive"}>
+                            {(firm as any).coin_balance} jeton
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2 text-foreground">{totalPurchased} jeton</td>
+                        <td className="px-3 py-2 text-foreground">{totalSpent} jeton</td>
+                        <td className="px-3 py-2 text-foreground">{firmTx.length}</td>
+                        <td className="px-3 py-2">
+                          <Button size="sm" variant="ghost" onClick={() => setSelectedFirmTransactions(selectedFirmTransactions === firm.id ? null : firm.id)}>
+                            {selectedFirmTransactions === firm.id ? "Gizle" : "Göster"}
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Selected firm transaction detail */}
+            {selectedFirmTransactions && (() => {
+              const firm = firmsData.find(f => f.id === selectedFirmTransactions);
+              const firmTx = coinTransactions.filter(t => t.firm_id === selectedFirmTransactions);
+              return (
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {firm?.company_name} - İşlem Geçmişi
+                  </h3>
+                  <div className="rounded-lg border border-border overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="text-left px-3 py-2 text-muted-foreground font-medium">Tarih</th>
+                          <th className="text-left px-3 py-2 text-muted-foreground font-medium">Tür</th>
+                          <th className="text-left px-3 py-2 text-muted-foreground font-medium">Miktar</th>
+                          <th className="text-left px-3 py-2 text-muted-foreground font-medium">Açıklama</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {firmTx.map((tx: any) => (
+                          <tr key={tx.id} className="hover:bg-muted/50">
+                            <td className="px-3 py-2 text-foreground">{new Date(tx.created_at).toLocaleString("tr-TR")}</td>
+                            <td className="px-3 py-2">
+                              <Badge variant={tx.type === "purchase" ? "default" : "secondary"}>
+                                {tx.type === "purchase" ? "Yükleme" : "Harcama"}
+                              </Badge>
+                            </td>
+                            <td className="px-3 py-2 text-foreground font-medium">
+                              {tx.type === "purchase" ? "+" : ""}{tx.amount} jeton
+                            </td>
+                            <td className="px-3 py-2 text-muted-foreground">{tx.description || "-"}</td>
+                          </tr>
+                        ))}
+                        {firmTx.length === 0 && (
+                          <tr><td colSpan={4} className="text-center py-4 text-muted-foreground">Henüz işlem yok</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 

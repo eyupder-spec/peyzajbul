@@ -12,11 +12,12 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut,
   Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
-  LayoutDashboard, Menu, BookOpen
+  LayoutDashboard, Menu, BookOpen, Rocket
 } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
 import AdminBlogTab from "@/components/admin/AdminBlogTab";
+import AdminChangelogTab from "@/components/admin/AdminChangelogTab";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
@@ -74,6 +75,7 @@ const SIDEBAR_ITEMS = [
   { title: "Firmalar", key: "firms", icon: Building2 },
   { title: "Jetonlar", key: "jetonlar", icon: Coins },
   { title: "Blog", key: "blog", icon: BookOpen },
+  { title: "Changelog", key: "changelog", icon: Rocket },
 ];
 
 function AdminSidebar({ tab, setTab, pendingFirmCount }: { tab: string; setTab: (t: any) => void; pendingFirmCount: number }) {
@@ -126,7 +128,7 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "jetonlar" | "blog">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "jetonlar" | "blog" | "changelog">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
   const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
@@ -770,6 +772,9 @@ const AdminPanel = () => {
 
             {/* Blog */}
             {tab === "blog" && <AdminBlogTab />}
+
+            {/* Changelog */}
+            {tab === "changelog" && <AdminChangelogTab />}
           </main>
         </div>
       </div>

@@ -716,7 +716,7 @@ const AdminPanel = () => {
                           <td className="px-3 py-2">
                             <div className="flex gap-1 flex-wrap">
                               <Button size="sm" variant="ghost" title="Düzenle" onClick={() => {
-                                setEditingFirm({
+                setEditingFirm({
                                   id: firm.id,
                                   user_id: firm.user_id,
                                   company_name: firm.company_name,
@@ -726,6 +726,7 @@ const AdminPanel = () => {
                                   district: firm.district || "",
                                   address: firm.address || "",
                                   website: (firm as any).website || "",
+                                  slug: (firm as any).slug || "",
                                   description: firm.description || "",
                                   services: firm.services,
                                   is_approved: firm.is_approved,

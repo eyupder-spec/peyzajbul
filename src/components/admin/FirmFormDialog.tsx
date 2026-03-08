@@ -136,6 +136,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           district: form.district || null,
           address: form.address || null,
           website: form.website || null,
+          slug: form.slug || null,
           description: form.description || null,
           services: form.services,
           is_approved: form.is_approved,

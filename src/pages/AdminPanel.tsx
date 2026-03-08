@@ -72,6 +72,7 @@ const SIDEBAR_ITEMS = [
   { title: "Leadler", key: "leads", icon: FileText },
   { title: "Firmalar", key: "firms", icon: Building2 },
   { title: "Jetonlar", key: "jetonlar", icon: Coins },
+  { title: "Blog", key: "blog", icon: BookOpen },
 ];
 
 function AdminSidebar({ tab, setTab, pendingFirmCount }: { tab: string; setTab: (t: any) => void; pendingFirmCount: number }) {

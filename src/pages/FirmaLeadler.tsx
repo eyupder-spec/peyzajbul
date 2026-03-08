@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { ShoppingCart, Eye, ArrowLeft } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
 
 type Lead = {
   id: string;

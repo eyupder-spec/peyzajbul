@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import FirmCard from "@/components/FirmCard";
 import { ArrowLeft, Calendar, User } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { categories } from "@/lib/categories";
-import { cities } from "@/lib/cities";
+import { CATEGORIES } from "@/lib/categories";
+import { CITIES } from "@/lib/cities";
 
 const BlogDetay = () => {
   const { slug } = useParams<{ slug: string }>();

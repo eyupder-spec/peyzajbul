@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Search, ArrowRight } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { categories } from "@/lib/categories";
-import { cities } from "@/lib/cities";
+import { CATEGORIES } from "@/lib/categories";
+import { CITIES } from "@/lib/cities";
 
 const Blog = () => {
   const [search, setSearch] = useState("");

@@ -177,6 +177,74 @@ const AdminPanel = () => {
     navigate("/admin/giris");
   };
 
+  // Admin gallery management
+  const loadAdminGallery = async (firmId: string) => {
+    setAdminGalleryFirmId(firmId);
+    const { data } = await supabase
+      .from("firm_gallery")
+      .select("*")
+      .eq("firm_id", firmId)
+      .order("sort_order", { ascending: true });
+    setAdminGallery(data || []);
+  };
+
+  const handleAdminGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !adminGalleryFirmId) return;
+    setGalleryUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${adminGalleryFirmId}/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("firm-gallery").upload(path, file);
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from("firm-gallery").getPublicUrl(path);
+      await supabase.from("firm_gallery").insert({
+        firm_id: adminGalleryFirmId,
+        image_url: publicUrl,
+        caption: galleryCaption || null,
+        sort_order: adminGallery.length,
+      });
+      toast({ title: "Fotoğraf eklendi!" });
+      setGalleryCaption("");
+      loadAdminGallery(adminGalleryFirmId);
+    } catch {
+      toast({ title: "Yükleme başarısız", variant: "destructive" });
+    } finally {
+      setGalleryUploading(false);
+    }
+  };
+
+  const handleAdminGalleryDelete = async (id: string, imageUrl: string) => {
+    const urlParts = imageUrl.split("/firm-gallery/");
+    if (urlParts[1]) await supabase.storage.from("firm-gallery").remove([urlParts[1]]);
+    await supabase.from("firm_gallery").delete().eq("id", id);
+    if (adminGalleryFirmId) loadAdminGallery(adminGalleryFirmId);
+    toast({ title: "Fotoğraf silindi" });
+  };
+
+  // Admin review management
+  const loadAdminReviews = async (firmId: string) => {
+    setAdminReviewsFirmId(firmId);
+    const { data } = await supabase
+      .from("firm_reviews")
+      .select("*")
+      .eq("firm_id", firmId)
+      .order("created_at", { ascending: false });
+    setAdminReviews(data || []);
+  };
+
+  const handleToggleReviewApproval = async (reviewId: string, currentApproved: boolean) => {
+    await supabase.from("firm_reviews").update({ is_approved: !currentApproved }).eq("id", reviewId);
+    if (adminReviewsFirmId) loadAdminReviews(adminReviewsFirmId);
+    toast({ title: currentApproved ? "Yorum gizlendi" : "Yorum onaylandı" });
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    await supabase.from("firm_reviews").delete().eq("id", reviewId);
+    if (adminReviewsFirmId) loadAdminReviews(adminReviewsFirmId);
+    toast({ title: "Yorum silindi" });
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Yükleniyor...</p></div>;
   }

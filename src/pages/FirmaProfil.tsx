@@ -336,16 +336,35 @@ const FirmaProfil = () => {
                   </div>
 
                   {/* Telegram Bildirim */}
-                  <div className="space-y-1.5">
-                    <Label>Telegram Chat ID (Bildirim)</Label>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 text-[hsl(200,80%,50%)]">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.73 6.65-2.87 7.97-3.44 3.79-1.58 4.58-1.86 5.09-1.87.11 0 .37.03.53.17.14.12.18.28.2.45-.01.06.01.24 0 .37z"/>
+                      </svg>
+                      Telegram Bildirim Ayarı
+                    </Label>
                     <Input
                       placeholder="Örn: 123456789"
                       value={form.telegram_chat_id}
                       onChange={(e) => update({ telegram_chat_id: e.target.value })}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Yeni lead geldiğinde Telegram'dan bildirim almak için: @userinfobot'a mesaj atıp Chat ID'nizi öğrenin, ardından @PeyzajRehberiBot'u başlatın.
-                    </p>
+                    <div className="bg-muted/50 border border-border rounded-lg p-3 space-y-2">
+                      <p className="text-xs font-medium text-foreground">📬 Yeni lead geldiğinde Telegram'dan anında bildirim alın:</p>
+                      <ol className="text-xs text-muted-foreground space-y-1.5 list-none">
+                        <li className="flex items-start gap-2">
+                          <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
+                          <span>Telegram'da <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium">@userinfobot</a>'a gidin ve <code className="bg-muted px-1 rounded text-foreground">/start</code> yazın. Bot size Chat ID'nizi gösterecek.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
+                          <span><a href="https://t.me/PeyzajRehberiBot" target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium">@PeyzajRehberiBot</a>'a gidin ve <code className="bg-muted px-1 rounded text-foreground">/start</code> yazın. (Bu adım zorunlu, yoksa bot mesaj gönderemez.)</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">3</span>
+                          <span>Chat ID'nizi yukarıdaki alana yapıştırın ve kaydedin. Artık her yeni lead'de bildirim alacaksınız! 🎉</span>
+                        </li>
+                      </ol>
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">

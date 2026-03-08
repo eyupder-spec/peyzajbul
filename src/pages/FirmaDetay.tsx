@@ -257,17 +257,28 @@ const FirmaDetay = () => {
 
               {/* Google Maps - Premium Only */}
               {firm.is_premium && firm.google_maps_url && (
-                <div className="bg-card rounded-lg border border-border overflow-hidden">
-                  <iframe
-                    src={firm.google_maps_url}
-                    width="100%"
-                    height="250"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Firma konumu"
-                  />
+                <div className="space-y-2">
+                  <div className="bg-card rounded-lg border border-border overflow-hidden">
+                    <iframe
+                      src={firm.google_maps_url}
+                      width="100%"
+                      height="250"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Firma konumu"
+                    />
+                  </div>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(firm.company_name + " " + firm.city)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" size="sm" className="w-full gap-2">
+                      <MapPin className="h-4 w-4" /> Yol Tarifi Al
+                    </Button>
+                  </a>
                 </div>
               )}
 

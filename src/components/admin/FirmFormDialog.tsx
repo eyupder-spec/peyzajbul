@@ -70,16 +70,12 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
   const [newServiceTitle, setNewServiceTitle] = useState("");
   const [newServiceDesc, setNewServiceDesc] = useState("");
 
-  // Re-initialize form when initialData changes (e.g. opening edit for a different firm)
-  useState(() => {
-    setForm(initialData || emptyForm);
-  });
-
-  const [saving, setSaving] = useState(false);
-  const [crawling, setCrawling] = useState(false);
-  const [crawlUrl, setCrawlUrl] = useState("");
-  const [newServiceTitle, setNewServiceTitle] = useState("");
-  const [newServiceDesc, setNewServiceDesc] = useState("");
+  // Re-initialize form when dialog opens with different data
+  React.useEffect(() => {
+    if (open) {
+      setForm(initialData || emptyForm);
+    }
+  }, [open, initialData]);
 
   const update = (partial: Partial<FirmFormData>) => setForm((p) => ({ ...p, ...partial }));
 

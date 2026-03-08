@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
+import AdminBlogTab from "@/components/admin/AdminBlogTab";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,

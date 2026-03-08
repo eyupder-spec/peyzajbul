@@ -257,6 +257,19 @@ const FirmaDetay = () => {
                     {firm.city}{firm.district ? ` / ${firm.district}` : ""}
                   </div>
                 </div>
+
+                {/* WhatsApp Button */}
+                <a
+                  href={`https://wa.me/${firm.phone.replace(/\D/g, "").replace(/^0/, "90")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <Button className="w-full gap-2 bg-[#25D366] hover:bg-[#1fb855] text-white">
+                    <MessageCircle className="h-5 w-5" />
+                    WhatsApp ile İletişim
+                  </Button>
+                </a>
               </div>
 
               {/* Google Maps - Premium Only */}

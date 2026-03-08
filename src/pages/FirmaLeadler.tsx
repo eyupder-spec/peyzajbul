@@ -186,9 +186,22 @@ const FirmaLeadler = () => {
                           {isPurchased ? lead.phone : maskPhone(lead.phone)}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getScoreColor(lead.lead_score)}`}>
-                            {lead.lead_score || 0}
-                          </span>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium cursor-help ${getScoreBadge(lead.lead_score).className}`}>
+                                {getScoreBadge(lead.lead_score).emoji} {lead.lead_score || 0}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p className="font-semibold mb-1">{getScoreBadge(lead.lead_score).label}</p>
+                              {getScoreBreakdown(lead).map((item, i) => (
+                                <div key={i} className="flex justify-between text-xs gap-4">
+                                  <span>{item.label}</span>
+                                  <span className="font-mono">+{item.points}</span>
+                                </div>
+                              ))}
+                            </TooltipContent>
+                          </Tooltip>
                         </td>
                         <td className="px-4 py-3">
                           <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>

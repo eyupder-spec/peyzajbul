@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle, Plus, Coins } from "lucide-react";
+import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
 
@@ -25,6 +25,11 @@ type Firm = {
   services: string[];
   is_approved: boolean;
   is_active: boolean;
+  is_premium: boolean;
+  premium_until: string | null;
+  google_maps_url: string | null;
+  detailed_services: any;
+  coin_balance: number;
   created_at: string;
 };
 
@@ -64,6 +69,12 @@ const AdminPanel = () => {
   const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "jetonlar">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
+  const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
+  const [adminGallery, setAdminGallery] = useState<any[]>([]);
+  const [adminReviewsFirmId, setAdminReviewsFirmId] = useState<string | null>(null);
+  const [adminReviews, setAdminReviews] = useState<any[]>([]);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [galleryCaption, setGalleryCaption] = useState("");
 
   // Filters
   const [filterCity, setFilterCity] = useState("");
@@ -164,6 +175,74 @@ const AdminPanel = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/admin/giris");
+  };
+
+  // Admin gallery management
+  const loadAdminGallery = async (firmId: string) => {
+    setAdminGalleryFirmId(firmId);
+    const { data } = await supabase
+      .from("firm_gallery")
+      .select("*")
+      .eq("firm_id", firmId)
+      .order("sort_order", { ascending: true });
+    setAdminGallery(data || []);
+  };
+
+  const handleAdminGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !adminGalleryFirmId) return;
+    setGalleryUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${adminGalleryFirmId}/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("firm-gallery").upload(path, file);
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from("firm-gallery").getPublicUrl(path);
+      await supabase.from("firm_gallery").insert({
+        firm_id: adminGalleryFirmId,
+        image_url: publicUrl,
+        caption: galleryCaption || null,
+        sort_order: adminGallery.length,
+      });
+      toast({ title: "Fotoğraf eklendi!" });
+      setGalleryCaption("");
+      loadAdminGallery(adminGalleryFirmId);
+    } catch {
+      toast({ title: "Yükleme başarısız", variant: "destructive" });
+    } finally {
+      setGalleryUploading(false);
+    }
+  };
+
+  const handleAdminGalleryDelete = async (id: string, imageUrl: string) => {
+    const urlParts = imageUrl.split("/firm-gallery/");
+    if (urlParts[1]) await supabase.storage.from("firm-gallery").remove([urlParts[1]]);
+    await supabase.from("firm_gallery").delete().eq("id", id);
+    if (adminGalleryFirmId) loadAdminGallery(adminGalleryFirmId);
+    toast({ title: "Fotoğraf silindi" });
+  };
+
+  // Admin review management
+  const loadAdminReviews = async (firmId: string) => {
+    setAdminReviewsFirmId(firmId);
+    const { data } = await supabase
+      .from("firm_reviews")
+      .select("*")
+      .eq("firm_id", firmId)
+      .order("created_at", { ascending: false });
+    setAdminReviews(data || []);
+  };
+
+  const handleToggleReviewApproval = async (reviewId: string, currentApproved: boolean) => {
+    await supabase.from("firm_reviews").update({ is_approved: !currentApproved }).eq("id", reviewId);
+    if (adminReviewsFirmId) loadAdminReviews(adminReviewsFirmId);
+    toast({ title: currentApproved ? "Yorum gizlendi" : "Yorum onaylandı" });
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    await supabase.from("firm_reviews").delete().eq("id", reviewId);
+    if (adminReviewsFirmId) loadAdminReviews(adminReviewsFirmId);
+    toast({ title: "Yorum silindi" });
   };
 
   if (loading) {
@@ -516,21 +595,25 @@ const AdminPanel = () => {
                   <tr>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Firma Adı</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">İl</th>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Telefon</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Premium</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Hizmetler</th>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Satın Almalar</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Durum</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Aksiyon</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {firmsData.filter((f) => f.is_approved).map((firm) => {
-                    const firmPurchases = purchases.filter((p) => p.firm_id === firm.user_id);
                     return (
                       <tr key={firm.id} className="hover:bg-muted/50">
                         <td className="px-3 py-2 text-foreground font-medium">{firm.company_name}</td>
                         <td className="px-3 py-2 text-foreground">{firm.city}</td>
-                        <td className="px-3 py-2 text-foreground">{firm.phone}</td>
+                        <td className="px-3 py-2">
+                          {firm.is_premium ? (
+                            <Badge className="bg-yellow-500/90 text-white gap-1"><Crown className="h-3 w-3" /> Premium</Badge>
+                          ) : (
+                            <Badge variant="outline">Standart</Badge>
+                          )}
+                        </td>
                         <td className="px-3 py-2">
                           <div className="flex flex-wrap gap-1">
                             {firm.services.slice(0, 2).map((s) => (
@@ -539,15 +622,14 @@ const AdminPanel = () => {
                             {firm.services.length > 2 && <Badge variant="outline" className="text-xs">+{firm.services.length - 2}</Badge>}
                           </div>
                         </td>
-                        <td className="px-3 py-2 text-foreground">{firmPurchases.length} (${firmPurchases.length * 20})</td>
                         <td className="px-3 py-2">
                           <Badge variant={firm.is_active ? "default" : "destructive"}>
                             {firm.is_active ? "Aktif" : "Pasif"}
                           </Badge>
                         </td>
                         <td className="px-3 py-2">
-                          <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" onClick={() => {
+                          <div className="flex gap-1 flex-wrap">
+                            <Button size="sm" variant="ghost" title="Düzenle" onClick={() => {
                               setEditingFirm({
                                 id: firm.id,
                                 user_id: firm.user_id,
@@ -562,10 +644,20 @@ const AdminPanel = () => {
                                 services: firm.services,
                                 is_approved: firm.is_approved,
                                 is_active: firm.is_active,
+                                is_premium: firm.is_premium,
+                                premium_until: firm.premium_until || "",
+                                google_maps_url: firm.google_maps_url || "",
+                                detailed_services: firm.detailed_services || [],
                               });
                               setFirmFormOpen(true);
                             }}>
                               <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant="ghost" title="Galeri" onClick={() => loadAdminGallery(firm.id)}>
+                              <Image className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant="ghost" title="Yorumlar" onClick={() => loadAdminReviews(firm.id)}>
+                              <Star className="h-3 w-3" />
                             </Button>
                             <Button size="sm" variant={firm.is_active ? "destructive" : "default"} onClick={() => handleToggleFirmActive(firm.id, firm.is_active)}>
                               {firm.is_active ? "Devre Dışı" : "Aktifleştir"}
@@ -622,6 +714,91 @@ const AdminPanel = () => {
         onSaved={() => checkAdmin()}
         initialData={editingFirm}
       />
+
+      {/* Admin Gallery Dialog */}
+      <Dialog open={!!adminGalleryFirmId} onOpenChange={() => setAdminGalleryFirmId(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Image className="h-5 w-5 text-primary" /> Galeri Yönetimi - {firmsData.find(f => f.id === adminGalleryFirmId)?.company_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Input
+                placeholder="Açıklama (opsiyonel)"
+                value={galleryCaption}
+                onChange={(e) => setGalleryCaption(e.target.value)}
+                className="flex-1"
+              />
+              <label className="cursor-pointer">
+                <input type="file" accept="image/*" onChange={handleAdminGalleryUpload} className="hidden" disabled={galleryUploading} />
+                <Button asChild disabled={galleryUploading}>
+                  <span>{galleryUploading ? "Yükleniyor..." : "Fotoğraf Ekle"}</span>
+                </Button>
+              </label>
+            </div>
+            {adminGallery.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {adminGallery.map((img) => (
+                  <div key={img.id} className="relative group aspect-[4/3] rounded-lg overflow-hidden border border-border">
+                    <img src={img.image_url} alt={img.caption || "Galeri"} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                      <Button variant="destructive" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleAdminGalleryDelete(img.id, img.image_url)}>
+                        <Trash2 className="h-4 w-4 mr-1" /> Sil
+                      </Button>
+                    </div>
+                    {img.caption && <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2">{img.caption}</div>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">Henüz fotoğraf yok.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin Reviews Dialog */}
+      <Dialog open={!!adminReviewsFirmId} onOpenChange={() => setAdminReviewsFirmId(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-yellow-500" /> Yorum Yönetimi - {firmsData.find(f => f.id === adminReviewsFirmId)?.company_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {adminReviews.length > 0 ? adminReviews.map((review) => (
+              <div key={review.id} className="border border-border rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-foreground">{review.reviewer_name}</span>
+                    <div className="flex items-center gap-0.5 mt-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={`h-3 w-3 ${i < review.rating ? "text-yellow-500 fill-current" : "text-muted"}`} />
+                      ))}
+                    </div>
+                  </div>
+                  <Badge variant={review.is_approved ? "default" : "secondary"}>
+                    {review.is_approved ? "Onaylı" : "Beklemede"}
+                  </Badge>
+                </div>
+                {review.comment && <p className="text-sm text-muted-foreground">{review.comment}</p>}
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => handleToggleReviewApproval(review.id, review.is_approved)}>
+                    {review.is_approved ? "Gizle" : "Onayla"}
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => handleDeleteReview(review.id)}>
+                    <Trash2 className="h-3 w-3 mr-1" /> Sil
+                  </Button>
+                </div>
+              </div>
+            )) : (
+              <p className="text-center text-muted-foreground py-8">Henüz yorum yok.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

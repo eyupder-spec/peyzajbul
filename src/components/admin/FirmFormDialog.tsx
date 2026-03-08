@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Globe, X } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Loader2, Globe, X, Crown, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TURKISH_CITIES } from "@/lib/leadFormData";
@@ -28,6 +29,10 @@ export type FirmFormData = {
   is_approved: boolean;
   is_active: boolean;
   user_id?: string;
+  is_premium?: boolean;
+  premium_until?: string;
+  google_maps_url?: string;
+  detailed_services?: { title: string; description: string }[];
 };
 
 const emptyForm: FirmFormData = {
@@ -42,6 +47,10 @@ const emptyForm: FirmFormData = {
   services: [],
   is_approved: true,
   is_active: true,
+  is_premium: false,
+  premium_until: "",
+  google_maps_url: "",
+  detailed_services: [],
 };
 
 interface FirmFormDialogProps {
@@ -57,6 +66,8 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
   const [saving, setSaving] = useState(false);
   const [crawling, setCrawling] = useState(false);
   const [crawlUrl, setCrawlUrl] = useState("");
+  const [newServiceTitle, setNewServiceTitle] = useState("");
+  const [newServiceDesc, setNewServiceDesc] = useState("");
 
   const update = (partial: Partial<FirmFormData>) => setForm((p) => ({ ...p, ...partial }));
 
@@ -117,6 +128,10 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           services: form.services,
           is_approved: form.is_approved,
           is_active: form.is_active,
+          is_premium: form.is_premium || false,
+          premium_until: form.premium_until || null,
+          google_maps_url: form.google_maps_url || null,
+          detailed_services: form.detailed_services || [],
         }).eq("id", initialData.id);
         if (error) throw error;
         toast.success("Firma güncellendi!");
@@ -248,6 +263,111 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
               ))}
             </div>
           </div>
+
+          {/* Premium Section - Only in edit mode */}
+          {isEdit && (
+            <div className="border-t border-border pt-4 space-y-4">
+              <h3 className="font-heading font-semibold text-foreground flex items-center gap-2">
+                <Crown className="h-4 w-4 text-primary" /> Premium Ayarları
+              </h3>
+              
+              <div className="flex items-center justify-between">
+                <Label>Premium Aktif</Label>
+                <Switch
+                  checked={form.is_premium || false}
+                  onCheckedChange={(checked) => update({ is_premium: checked })}
+                />
+              </div>
+
+              {form.is_premium && (
+                <div className="space-y-1.5">
+                  <Label>Premium Bitiş Tarihi</Label>
+                  <Input
+                    type="date"
+                    value={form.premium_until ? new Date(form.premium_until).toISOString().split("T")[0] : ""}
+                    onChange={(e) => update({ premium_until: e.target.value ? new Date(e.target.value).toISOString() : "" })}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <Label>Google Maps Embed URL</Label>
+                <Input
+                  placeholder="https://www.google.com/maps/embed?..."
+                  value={form.google_maps_url || ""}
+                  onChange={(e) => update({ google_maps_url: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Detaylı Hizmetler</Label>
+                {(form.detailed_services || []).map((ds, i) => (
+                  <div key={i} className="flex gap-2 items-start bg-muted/50 rounded-lg p-2">
+                    <div className="flex-1 space-y-1">
+                      <Input
+                        placeholder="Hizmet başlığı"
+                        value={ds.title}
+                        onChange={(e) => {
+                          const updated = [...(form.detailed_services || [])];
+                          updated[i] = { ...updated[i], title: e.target.value };
+                          update({ detailed_services: updated });
+                        }}
+                      />
+                      <Textarea
+                        placeholder="Açıklama"
+                        value={ds.description}
+                        rows={2}
+                        onChange={(e) => {
+                          const updated = [...(form.detailed_services || [])];
+                          updated[i] = { ...updated[i], description: e.target.value };
+                          update({ detailed_services: updated });
+                        }}
+                      />
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive shrink-0"
+                      onClick={() => {
+                        const updated = (form.detailed_services || []).filter((_, idx) => idx !== i);
+                        update({ detailed_services: updated });
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Yeni hizmet başlığı"
+                    value={newServiceTitle}
+                    onChange={(e) => setNewServiceTitle(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Input
+                    placeholder="Açıklama"
+                    value={newServiceDesc}
+                    onChange={(e) => setNewServiceDesc(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (!newServiceTitle.trim()) return;
+                      update({
+                        detailed_services: [...(form.detailed_services || []), { title: newServiceTitle, description: newServiceDesc }],
+                      });
+                      setNewServiceTitle("");
+                      setNewServiceDesc("");
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>

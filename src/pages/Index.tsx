@@ -43,7 +43,7 @@ const Index = () => {
       <HowItWorks />
       <PopularCategories />
       <FeaturedCities />
-      <TrustBadges />
+      
       <Footer />
       <LeadFormModal open={formOpen} onClose={() => setFormOpen(false)} />
     </div>

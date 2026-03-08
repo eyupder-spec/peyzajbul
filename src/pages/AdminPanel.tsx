@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle } from "lucide-react";
+import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle, Plus } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
+import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
 
 type Firm = {
   id: string;
@@ -71,6 +72,10 @@ const AdminPanel = () => {
 
   // Status edit
   const [editingStatus, setEditingStatus] = useState<{ id: string; status: string } | null>(null);
+
+  // Firm form dialog
+  const [firmFormOpen, setFirmFormOpen] = useState(false);
+  const [editingFirm, setEditingFirm] = useState<FirmFormData | null>(null);
 
   const checkAdmin = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -312,9 +317,14 @@ const AdminPanel = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-foreground">Firma Yönetimi</h2>
-              {pendingFirmCount > 0 && (
-                <Badge variant="destructive">{pendingFirmCount} onay bekliyor</Badge>
-              )}
+              <div className="flex items-center gap-3">
+                {pendingFirmCount > 0 && (
+                  <Badge variant="destructive">{pendingFirmCount} onay bekliyor</Badge>
+                )}
+                <Button onClick={() => { setEditingFirm(null); setFirmFormOpen(true); }}>
+                  <Plus className="h-4 w-4 mr-2" /> Firma Ekle
+                </Button>
+              </div>
             </div>
 
             {/* Pending approvals */}
@@ -399,9 +409,31 @@ const AdminPanel = () => {
                           </Badge>
                         </td>
                         <td className="px-3 py-2">
-                          <Button size="sm" variant={firm.is_active ? "destructive" : "default"} onClick={() => handleToggleFirmActive(firm.id, firm.is_active)}>
-                            {firm.is_active ? "Devre Dışı" : "Aktifleştir"}
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="ghost" onClick={() => {
+                              setEditingFirm({
+                                id: firm.id,
+                                user_id: firm.user_id,
+                                company_name: firm.company_name,
+                                phone: firm.phone,
+                                email: firm.email,
+                                city: firm.city,
+                                district: firm.district || "",
+                                address: "",
+                                tax_number: firm.tax_number || "",
+                                description: firm.description || "",
+                                services: firm.services,
+                                is_approved: firm.is_approved,
+                                is_active: firm.is_active,
+                              });
+                              setFirmFormOpen(true);
+                            }}>
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant={firm.is_active ? "destructive" : "default"} onClick={() => handleToggleFirmActive(firm.id, firm.is_active)}>
+                              {firm.is_active ? "Devre Dışı" : "Aktifleştir"}
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -445,6 +477,14 @@ const AdminPanel = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Firm form dialog */}
+      <FirmFormDialog
+        open={firmFormOpen}
+        onClose={() => { setFirmFormOpen(false); setEditingFirm(null); }}
+        onSaved={() => checkAdmin()}
+        initialData={editingFirm}
+      />
     </div>
   );
 };

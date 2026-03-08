@@ -43,7 +43,7 @@ const BlogDetay = () => {
 
       // Match by city name from city_slug
       if (post?.city_slug) {
-        const cityObj = cities.find((c) => c.slug === post.city_slug);
+        const cityObj = CITIES.find((c) => c.slug === post.city_slug);
         if (cityObj) query = query.eq("city", cityObj.name);
       }
 

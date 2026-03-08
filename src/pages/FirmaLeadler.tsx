@@ -108,7 +108,7 @@ const FirmaLeadler = () => {
       const { data: leadsData } = await supabase
         .from("leads_for_firms" as any)
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false }) as { data: Lead[] | null };
 
       setLeads(leadsData || []);
 

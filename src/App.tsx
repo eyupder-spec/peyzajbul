@@ -23,6 +23,7 @@ import KategoriDetay from "./pages/KategoriDetay";
 import Blog from "./pages/Blog";
 import BlogDetay from "./pages/BlogDetay";
 import Changelog from "./pages/Changelog";
+import FirmaSahiplen from "./pages/FirmaSahiplen";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

@@ -14,10 +14,52 @@ export type Database = {
   }
   public: {
     Tables: {
+      coin_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          firm_id: string
+          id: string
+          lead_id: string | null
+          stripe_session_id: string | null
+          type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          firm_id: string
+          id?: string
+          lead_id?: string | null
+          stripe_session_id?: string | null
+          type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          firm_id?: string
+          id?: string
+          lead_id?: string | null
+          stripe_session_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coin_transactions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       firms: {
         Row: {
           address: string | null
           city: string
+          coin_balance: number
           company_name: string
           created_at: string
           description: string | null
@@ -35,6 +77,7 @@ export type Database = {
         Insert: {
           address?: string | null
           city: string
+          coin_balance?: number
           company_name: string
           created_at?: string
           description?: string | null
@@ -52,6 +95,7 @@ export type Database = {
         Update: {
           address?: string | null
           city?: string
+          coin_balance?: number
           company_name?: string
           created_at?: string
           description?: string | null

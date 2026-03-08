@@ -25,7 +25,7 @@ const Hero = ({ onTeklifAl }: HeroProps) => {
               Ücretsiz Teklif Al
             </Button>
             <Link to="/firmalar">
-              <Button variant="outline" size="lg" className="text-base px-8 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+              <Button variant="outline" size="lg" className="text-base px-8 border-primary-foreground text-primary-foreground bg-primary-foreground/10 hover:bg-primary-foreground/20 hover:text-primary-foreground">
                 Firmaları İncele
               </Button>
             </Link>

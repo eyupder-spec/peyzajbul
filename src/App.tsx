@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Firmalar from "./pages/Firmalar";
 import Hesabim from "./pages/Hesabim";
 import FirmaPanel from "./pages/FirmaPanel";
+import FirmaGiris from "./pages/FirmaGiris";
 import FirmaLeadler from "./pages/FirmaLeadler";
 import NotFound from "./pages/NotFound";
 

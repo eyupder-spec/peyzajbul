@@ -13,9 +13,10 @@ type FirmCardProps = {
   description?: string | null;
   is_premium?: boolean;
   slug?: string | null;
+  logo_url?: string | null;
 };
 
-const FirmCard = ({ id, company_name, city, district, services, description, is_premium, slug: dbSlug }: FirmCardProps) => {
+const FirmCard = ({ id, company_name, city, district, services, description, is_premium, slug: dbSlug, logo_url }: FirmCardProps) => {
   const slug = dbSlug || generateFirmSlug(company_name, id);
 
   return (

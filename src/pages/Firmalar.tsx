@@ -14,10 +14,7 @@ const Firmalar = () => {
   const [cityFilter, setCityFilter] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
 
-  const allServices = useMemo(() => {
-    if (!firms) return [];
-    return [...new Set(firms.flatMap((f) => f.services || []))].sort();
-  }, [firms]);
+  const allServices = SERVICE_LABELS;
 
   const filtered = useMemo(() => {
     if (!firms) return [];

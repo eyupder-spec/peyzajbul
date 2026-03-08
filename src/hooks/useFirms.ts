@@ -15,6 +15,7 @@ export type PublicFirm = {
   detailed_services: any[] | null;
   slug: string | null;
   website: string | null;
+  logo_url: string | null;
 };
 
 export function useApprovedFirms() {

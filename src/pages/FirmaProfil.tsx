@@ -177,7 +177,7 @@ const FirmaProfil = () => {
 
       toast({
         title: "Bilgileriniz güncellendi",
-        description: "Değişiklikleriniz admin onayına gönderildi. Onaylanana kadar firmanız geçici olarak yayından kaldırılacaktır.",
+        description: "Değişiklikleriniz admin onayına gönderildi. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir.",
       });
       navigate("/firma/panel");
     } catch (err: any) {

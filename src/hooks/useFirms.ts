@@ -13,6 +13,8 @@ export type PublicFirm = {
   is_premium: boolean;
   google_maps_url: string | null;
   detailed_services: any[] | null;
+  slug: string | null;
+  website: string | null;
 };
 
 export function useApprovedFirms() {

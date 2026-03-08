@@ -396,6 +396,12 @@ const FirmaLeadler = () => {
                   </TooltipContent>
                 </Tooltip>
               </div>
+
+              {selectedLead && !purchasedLeadIds.has(selectedLead.id) && getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0) && (
+                <div className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded border ${getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0)!.className}`}>
+                  🔥 {getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0)!.text}
+                </div>
+              )}
             </div>
           )}
           <DialogFooter>

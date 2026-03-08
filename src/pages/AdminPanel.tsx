@@ -200,6 +200,7 @@ const AdminPanel = () => {
             <Button variant={tab === "dashboard" ? "default" : "ghost"} size="sm" onClick={() => setTab("dashboard")}>Dashboard</Button>
             <Button variant={tab === "leads" ? "default" : "ghost"} size="sm" onClick={() => setTab("leads")}>Leadler</Button>
             <Button variant={tab === "firms" ? "default" : "ghost"} size="sm" onClick={() => setTab("firms")}>Firmalar</Button>
+            <Button variant={tab === "jetonlar" ? "default" : "ghost"} size="sm" onClick={() => setTab("jetonlar")}><Coins className="h-4 w-4 mr-1" />Jetonlar</Button>
             <Button variant="ghost" size="icon" onClick={handleLogout}><LogOut className="h-4 w-4" /></Button>
           </div>
         </div>

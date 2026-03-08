@@ -27,11 +27,11 @@ type Lead = {
   status: string;
 };
 
-const getFomoMessage = (count: number): { text: string; className: string } | null => {
-  if (count === 0) return null;
-  if (count === 1) return { text: "1 firma teklif verdi", className: "text-amber-600 bg-amber-50 border-amber-200" };
-  if (count === 2) return { text: "2 firma teklif verdi — acele edin!", className: "text-orange-600 bg-orange-50 border-orange-200" };
-  return { text: `${count} firma teklif verdi — son şans!`, className: "text-red-600 bg-red-50 border-red-200" };
+const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
+  if (count === 0) return { text: "Henüz teklif yok — tam zamanı!", icon: "✅", className: "text-emerald-600 bg-emerald-50 border-emerald-200" };
+  if (count === 1) return { text: "1 firma teklif verdi — acele edin!", icon: "⚡", className: "text-amber-600 bg-amber-50 border-amber-200" };
+  if (count === 2) return { text: "2 firma teklif verdi — son şans!", icon: "🔥", className: "text-red-600 bg-red-50 border-red-200" };
+  return { text: "3 firma teklif verdi — kapasite doldu!", icon: "🚫", className: "text-muted-foreground bg-muted border-border opacity-70" };
 };
 
 const maskName = (name: string) => {

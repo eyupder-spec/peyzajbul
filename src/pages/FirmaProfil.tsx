@@ -174,7 +174,7 @@ const FirmaProfil = () => {
     }
   };
 
-
+  const handleSave = async () => {
     if (!form.company_name || !form.phone || !form.email || !form.city) {
       toast({ title: "Hata", description: "Firma adı, telefon, e-posta ve il zorunludur.", variant: "destructive" });
       return;

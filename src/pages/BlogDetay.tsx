@@ -160,7 +160,7 @@ const BlogDetay = () => {
               </h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {relatedFirms.map((firm) => (
-                  <FirmCard key={firm.id} firm={firm} />
+                  <FirmCard key={firm.id} {...firm} services={firm.services || []} />
                 ))}
               </div>
             </div>

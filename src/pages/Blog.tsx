@@ -113,7 +113,7 @@ const Blog = () => {
                       )}
                       {post.city_slug && (
                         <Badge variant="outline" className="text-xs">
-                          {cities.find((c) => c.slug === post.city_slug)?.name || post.city_slug}
+                          {CITIES.find((c) => c.slug === post.city_slug)?.name || post.city_slug}
                         </Badge>
                       )}
                     </div>

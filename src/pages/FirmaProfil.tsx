@@ -334,6 +334,19 @@ const FirmaProfil = () => {
                     <Textarea value={form.description} onChange={(e) => update({ description: e.target.value })} rows={3} />
                   </div>
 
+                  {/* Telegram Bildirim */}
+                  <div className="space-y-1.5">
+                    <Label>Telegram Chat ID (Bildirim)</Label>
+                    <Input
+                      placeholder="Örn: 123456789"
+                      value={form.telegram_chat_id}
+                      onChange={(e) => update({ telegram_chat_id: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Yeni lead geldiğinde Telegram'dan bildirim almak için: @userinfobot'a mesaj atıp Chat ID'nizi öğrenin, ardından @PeyzajRehberiBot'u başlatın.
+                    </p>
+                  </div>
+
                   <div className="space-y-1.5">
                     <Label>Hizmetler</Label>
                     <div className="flex flex-wrap gap-2">

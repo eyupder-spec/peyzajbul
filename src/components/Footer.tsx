@@ -20,6 +20,7 @@ const Footer = () => {
             <div className="space-y-2">
               <Link to="/" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Ana Sayfa</Link>
               <Link to="/firmalar" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Firmalar</Link>
+              <Link to="/blog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link>
               <a href="#nasil-calisir" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Nasıl Çalışır</a>
             </div>
           </div>

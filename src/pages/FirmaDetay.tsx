@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Mail, ArrowLeft, Building2, Crown, Star, Image as ImageIcon, Globe, Eye } from "lucide-react";
+import { MapPin, Phone, Mail, ArrowLeft, Building2, Crown, Star, Image as ImageIcon, Globe, Eye, MessageCircle } from "lucide-react";
 import { extractFirmIdFromSlug } from "@/lib/firmUtils";
 import { useApprovedFirms, useFirmGallery, useFirmReviews } from "@/hooks/useFirms";
 import { getCitySlug } from "@/lib/cities";
@@ -257,6 +257,19 @@ const FirmaDetay = () => {
                     {firm.city}{firm.district ? ` / ${firm.district}` : ""}
                   </div>
                 </div>
+
+                {/* WhatsApp Button */}
+                <a
+                  href={`https://wa.me/${firm.phone.replace(/\D/g, "").replace(/^0/, "90")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <Button className="w-full gap-2 bg-[#25D366] hover:bg-[#1fb855] text-white">
+                    <MessageCircle className="h-5 w-5" />
+                    WhatsApp ile İletişim
+                  </Button>
+                </a>
               </div>
 
               {/* Google Maps - Premium Only */}

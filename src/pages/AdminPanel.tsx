@@ -12,10 +12,11 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut,
   Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
-  LayoutDashboard, Menu
+  LayoutDashboard, Menu, BookOpen
 } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
+import AdminBlogTab from "@/components/admin/AdminBlogTab";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
@@ -72,6 +73,7 @@ const SIDEBAR_ITEMS = [
   { title: "Leadler", key: "leads", icon: FileText },
   { title: "Firmalar", key: "firms", icon: Building2 },
   { title: "Jetonlar", key: "jetonlar", icon: Coins },
+  { title: "Blog", key: "blog", icon: BookOpen },
 ];
 
 function AdminSidebar({ tab, setTab, pendingFirmCount }: { tab: string; setTab: (t: any) => void; pendingFirmCount: number }) {
@@ -124,7 +126,7 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "jetonlar">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "jetonlar" | "blog">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
   const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
@@ -765,6 +767,9 @@ const AdminPanel = () => {
                 </div>
               </div>
             )}
+
+            {/* Blog */}
+            {tab === "blog" && <AdminBlogTab />}
           </main>
         </div>
       </div>

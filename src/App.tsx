@@ -9,6 +9,8 @@ import Hesabim from "./pages/Hesabim";
 import FirmaPanel from "./pages/FirmaPanel";
 import FirmaGiris from "./pages/FirmaGiris";
 import FirmaLeadler from "./pages/FirmaLeadler";
+import AdminGiris from "./pages/AdminGiris";
+import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

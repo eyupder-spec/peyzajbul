@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 const FeaturedFirms = () => {
   const { data: firms, isLoading } = useApprovedFirms();
+  // Premium firms first, then latest - already sorted by query
   const featured = firms?.slice(0, 6) || [];
 
   return (
@@ -30,6 +31,7 @@ const FeaturedFirms = () => {
                 district={firm.district}
                 services={firm.services || []}
                 description={firm.description}
+                is_premium={firm.is_premium}
               />
             ))}
           </div>

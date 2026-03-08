@@ -1,4 +1,4 @@
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
@@ -11,14 +11,22 @@ type FirmCardProps = {
   district?: string | null;
   services: string[];
   description?: string | null;
+  is_premium?: boolean;
 };
 
-const FirmCard = ({ id, company_name, city, district, services, description }: FirmCardProps) => {
+const FirmCard = ({ id, company_name, city, district, services, description, is_premium }: FirmCardProps) => {
   const slug = generateFirmSlug(company_name, id);
 
   return (
-    <div className="bg-card rounded-lg border border-border p-6 hover:shadow-lg transition-shadow group flex flex-col">
-      <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center mb-4">
+    <div className={`bg-card rounded-lg border p-6 hover:shadow-lg transition-shadow group flex flex-col relative ${is_premium ? "border-primary/50 ring-1 ring-primary/20" : "border-border"}`}>
+      {is_premium && (
+        <div className="absolute top-3 right-3">
+          <Badge className="bg-primary text-primary-foreground gap-1 text-xs">
+            <Crown className="h-3 w-3" /> Premium
+          </Badge>
+        </div>
+      )}
+      <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${is_premium ? "bg-primary/10" : "bg-secondary"}`}>
         <span className="font-heading text-lg font-bold text-primary">{company_name[0]}</span>
       </div>
       <h3 className="font-heading text-lg font-semibold text-foreground mb-1">{company_name}</h3>

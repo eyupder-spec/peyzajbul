@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { ShoppingCart, Eye, ArrowLeft } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
 
 type Lead = {
   id: string;
@@ -35,11 +37,7 @@ const maskPhone = (phone: string) => {
   return phone.slice(0, 2) + "** *** **" + phone.slice(-2);
 };
 
-const getScoreColor = (score: number | null) => {
-  if (!score || score < 30) return "bg-destructive/20 text-destructive";
-  if (score < 60) return "bg-accent/20 text-accent-foreground";
-  return "bg-primary/20 text-primary";
-};
+// Score rendering now uses imported getScoreBadge + getScoreBreakdown
 
 const getStatusLabel = (status: string) => {
   switch (status) {
@@ -188,9 +186,22 @@ const FirmaLeadler = () => {
                           {isPurchased ? lead.phone : maskPhone(lead.phone)}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getScoreColor(lead.lead_score)}`}>
-                            {lead.lead_score || 0}
-                          </span>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium cursor-help ${getScoreBadge(lead.lead_score).className}`}>
+                                {getScoreBadge(lead.lead_score).emoji} {lead.lead_score || 0}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p className="font-semibold mb-1">{getScoreBadge(lead.lead_score).label}</p>
+                              {getScoreBreakdown(lead).map((item, i) => (
+                                <div key={i} className="flex justify-between text-xs gap-4">
+                                  <span>{item.label}</span>
+                                  <span className="font-mono">+{item.points}</span>
+                                </div>
+                              ))}
+                            </TooltipContent>
+                          </Tooltip>
                         </td>
                         <td className="px-4 py-3">
                           <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
@@ -317,9 +328,21 @@ const FirmaLeadler = () => {
 
               <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground">Lead Skoru:</p>
-                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getScoreColor(selectedLead.lead_score)}`}>
-                  {selectedLead.lead_score || 0}
-                </span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium cursor-help ${getScoreBadge(selectedLead.lead_score).className}`}>
+                      {getScoreBadge(selectedLead.lead_score).emoji} {selectedLead.lead_score || 0} — {getScoreBadge(selectedLead.lead_score).label}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    {getScoreBreakdown(selectedLead).map((item, i) => (
+                      <div key={i} className="flex justify-between text-xs gap-4">
+                        <span>{item.label}</span>
+                        <span className="font-mono">+{item.points}</span>
+                      </div>
+                    ))}
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           )}

@@ -36,6 +36,7 @@ export type FirmFormData = {
   premium_until?: string;
   google_maps_url?: string;
   detailed_services?: { title: string; description: string }[];
+  logo_url?: string;
 };
 
 const emptyForm: FirmFormData = {

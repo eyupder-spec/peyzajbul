@@ -127,6 +127,10 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           services: form.services,
           is_approved: form.is_approved,
           is_active: form.is_active,
+          is_premium: form.is_premium || false,
+          premium_until: form.premium_until || null,
+          google_maps_url: form.google_maps_url || null,
+          detailed_services: form.detailed_services || [],
         }).eq("id", initialData.id);
         if (error) throw error;
         toast.success("Firma güncellendi!");

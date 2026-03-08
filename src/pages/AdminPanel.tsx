@@ -176,6 +176,7 @@ const AdminPanel = () => {
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const weekLeads = leads.filter((l) => new Date(l.created_at) >= weekAgo).length;
   const monthLeads = leads.filter((l) => new Date(l.created_at).getMonth() === now.getMonth()).length;
+  const totalCoinRevenue = coinTransactions.filter(t => t.type === "purchase").reduce((sum: number, t: any) => sum + t.amount, 0);
   const totalRevenue = purchases.length * 20;
   const firmCount = firmsData.filter((f) => f.is_approved).length;
   const pendingFirmCount = firmsData.filter((f) => !f.is_approved).length;

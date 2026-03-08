@@ -118,6 +118,18 @@ const FirmaLeadler = () => {
         .eq("firm_id", user.id);
 
       setPurchasedLeadIds(new Set(purchases?.map((p) => p.lead_id) || []));
+
+      // Fetch all purchase counts per lead for FOMO
+      const { data: allPurchases } = await supabase
+        .from("lead_purchases")
+        .select("lead_id");
+
+      const counts: Record<string, number> = {};
+      allPurchases?.forEach((p) => {
+        counts[p.lead_id] = (counts[p.lead_id] || 0) + 1;
+      });
+      setLeadPurchaseCounts(counts);
+
       setLoading(false);
     };
     fetchData();

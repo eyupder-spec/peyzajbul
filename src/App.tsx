@@ -20,6 +20,8 @@ import AdminGiris from "./pages/AdminGiris";
 import AdminPanel from "./pages/AdminPanel";
 import Kategoriler from "./pages/Kategoriler";
 import KategoriDetay from "./pages/KategoriDetay";
+import Blog from "./pages/Blog";
+import BlogDetay from "./pages/BlogDetay";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

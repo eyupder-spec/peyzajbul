@@ -310,30 +310,97 @@ const AdminPanel = () => {
         {/* Firms */}
         {tab === "firms" && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-foreground">Firma Yönetimi</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-foreground">Firma Yönetimi</h2>
+              {pendingFirmCount > 0 && (
+                <Badge variant="destructive">{pendingFirmCount} onay bekliyor</Badge>
+              )}
+            </div>
+
+            {/* Pending approvals */}
+            {firmsData.filter((f) => !f.is_approved).length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-foreground">Onay Bekleyenler</h3>
+                <div className="grid gap-4">
+                  {firmsData.filter((f) => !f.is_approved).map((firm) => (
+                    <Card key={firm.id} className="border-accent/30 bg-accent/5">
+                      <CardContent className="pt-4">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <p className="font-semibold text-foreground">{firm.company_name}</p>
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-muted-foreground">
+                              <span>📧 {firm.email}</span>
+                              <span>📞 {firm.phone}</span>
+                              <span>📍 {firm.city}{firm.district ? ` / ${firm.district}` : ""}</span>
+                              {firm.tax_number && <span>🏢 VN: {firm.tax_number}</span>}
+                            </div>
+                            {firm.services.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {firm.services.map((s) => (
+                                  <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
+                                ))}
+                              </div>
+                            )}
+                            {firm.description && (
+                              <p className="text-sm text-muted-foreground mt-1">{firm.description}</p>
+                            )}
+                          </div>
+                          <div className="flex gap-2 shrink-0">
+                            <Button size="sm" onClick={() => handleApproveFirm(firm.id)}>
+                              <CheckCircle className="h-4 w-4 mr-1" /> Onayla
+                            </Button>
+                            <Button size="sm" variant="destructive" onClick={() => handleRejectFirm(firm.id, firm.user_id)}>
+                              <XCircle className="h-4 w-4 mr-1" /> Reddet
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Approved firms */}
+            <h3 className="text-lg font-semibold text-foreground">Onaylı Firmalar</h3>
             <div className="rounded-lg border border-border overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-muted">
                   <tr>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">User ID</th>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Rol</th>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Kayıt Tarihi</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Firma Adı</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">İl</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Telefon</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Hizmetler</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Satın Almalar</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Durum</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Aksiyon</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {firms.map((firm) => {
+                  {firmsData.filter((f) => f.is_approved).map((firm) => {
                     const firmPurchases = purchases.filter((p) => p.firm_id === firm.user_id);
                     return (
                       <tr key={firm.id} className="hover:bg-muted/50">
-                        <td className="px-3 py-2 text-foreground font-mono text-xs">{firm.user_id.slice(0, 12)}...</td>
-                        <td className="px-3 py-2"><Badge>firm</Badge></td>
-                        <td className="px-3 py-2 text-foreground">{new Date(firm.created_at).toLocaleDateString("tr-TR")}</td>
+                        <td className="px-3 py-2 text-foreground font-medium">{firm.company_name}</td>
+                        <td className="px-3 py-2 text-foreground">{firm.city}</td>
+                        <td className="px-3 py-2 text-foreground">{firm.phone}</td>
+                        <td className="px-3 py-2">
+                          <div className="flex flex-wrap gap-1">
+                            {firm.services.slice(0, 2).map((s) => (
+                              <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
+                            ))}
+                            {firm.services.length > 2 && <Badge variant="outline" className="text-xs">+{firm.services.length - 2}</Badge>}
+                          </div>
+                        </td>
                         <td className="px-3 py-2 text-foreground">{firmPurchases.length} (${firmPurchases.length * 20})</td>
                         <td className="px-3 py-2">
-                          <Button size="sm" variant="destructive" onClick={() => handleToggleFirmActive(firm.user_id, "firm")}>
-                            Devre Dışı
+                          <Badge variant={firm.is_active ? "default" : "destructive"}>
+                            {firm.is_active ? "Aktif" : "Pasif"}
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2">
+                          <Button size="sm" variant={firm.is_active ? "destructive" : "default"} onClick={() => handleToggleFirmActive(firm.id, firm.is_active)}>
+                            {firm.is_active ? "Devre Dışı" : "Aktifleştir"}
                           </Button>
                         </td>
                       </tr>
@@ -341,8 +408,8 @@ const AdminPanel = () => {
                   })}
                 </tbody>
               </table>
-              {firms.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">Henüz kayıtlı firma yok.</div>
+              {firmsData.filter((f) => f.is_approved).length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">Henüz onaylı firma yok.</div>
               )}
             </div>
           </div>

@@ -667,12 +667,6 @@ const AdminPanel = () => {
                       </tr>
                     );
                   })}
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
                 </tbody>
               </table>
               {firmsData.filter((f) => f.is_approved).length === 0 && (

@@ -219,12 +219,8 @@ const FirmaLeadler = () => {
                         <td className="px-4 py-3 text-sm text-foreground">{lead.budget}</td>
                         <td className="px-4 py-3 text-sm text-foreground">{lead.city}</td>
                         <td className="px-4 py-3 text-sm text-foreground">{lead.district || "-"}</td>
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          {isPurchased ? lead.full_name : maskName(lead.full_name)}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          {isPurchased ? lead.phone : maskPhone(lead.phone)}
-                        </td>
+                        <td className="px-4 py-3 text-sm text-foreground">{lead.full_name}</td>
+                        <td className="px-4 py-3 text-sm text-foreground">{lead.phone}</td>
                         <td className="px-4 py-3">
                           <Tooltip>
                             <TooltipTrigger asChild>

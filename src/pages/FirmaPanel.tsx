@@ -25,13 +25,14 @@ const FirmaPanel = () => {
       if (!roles || roles.length === 0) { navigate("/"); return; }
 
       // Check firm approval & get balance
-      const { data: firm } = await supabase
+      const { data: firmData } = await supabase
         .from("firms")
-        .select("is_approved, coin_balance")
+        .select("is_approved, coin_balance, is_premium, premium_until")
         .eq("user_id", user.id)
         .single();
 
-      if (!firm?.is_approved) { navigate("/firma/giris"); return; }
+      if (!firmData?.is_approved) { navigate("/firma/giris"); return; }
+      const firm = firmData;
 
       // Fetch stats
       const { count: totalLeads } = await supabase

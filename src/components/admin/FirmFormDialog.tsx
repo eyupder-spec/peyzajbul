@@ -152,16 +152,13 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
         if (error) throw error;
         toast.success("Firma güncellendi!");
       } else {
-        const tempPassword = Math.random().toString(36).slice(-10) + "A1!";
-        const { data: authData, error: authError } = await supabase.functions.invoke("create-firm-user", {
-          body: { email: form.email, password: tempPassword, company_name: form.company_name },
-        });
-        if (authError) throw authError;
-        if (!authData?.user_id) throw new Error("Kullanıcı oluşturulamadı.");
+        // Use admin's own user_id — will be transferred on claim approval
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Oturum bulunamadı.");
 
-        const firmSlug = generateFirmSlug(form.company_name, authData.user_id);
+        const firmSlug = generateFirmSlug(form.company_name, user.id);
         const { error } = await supabase.from("firms").insert({
-          user_id: authData.user_id,
+          user_id: user.id,
           company_name: form.company_name,
           phone: form.phone,
           email: form.email,

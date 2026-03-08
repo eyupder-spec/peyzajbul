@@ -68,8 +68,8 @@ const Blog = () => {
               <SelectTrigger className="w-48"><SelectValue placeholder="Kategori" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tüm Kategoriler</SelectItem>
-                {categories.map((c) => (
-                  <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
+                {CATEGORIES.map((c) => (
+                  <SelectItem key={c.slug} value={c.slug}>{c.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

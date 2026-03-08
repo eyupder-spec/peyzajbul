@@ -77,7 +77,7 @@ const Blog = () => {
               <SelectTrigger className="w-48"><SelectValue placeholder="Şehir" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tüm Şehirler</SelectItem>
-                {cities.map((c) => (
+                {CITIES.map((c) => (
                   <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
                 ))}
               </SelectContent>

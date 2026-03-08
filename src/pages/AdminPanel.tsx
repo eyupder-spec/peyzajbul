@@ -59,6 +59,7 @@ const AdminPanel = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
+  const [firmsData, setFirmsData] = useState<Firm[]>([]);
   const [tab, setTab] = useState<"dashboard" | "leads" | "firms">("dashboard");
 
   // Filters

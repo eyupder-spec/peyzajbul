@@ -247,6 +247,31 @@ const FirmaProfil = () => {
                 </div>
               </div>
 
+              {/* Logo */}
+              <Card className="border-border">
+                <CardContent className="pt-6">
+                  <Label className="mb-3 block">Firma Logosu</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-lg border border-border bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                      {logoUrl ? (
+                        <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                      ) : (
+                        <Camera className="h-8 w-8 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="cursor-pointer">
+                        <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" disabled={uploadingLogo} />
+                        <Button asChild variant="outline" size="sm" disabled={uploadingLogo}>
+                          <span>{uploadingLogo ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Yükleniyor...</> : <><Upload className="h-4 w-4 mr-2" /> Logo Yükle</>}</span>
+                        </Button>
+                      </label>
+                      <p className="text-xs text-muted-foreground">PNG veya JPG, max 2MB önerilir</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card className="border-border">
                 <CardContent className="pt-6 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

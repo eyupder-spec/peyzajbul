@@ -24,6 +24,15 @@ const FirmaPanel = () => {
 
       if (!roles || roles.length === 0) { navigate("/"); return; }
 
+      // Check firm approval
+      const { data: firm } = await supabase
+        .from("firms")
+        .select("is_approved")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!firm?.is_approved) { navigate("/firma/giris"); return; }
+
       // Fetch stats
       const { count: totalLeads } = await supabase
         .from("leads")

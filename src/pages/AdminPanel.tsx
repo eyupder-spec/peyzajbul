@@ -8,8 +8,24 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2 } from "lucide-react";
+import { Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Building2, CheckCircle, XCircle } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
+
+type Firm = {
+  id: string;
+  user_id: string;
+  company_name: string;
+  phone: string;
+  email: string;
+  city: string;
+  district: string | null;
+  tax_number: string | null;
+  description: string | null;
+  services: string[];
+  is_approved: boolean;
+  is_active: boolean;
+  created_at: string;
+};
 
 type Lead = {
   id: string;
@@ -43,6 +59,7 @@ const AdminPanel = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
+  const [firmsData, setFirmsData] = useState<Firm[]>([]);
   const [tab, setTab] = useState<"dashboard" | "leads" | "firms">("dashboard");
 
   // Filters
@@ -68,15 +85,17 @@ const AdminPanel = () => {
     if (!adminRoles || adminRoles.length === 0) { navigate("/admin/giris"); return; }
 
     // Fetch all data
-    const [leadsRes, rolesRes, purchasesRes] = await Promise.all([
+    const [leadsRes, rolesRes, purchasesRes, firmsRes] = await Promise.all([
       supabase.from("leads").select("*").order("created_at", { ascending: false }),
       supabase.from("user_roles").select("*"),
       supabase.from("lead_purchases").select("*"),
+      supabase.from("firms").select("*").order("created_at", { ascending: false }),
     ]);
 
     setLeads(leadsRes.data || []);
     setRoles(rolesRes.data || []);
     setPurchases(purchasesRes.data || []);
+    setFirmsData((firmsRes.data as Firm[]) || []);
     setLoading(false);
   }, [navigate]);
 
@@ -104,12 +123,32 @@ const AdminPanel = () => {
     setEditingStatus(null);
   };
 
-  const handleToggleFirmActive = async (userId: string, currentRole: string) => {
-    // Toggle by deleting/re-adding firm role
-    if (currentRole === "firm") {
-      await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "firm");
-      setRoles((prev) => prev.filter((r) => !(r.user_id === userId && r.role === "firm")));
-      toast({ title: "Firma devre dışı bırakıldı" });
+  const handleApproveFirm = async (firmId: string) => {
+    const { error } = await supabase.from("firms").update({ is_approved: true }).eq("id", firmId);
+    if (error) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    } else {
+      setFirmsData((prev) => prev.map((f) => f.id === firmId ? { ...f, is_approved: true } : f));
+      toast({ title: "Firma onaylandı!" });
+    }
+  };
+
+  const handleRejectFirm = async (firmId: string, userId: string) => {
+    // Delete firm record and remove firm role
+    await supabase.from("firms").delete().eq("id", firmId);
+    await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "firm");
+    setFirmsData((prev) => prev.filter((f) => f.id !== firmId));
+    setRoles((prev) => prev.filter((r) => !(r.user_id === userId && r.role === "firm")));
+    toast({ title: "Firma başvurusu reddedildi" });
+  };
+
+  const handleToggleFirmActive = async (firmId: string, currentActive: boolean) => {
+    const { error } = await supabase.from("firms").update({ is_active: !currentActive }).eq("id", firmId);
+    if (error) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    } else {
+      setFirmsData((prev) => prev.map((f) => f.id === firmId ? { ...f, is_active: !currentActive } : f));
+      toast({ title: currentActive ? "Firma devre dışı bırakıldı" : "Firma aktifleştirildi" });
     }
   };
 
@@ -129,7 +168,8 @@ const AdminPanel = () => {
   const weekLeads = leads.filter((l) => new Date(l.created_at) >= weekAgo).length;
   const monthLeads = leads.filter((l) => new Date(l.created_at).getMonth() === now.getMonth()).length;
   const totalRevenue = purchases.length * 20;
-  const firmCount = roles.filter((r) => r.role === "firm").length;
+  const firmCount = firmsData.filter((f) => f.is_approved).length;
+  const pendingFirmCount = firmsData.filter((f) => !f.is_approved).length;
   const conversionRate = leads.length > 0 ? Math.round((purchases.length / leads.length) * 100) : 0;
 
   const filteredLeads = leads.filter((l) => {
@@ -137,8 +177,6 @@ const AdminPanel = () => {
     if (filterStatus !== "all" && l.status !== filterStatus) return false;
     return true;
   });
-
-  const firms = roles.filter((r) => r.role === "firm");
 
   return (
     <div className="min-h-screen bg-background">
@@ -272,30 +310,97 @@ const AdminPanel = () => {
         {/* Firms */}
         {tab === "firms" && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-foreground">Firma Yönetimi</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-foreground">Firma Yönetimi</h2>
+              {pendingFirmCount > 0 && (
+                <Badge variant="destructive">{pendingFirmCount} onay bekliyor</Badge>
+              )}
+            </div>
+
+            {/* Pending approvals */}
+            {firmsData.filter((f) => !f.is_approved).length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-foreground">Onay Bekleyenler</h3>
+                <div className="grid gap-4">
+                  {firmsData.filter((f) => !f.is_approved).map((firm) => (
+                    <Card key={firm.id} className="border-accent/30 bg-accent/5">
+                      <CardContent className="pt-4">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <p className="font-semibold text-foreground">{firm.company_name}</p>
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-muted-foreground">
+                              <span>📧 {firm.email}</span>
+                              <span>📞 {firm.phone}</span>
+                              <span>📍 {firm.city}{firm.district ? ` / ${firm.district}` : ""}</span>
+                              {firm.tax_number && <span>🏢 VN: {firm.tax_number}</span>}
+                            </div>
+                            {firm.services.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {firm.services.map((s) => (
+                                  <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
+                                ))}
+                              </div>
+                            )}
+                            {firm.description && (
+                              <p className="text-sm text-muted-foreground mt-1">{firm.description}</p>
+                            )}
+                          </div>
+                          <div className="flex gap-2 shrink-0">
+                            <Button size="sm" onClick={() => handleApproveFirm(firm.id)}>
+                              <CheckCircle className="h-4 w-4 mr-1" /> Onayla
+                            </Button>
+                            <Button size="sm" variant="destructive" onClick={() => handleRejectFirm(firm.id, firm.user_id)}>
+                              <XCircle className="h-4 w-4 mr-1" /> Reddet
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Approved firms */}
+            <h3 className="text-lg font-semibold text-foreground">Onaylı Firmalar</h3>
             <div className="rounded-lg border border-border overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-muted">
                   <tr>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">User ID</th>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Rol</th>
-                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Kayıt Tarihi</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Firma Adı</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">İl</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Telefon</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Hizmetler</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Satın Almalar</th>
+                    <th className="text-left px-3 py-2 text-muted-foreground font-medium">Durum</th>
                     <th className="text-left px-3 py-2 text-muted-foreground font-medium">Aksiyon</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {firms.map((firm) => {
+                  {firmsData.filter((f) => f.is_approved).map((firm) => {
                     const firmPurchases = purchases.filter((p) => p.firm_id === firm.user_id);
                     return (
                       <tr key={firm.id} className="hover:bg-muted/50">
-                        <td className="px-3 py-2 text-foreground font-mono text-xs">{firm.user_id.slice(0, 12)}...</td>
-                        <td className="px-3 py-2"><Badge>firm</Badge></td>
-                        <td className="px-3 py-2 text-foreground">{new Date(firm.created_at).toLocaleDateString("tr-TR")}</td>
+                        <td className="px-3 py-2 text-foreground font-medium">{firm.company_name}</td>
+                        <td className="px-3 py-2 text-foreground">{firm.city}</td>
+                        <td className="px-3 py-2 text-foreground">{firm.phone}</td>
+                        <td className="px-3 py-2">
+                          <div className="flex flex-wrap gap-1">
+                            {firm.services.slice(0, 2).map((s) => (
+                              <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
+                            ))}
+                            {firm.services.length > 2 && <Badge variant="outline" className="text-xs">+{firm.services.length - 2}</Badge>}
+                          </div>
+                        </td>
                         <td className="px-3 py-2 text-foreground">{firmPurchases.length} (${firmPurchases.length * 20})</td>
                         <td className="px-3 py-2">
-                          <Button size="sm" variant="destructive" onClick={() => handleToggleFirmActive(firm.user_id, "firm")}>
-                            Devre Dışı
+                          <Badge variant={firm.is_active ? "default" : "destructive"}>
+                            {firm.is_active ? "Aktif" : "Pasif"}
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2">
+                          <Button size="sm" variant={firm.is_active ? "destructive" : "default"} onClick={() => handleToggleFirmActive(firm.id, firm.is_active)}>
+                            {firm.is_active ? "Devre Dışı" : "Aktifleştir"}
                           </Button>
                         </td>
                       </tr>
@@ -303,8 +408,8 @@ const AdminPanel = () => {
                   })}
                 </tbody>
               </table>
-              {firms.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">Henüz kayıtlı firma yok.</div>
+              {firmsData.filter((f) => f.is_approved).length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">Henüz onaylı firma yok.</div>
               )}
             </div>
           </div>

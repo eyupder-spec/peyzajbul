@@ -70,6 +70,7 @@ const FirmaLeadler = () => {
   const { toast } = useToast();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [purchasedLeadIds, setPurchasedLeadIds] = useState<Set<string>>(new Set());
+  const [leadPurchaseCounts, setLeadPurchaseCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [purchasing, setPurchasing] = useState(false);

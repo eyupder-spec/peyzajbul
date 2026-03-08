@@ -86,6 +86,8 @@ const FirmaProfil = () => {
   const [firmId, setFirmId] = useState("");
   const [firmName, setFirmName] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [form, setForm] = useState<FirmData>({
     id: "",
     company_name: "",

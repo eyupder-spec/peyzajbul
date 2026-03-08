@@ -135,7 +135,7 @@ const FirmaPremium = () => {
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center gap-2">
                   <Crown className="h-5 w-5 text-primary" />
-                  Aylık {PREMIUM_COST} Jeton
+                  Aylık 20 Jeton
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center space-y-4">

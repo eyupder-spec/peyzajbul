@@ -46,6 +46,10 @@ const emptyForm: FirmFormData = {
   services: [],
   is_approved: true,
   is_active: true,
+  is_premium: false,
+  premium_until: "",
+  google_maps_url: "",
+  detailed_services: [],
 };
 
 interface FirmFormDialogProps {

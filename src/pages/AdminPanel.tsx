@@ -92,17 +92,19 @@ const AdminPanel = () => {
     if (!adminRoles || adminRoles.length === 0) { navigate("/admin/giris"); return; }
 
     // Fetch all data
-    const [leadsRes, rolesRes, purchasesRes, firmsRes] = await Promise.all([
+    const [leadsRes, rolesRes, purchasesRes, firmsRes, coinTxRes] = await Promise.all([
       supabase.from("leads").select("*").order("created_at", { ascending: false }),
       supabase.from("user_roles").select("*"),
       supabase.from("lead_purchases").select("*"),
       supabase.from("firms").select("*").order("created_at", { ascending: false }),
+      supabase.from("coin_transactions").select("*").order("created_at", { ascending: false }),
     ]);
 
     setLeads(leadsRes.data || []);
     setRoles(rolesRes.data || []);
     setPurchases(purchasesRes.data || []);
     setFirmsData((firmsRes.data as Firm[]) || []);
+    setCoinTransactions(coinTxRes.data || []);
     setLoading(false);
   }, [navigate]);
 

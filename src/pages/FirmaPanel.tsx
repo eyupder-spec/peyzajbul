@@ -281,6 +281,7 @@ const FirmaPanel = () => {
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Bütçe</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">İl</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Ad Soyad</th>
+                          <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Telefon</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Skor</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Durum</th>
                           <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Aksiyon</th>
@@ -300,6 +301,9 @@ const FirmaPanel = () => {
                               <td className="px-4 py-3 text-sm text-foreground">{lead.city}</td>
                               <td className="px-4 py-3 text-sm text-foreground">
                                 {isPurchased ? lead.full_name : maskName(lead.full_name)}
+                              </td>
+                              <td className="px-4 py-3 text-sm text-foreground">
+                                {isPurchased ? lead.phone : maskPhone(lead.phone)}
                               </td>
                               <td className="px-4 py-3">
                                 <Tooltip>

@@ -772,6 +772,9 @@ const AdminPanel = () => {
 
             {/* Blog */}
             {tab === "blog" && <AdminBlogTab />}
+
+            {/* Changelog */}
+            {tab === "changelog" && <AdminChangelogTab />}
           </main>
         </div>
       </div>

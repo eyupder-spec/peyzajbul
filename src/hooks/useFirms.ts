@@ -15,6 +15,7 @@ export type PublicFirm = {
   detailed_services: any[] | null;
   slug: string | null;
   website: string | null;
+  logo_url: string | null;
 };
 
 export function useApprovedFirms() {
@@ -23,7 +24,7 @@ export function useApprovedFirms() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website")
+        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url")
         .eq("is_approved", true)
         .eq("is_active", true)
         .order("is_premium", { ascending: false })
@@ -40,7 +41,7 @@ export function useFirmsByCity(city: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website")
+        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url")
         .eq("is_approved", true)
         .eq("is_active", true)
         .eq("city", city)
@@ -59,7 +60,7 @@ export function useFirmById(firmId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, address, is_premium, google_maps_url, detailed_services, slug, website")
+        .select("id, company_name, city, district, services, description, phone, email, address, is_premium, google_maps_url, detailed_services, slug, website, logo_url")
         .eq("id", firmId)
         .eq("is_approved", true)
         .eq("is_active", true)

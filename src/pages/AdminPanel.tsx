@@ -735,6 +735,7 @@ const AdminPanel = () => {
                                   premium_until: firm.premium_until || "",
                                   google_maps_url: firm.google_maps_url || "",
                                   detailed_services: firm.detailed_services || [],
+                                  logo_url: (firm as any).logo_url || "",
                                 });
                                 setFirmFormOpen(true);
                               }}>

@@ -98,6 +98,7 @@ const Firmalar = () => {
                     description={firm.description}
                     is_premium={firm.is_premium}
                     slug={firm.slug}
+                    logo_url={firm.logo_url}
                   />
                 ))}
               </div>

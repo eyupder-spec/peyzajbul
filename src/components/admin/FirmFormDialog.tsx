@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Globe, X, Crown, Plus, Trash2 } from "lucide-react";
+import { Loader2, Globe, X, Crown, Plus, Trash2, Upload, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TURKISH_CITIES } from "@/lib/leadFormData";
@@ -36,6 +36,7 @@ export type FirmFormData = {
   premium_until?: string;
   google_maps_url?: string;
   detailed_services?: { title: string; description: string }[];
+  logo_url?: string;
 };
 
 const emptyForm: FirmFormData = {
@@ -72,6 +73,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
   const [crawlUrl, setCrawlUrl] = useState("");
   const [newServiceTitle, setNewServiceTitle] = useState("");
   const [newServiceDesc, setNewServiceDesc] = useState("");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   // Re-initialize form when dialog opens with different data
   useEffect(() => {
@@ -207,6 +209,46 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
               <Button onClick={handleCrawl} disabled={crawling || !crawlUrl.trim()} variant="outline">
                 {crawling ? <Loader2 className="h-4 w-4 animate-spin" /> : "Çek"}
               </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Logo upload - only for existing firms */}
+        {isEdit && initialData?.id && (
+          <div className="space-y-2">
+            <Label>Logo</Label>
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 rounded-lg border border-border bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                {form.logo_url ? (
+                  <img src={form.logo_url} alt="Logo" className="w-full h-full object-cover" />
+                ) : (
+                  <Camera className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
+              <label className="cursor-pointer">
+                <input type="file" accept="image/*" className="hidden" disabled={uploadingLogo} onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !initialData?.id) return;
+                  setUploadingLogo(true);
+                  try {
+                    const ext = file.name.split(".").pop();
+                    const path = `${initialData.id}/logo.${ext}`;
+                    await supabase.storage.from("firm-logos").upload(path, file, { upsert: true });
+                    const { data: { publicUrl } } = supabase.storage.from("firm-logos").getPublicUrl(path);
+                    const url = publicUrl + "?t=" + Date.now();
+                    await supabase.from("firms").update({ logo_url: url }).eq("id", initialData.id);
+                    update({ logo_url: url });
+                    toast.success("Logo güncellendi!");
+                  } catch (err: any) {
+                    toast.error(err.message || "Logo yüklenemedi");
+                  } finally {
+                    setUploadingLogo(false);
+                  }
+                }} />
+                <Button asChild variant="outline" size="sm" disabled={uploadingLogo}>
+                  <span>{uploadingLogo ? "Yükleniyor..." : "Logo Yükle"}</span>
+                </Button>
+              </label>
             </div>
           </div>
         )}

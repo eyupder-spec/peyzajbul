@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, X, AlertTriangle, Crown, Users, Coins, Image, FileText, LogOut } from "lucide-react";
+import { Loader2, Save, X, AlertTriangle, Crown, Users, Coins, Image, FileText, LogOut, Upload, Camera } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { TURKISH_CITIES } from "@/lib/leadFormData";
 import { SERVICE_LABELS } from "@/lib/categories";
@@ -86,6 +86,8 @@ const FirmaProfil = () => {
   const [firmId, setFirmId] = useState("");
   const [firmName, setFirmName] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [form, setForm] = useState<FirmData>({
     id: "",
     company_name: "",
@@ -113,7 +115,7 @@ const FirmaProfil = () => {
 
       const { data: firm } = await supabase
         .from("firms")
-        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved")
+        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved, logo_url")
         .eq("user_id", user.id)
         .single();
 
@@ -122,6 +124,7 @@ const FirmaProfil = () => {
 
       setFirmId(firm.id);
       setFirmName(firm.company_name);
+      setLogoUrl(firm.logo_url || null);
       setForm({
         id: firm.id,
         company_name: firm.company_name,
@@ -147,6 +150,28 @@ const FirmaProfil = () => {
       ...p,
       services: p.services.includes(s) ? p.services.filter((x) => x !== s) : [...p.services, s],
     }));
+  };
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !firmId) return;
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${firmId}/logo.${ext}`;
+      // Remove old logo if exists
+      await supabase.storage.from("firm-logos").remove([path]);
+      const { error: uploadError } = await supabase.storage.from("firm-logos").upload(path, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from("firm-logos").getPublicUrl(path);
+      const url = publicUrl + "?t=" + Date.now();
+      await supabase.from("firms").update({ logo_url: url }).eq("id", firmId);
+      setLogoUrl(url);
+      toast({ title: "Logo güncellendi!" });
+    } catch (err: any) {
+      toast({ title: "Logo yüklenemedi", description: err.message, variant: "destructive" });
+    } finally {
+      setUploadingLogo(false);
+    }
   };
 
   const handleSave = async () => {
@@ -221,6 +246,31 @@ const FirmaProfil = () => {
                   <p>Bilgilerinizi güncelledikten sonra değişiklikler admin onayına gönderilecektir. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir.</p>
                 </div>
               </div>
+
+              {/* Logo */}
+              <Card className="border-border">
+                <CardContent className="pt-6">
+                  <Label className="mb-3 block">Firma Logosu</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-lg border border-border bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                      {logoUrl ? (
+                        <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                      ) : (
+                        <Camera className="h-8 w-8 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="cursor-pointer">
+                        <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" disabled={uploadingLogo} />
+                        <Button asChild variant="outline" size="sm" disabled={uploadingLogo}>
+                          <span>{uploadingLogo ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Yükleniyor...</> : <><Upload className="h-4 w-4 mr-2" /> Logo Yükle</>}</span>
+                        </Button>
+                      </label>
+                      <p className="text-xs text-muted-foreground">PNG veya JPG, max 2MB önerilir</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               <Card className="border-border">
                 <CardContent className="pt-6 space-y-4">

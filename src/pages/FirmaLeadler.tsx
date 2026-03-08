@@ -292,6 +292,11 @@ const FirmaLeadler = () => {
                         {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
                       </Badge>
                     </div>
+                    {!isPurchased && getFomoMessage(leadPurchaseCounts[lead.id] || 0) && (
+                      <span className={`inline-flex items-center text-xs font-medium px-2 py-1 rounded border mt-1 ${getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.className}`}>
+                        🔥 {getFomoMessage(leadPurchaseCounts[lead.id] || 0)!.text}
+                      </span>
+                    )}
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="grid grid-cols-2 gap-2 text-sm">

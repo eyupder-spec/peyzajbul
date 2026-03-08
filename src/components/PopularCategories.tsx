@@ -11,6 +11,7 @@ const PopularCategories = () => {
           <h2 className="font-heading text-3xl font-bold text-foreground mb-3">
             Hizmet Kategorileri
           </h2>
+          <div className="w-16 h-1 bg-accent rounded-full mx-auto mb-4" />
           <p className="text-muted-foreground font-body max-w-xl mx-auto">
             Aradığınız peyzaj hizmetini seçin, alanında uzman firmaları hemen bulun.
           </p>
@@ -20,9 +21,9 @@ const PopularCategories = () => {
             <Link
               key={cat.slug}
               to={`/kategoriler/${cat.slug}`}
-              className="group bg-card border border-border rounded-xl p-5 text-center hover:border-primary/40 hover:shadow-md transition-all"
+              className="group bg-card border border-border rounded-xl p-6 text-center hover:border-primary/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
             >
-              <span className="text-3xl mb-3 block">{cat.icon}</span>
+              <span className="text-4xl mb-3 block transition-transform duration-300 group-hover:scale-110">{cat.icon}</span>
               <h3 className="font-heading text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                 {cat.label}
               </h3>

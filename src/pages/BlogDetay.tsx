@@ -83,8 +83,8 @@ const BlogDetay = () => {
     );
   }
 
-  const categoryName = categories.find((c) => c.slug === post.category_slug)?.name;
-  const cityName = cities.find((c) => c.slug === post.city_slug)?.name;
+  const categoryName = CATEGORIES.find((c) => c.slug === post.category_slug)?.label;
+  const cityName = CITIES.find((c) => c.slug === post.city_slug)?.name;
 
   return (
     <div className="min-h-screen flex flex-col">

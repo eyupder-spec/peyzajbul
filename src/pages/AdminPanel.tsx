@@ -723,7 +723,7 @@ const AdminPanel = () => {
                                   email: firm.email,
                                   city: firm.city,
                                   district: firm.district || "",
-                                  address: "",
+                                  address: firm.address || "",
                                   website: (firm as any).website || "",
                                   description: firm.description || "",
                                   services: firm.services,

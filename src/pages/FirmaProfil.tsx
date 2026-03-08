@@ -320,7 +320,7 @@ const FirmaProfil = () => {
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Bilgilerinizi güncelledikten sonra firmanız admin onayına gönderilecek ve onaylanana kadar yayından geçici olarak kaldırılacaktır. Devam etmek istiyor musunuz?
+            Bilgilerinizi güncelledikten sonra firmanız admin onayına gönderilecektir. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir. Devam etmek istiyor musunuz?
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>İptal</Button>

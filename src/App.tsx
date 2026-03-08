@@ -22,6 +22,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/firmalar" element={<Firmalar />} />
           <Route path="/hesabim" element={<Hesabim />} />
+          <Route path="/firma/panel" element={<FirmaPanel />} />
+          <Route path="/firma/leadler" element={<FirmaLeadler />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

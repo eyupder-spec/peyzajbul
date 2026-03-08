@@ -304,8 +304,8 @@ const FirmaLeadler = () => {
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div><span className="text-muted-foreground">İl:</span> {lead.city}</div>
                       <div><span className="text-muted-foreground">Bütçe:</span> {lead.budget}</div>
-                      <div><span className="text-muted-foreground">Ad:</span> {isPurchased ? lead.full_name : maskName(lead.full_name)}</div>
-                      <div><span className="text-muted-foreground">Tel:</span> {isPurchased ? lead.phone : maskPhone(lead.phone)}</div>
+                      <div><span className="text-muted-foreground">Ad:</span> {lead.full_name}</div>
+                      <div><span className="text-muted-foreground">Tel:</span> {lead.phone}</div>
                     </div>
                     {!isPurchased && (
                       <div className="flex gap-2 pt-2">

@@ -70,7 +70,12 @@ Deno.serve(async (req) => {
     if (!resendRes.ok) {
       const errBody = await resendRes.text();
       console.error("Resend error:", errBody);
-      throw new Error("E-posta gönderilemedi");
+      
+      // Check if it's a domain verification issue
+      if (errBody.includes("verify a domain") || errBody.includes("testing emails")) {
+        throw new Error("Resend domain doğrulanmamış. Lütfen resend.com/domains adresinden domain doğrulayın veya test için Resend hesap e-postanızı kullanın.");
+      }
+      throw new Error("E-posta gönderilemedi. Lütfen tekrar deneyin.");
     }
 
     return new Response(JSON.stringify({ success: true }), {

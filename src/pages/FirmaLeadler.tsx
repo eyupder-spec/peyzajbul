@@ -37,11 +37,7 @@ const maskPhone = (phone: string) => {
   return phone.slice(0, 2) + "** *** **" + phone.slice(-2);
 };
 
-const getScoreColor = (score: number | null) => {
-  if (!score || score < 30) return "bg-destructive/20 text-destructive";
-  if (score < 60) return "bg-accent/20 text-accent-foreground";
-  return "bg-primary/20 text-primary";
-};
+// Score rendering now uses imported getScoreBadge + getScoreBreakdown
 
 const getStatusLabel = (status: string) => {
   switch (status) {

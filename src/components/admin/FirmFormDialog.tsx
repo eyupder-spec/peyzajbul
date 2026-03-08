@@ -261,6 +261,18 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
             <Input value={form.address} onChange={(e) => update({ address: e.target.value })} />
           </div>
 
+          {isEdit && (
+            <div className="space-y-1.5">
+              <Label>Slug (URL yolu)</Label>
+              <Input
+                value={form.slug}
+                onChange={(e) => update({ slug: e.target.value })}
+                placeholder="firma-adi-12345678"
+              />
+              <p className="text-xs text-muted-foreground">Firmanın URL'de görünen benzersiz tanımlayıcısı. Dikkatli değiştirin.</p>
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <Label>Açıklama</Label>
             <Textarea value={form.description} onChange={(e) => update({ description: e.target.value })} rows={3} />

@@ -115,7 +115,7 @@ const FirmaProfil = () => {
 
       const { data: firm } = await supabase
         .from("firms")
-        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved")
+        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved, logo_url")
         .eq("user_id", user.id)
         .single();
 

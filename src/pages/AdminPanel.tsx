@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut,
   Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
-  LayoutDashboard, Menu, BookOpen, Rocket
+  LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon
 } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";

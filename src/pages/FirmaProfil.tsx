@@ -76,6 +76,7 @@ type FirmData = {
   website: string;
   description: string;
   services: string[];
+  telegram_chat_id: string;
 };
 
 const FirmaProfil = () => {

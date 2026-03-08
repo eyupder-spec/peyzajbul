@@ -78,7 +78,7 @@ const Hesabim = () => {
                   {user?.email}
                 </p>
               </div>
-              <Button variant="outline" size="sm" onClick={handleLogout} className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+              <Button variant="outline" size="sm" onClick={handleLogout} className="border-accent text-accent-foreground bg-accent hover:bg-accent/90">
                 <LogOut className="mr-2 h-4 w-4" />
                 Çıkış Yap
               </Button>

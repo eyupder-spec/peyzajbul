@@ -24,22 +24,39 @@ serve(async (req) => {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { lead_id, firm_id } = session.metadata || {};
+    const { firm_user_id, package_id, coins } = session.metadata || {};
 
-    if (lead_id && firm_id) {
+    if (firm_user_id && coins) {
       const supabaseAdmin = createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
       );
 
-      // Insert purchase record
-      await supabaseAdmin.from("lead_purchases").insert({
-        lead_id,
-        firm_id,
-        stripe_session_id: session.id,
-        amount: 20.00,
-        status: "paid",
-      });
+      const coinAmount = parseInt(coins, 10);
+
+      // Get firm
+      const { data: firm } = await supabaseAdmin
+        .from("firms")
+        .select("id, coin_balance")
+        .eq("user_id", firm_user_id)
+        .single();
+
+      if (firm) {
+        // Update balance
+        await supabaseAdmin
+          .from("firms")
+          .update({ coin_balance: firm.coin_balance + coinAmount })
+          .eq("id", firm.id);
+
+        // Record purchase transaction
+        await supabaseAdmin.from("coin_transactions").insert({
+          firm_id: firm.id,
+          type: "purchase",
+          amount: coinAmount,
+          description: `${package_id} paketi - ${coinAmount} jeton`,
+          stripe_session_id: session.id,
+        });
+      }
     }
   }
 

@@ -84,6 +84,7 @@ const IlFirmalari = () => {
                   services={firm.services || []}
                   description={firm.description}
                   slug={firm.slug}
+                  logo_url={firm.logo_url}
                 />
               ))}
             </div>

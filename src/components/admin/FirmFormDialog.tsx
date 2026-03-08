@@ -213,6 +213,46 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           </div>
         )}
 
+        {/* Logo upload - only for existing firms */}
+        {isEdit && initialData?.id && (
+          <div className="space-y-2">
+            <Label>Logo</Label>
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 rounded-lg border border-border bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                {form.logo_url ? (
+                  <img src={form.logo_url} alt="Logo" className="w-full h-full object-cover" />
+                ) : (
+                  <Camera className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
+              <label className="cursor-pointer">
+                <input type="file" accept="image/*" className="hidden" disabled={uploadingLogo} onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !initialData?.id) return;
+                  setUploadingLogo(true);
+                  try {
+                    const ext = file.name.split(".").pop();
+                    const path = `${initialData.id}/logo.${ext}`;
+                    await supabase.storage.from("firm-logos").upload(path, file, { upsert: true });
+                    const { data: { publicUrl } } = supabase.storage.from("firm-logos").getPublicUrl(path);
+                    const url = publicUrl + "?t=" + Date.now();
+                    await supabase.from("firms").update({ logo_url: url }).eq("id", initialData.id);
+                    update({ logo_url: url });
+                    toast.success("Logo güncellendi!");
+                  } catch (err: any) {
+                    toast.error(err.message || "Logo yüklenemedi");
+                  } finally {
+                    setUploadingLogo(false);
+                  }
+                }} />
+                <Button asChild variant="outline" size="sm" disabled={uploadingLogo}>
+                  <span>{uploadingLogo ? "Yükleniyor..." : "Logo Yükle"}</span>
+                </Button>
+              </label>
+            </div>
+          </div>
+        )}
+
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">

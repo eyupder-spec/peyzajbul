@@ -19,6 +19,7 @@ import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDi
 import AdminBlogTab from "@/components/admin/AdminBlogTab";
 import AdminChangelogTab from "@/components/admin/AdminChangelogTab";
 import AdminClaimTab from "@/components/admin/AdminClaimTab";
+import AdminBulkFirmTab from "@/components/admin/AdminBulkFirmTab";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,

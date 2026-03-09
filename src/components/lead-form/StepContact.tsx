@@ -25,7 +25,8 @@ const formatPhone = (value: string): string => {
   const d = local.slice(0, 10);
   if (d.length <= 4) return d;
   if (d.length <= 7) return `${d.slice(0, 4)} ${d.slice(4)}`;
-  return `${d.slice(0, 4)} ${d.slice(4, 7)} ${d.slice(7)}`;
+  if (d.length <= 9) return `${d.slice(0, 4)} ${d.slice(4, 7)} ${d.slice(7)}`;
+  return `${d.slice(0, 4)} ${d.slice(4, 7)} ${d.slice(7, 9)} ${d.slice(9)}`;
 };
 
 const validatePhone = (phone: string): string | null => {

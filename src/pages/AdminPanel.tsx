@@ -12,13 +12,14 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut,
   Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
-  LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon
+  LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon, Upload
 } from "lucide-react";
 import { getScoreBadge } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
 import AdminBlogTab from "@/components/admin/AdminBlogTab";
 import AdminChangelogTab from "@/components/admin/AdminChangelogTab";
 import AdminClaimTab from "@/components/admin/AdminClaimTab";
+import AdminBulkFirmTab from "@/components/admin/AdminBulkFirmTab";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
@@ -74,6 +75,7 @@ const SIDEBAR_ITEMS = [
   { title: "Dashboard", key: "dashboard", icon: LayoutDashboard },
   { title: "Leadler", key: "leads", icon: FileText },
   { title: "Firmalar", key: "firms", icon: Building2 },
+  { title: "Toplu Ekle", key: "bulk", icon: Upload },
   { title: "Sahiplenme", key: "claims", icon: HandshakeIcon },
   { title: "Jetonlar", key: "jetonlar", icon: Coins },
   { title: "Blog", key: "blog", icon: BookOpen },
@@ -130,7 +132,7 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "claims" | "jetonlar" | "blog" | "changelog">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "bulk" | "claims" | "jetonlar" | "blog" | "changelog">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
   const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
@@ -774,6 +776,9 @@ const AdminPanel = () => {
 
             {/* Claims */}
             {tab === "claims" && <AdminClaimTab />}
+
+            {/* Bulk */}
+            {tab === "bulk" && <AdminBulkFirmTab />}
 
             {/* Blog */}
             {tab === "blog" && <AdminBlogTab />}

@@ -18,11 +18,11 @@ const validateName = (name: string): string | null => {
 };
 
 const formatPhone = (value: string): string => {
-  // Strip everything except digits
-  const digits = value.replace(/\D/g, "");
-  // Remove leading 90 country code if pasted
-  const local = digits.startsWith("90") && digits.length > 10 ? digits.slice(2) : digits;
-  const d = local.slice(0, 10);
+  let digits = value.replace(/\D/g, "");
+  // Remove leading +90 or 90 country code if pasted
+  if (digits.startsWith("90") && digits.length > 11) digits = digits.slice(2);
+  // Turkish mobile: 0 5XX XXX XX XX = 11 digits
+  const d = digits.slice(0, 11);
   if (d.length <= 4) return d;
   if (d.length <= 7) return `${d.slice(0, 4)} ${d.slice(4)}`;
   if (d.length <= 9) return `${d.slice(0, 4)} ${d.slice(4, 7)} ${d.slice(7)}`;
@@ -32,8 +32,8 @@ const formatPhone = (value: string): string => {
 const validatePhone = (phone: string): string | null => {
   const digits = phone.replace(/\D/g, "");
   if (!digits) return "Telefon numarası zorunludur.";
-  if (digits.length < 10) return "Telefon numarası 10 haneli olmalıdır.";
-  if (digits.length > 10) return "Telefon numarası en fazla 10 haneli olabilir.";
+  if (digits.length < 11) return "Telefon numarası 11 haneli olmalıdır (05XX XXX XX XX).";
+  if (digits.length > 11) return "Telefon numarası en fazla 11 haneli olabilir.";
   if (!digits.startsWith("05")) return "Telefon numarası 05 ile başlamalıdır.";
   return null;
 };

@@ -6,13 +6,15 @@ import { LeadFormData, initialFormData, SCOPE_OPTIONS } from "@/lib/leadFormData
 import StepProjectType from "./StepProjectType";
 import StepServiceType from "./StepServiceType";
 import StepScope from "./StepScope";
-import StepProjectDetails from "./StepProjectDetails";
+import StepLocationProperty from "./StepLocationProperty";
+import StepConditionBudget from "./StepConditionBudget";
+import StepTimelineExtras from "./StepTimelineExtras";
 import StepContact from "./StepContact";
 import StepOtp from "./StepOtp";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 8;
 
 interface LeadFormModalProps {
   open: boolean;
@@ -59,16 +61,14 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
           return !!data.irrigationType && !!data.irrigationSystem && !!data.waterSource;
         }
         const scopeOpts = SCOPE_OPTIONS[data.serviceType];
-        // If no scope options, allow skip
         if (!scopeOpts || scopeOpts.length === 0) return true;
         return data.scope.length > 0;
       }
-      case 4:
-        return !!data.city && !!data.propertyType && !!data.areaSize && !!data.currentCondition && !!data.budget && !!data.timeline;
-      case 5:
-        return !!data.fullName && !!data.phone && !!data.email && data.kvkkAccepted;
-      case 6:
-        return otpCode.length === 6;
+      case 4: return !!data.city && !!data.propertyType && !!data.areaSize;
+      case 5: return !!data.currentCondition && !!data.budget;
+      case 6: return !!data.timeline;
+      case 7: return !!data.fullName && !!data.phone && !!data.email && data.kvkkAccepted;
+      case 8: return otpCode.length === 6;
       default: return false;
     }
   };
@@ -91,7 +91,6 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Verify OTP and create account
       const { data: verifyRes, error: verifyError } = await supabase.functions.invoke("verify-otp", {
         body: {
           email: data.email,
@@ -106,7 +105,6 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
 
       const userId = verifyRes.userId;
 
-      // Set session if returned
       if (verifyRes.session) {
         await supabase.auth.setSession({
           access_token: verifyRes.session.access_token,
@@ -114,10 +112,8 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
         });
       }
 
-      // Upload photos
       const photoUrls = await uploadPhotos(userId);
 
-      // Save lead
       const { error: leadError } = await supabase.from("leads").insert({
         project_type: data.projectType || null,
         service_type: data.serviceType,
@@ -159,11 +155,10 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
   };
 
   const handleNext = async () => {
-    if (step === 5) {
-      // Send OTP before moving to step 6
+    if (step === 7) {
       try {
         await sendOtp();
-        setStep(6);
+        setStep(8);
       } catch {
         // Error already shown via toast
       }
@@ -178,7 +173,6 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
 
   return (
     <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-sm flex flex-col">
-      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <span className="text-sm font-body text-muted-foreground">
           Adım {step} / {TOTAL_STEPS}
@@ -188,7 +182,6 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
         </button>
       </div>
 
-      {/* Progress bar */}
       <div className="h-1 bg-muted">
         <div
           className="h-full bg-accent transition-all duration-500 ease-out"
@@ -196,15 +189,16 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
         />
       </div>
 
-      {/* Content */}
       <div className="flex-1 overflow-y-auto flex items-start justify-center px-4 py-8">
         <div className="w-full max-w-xl">
           {step === 1 && <StepProjectType data={data} onChange={updateData} />}
           {step === 2 && <StepServiceType data={data} onChange={updateData} />}
           {step === 3 && <StepScope data={data} onChange={updateData} />}
-          {step === 4 && <StepProjectDetails data={data} onChange={updateData} />}
-          {step === 5 && <StepContact data={data} onChange={updateData} />}
-          {step === 6 && (
+          {step === 4 && <StepLocationProperty data={data} onChange={updateData} />}
+          {step === 5 && <StepConditionBudget data={data} onChange={updateData} />}
+          {step === 6 && <StepTimelineExtras data={data} onChange={updateData} />}
+          {step === 7 && <StepContact data={data} onChange={updateData} />}
+          {step === 8 && (
             <StepOtp
               email={data.email}
               otpCode={otpCode}
@@ -216,7 +210,6 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
         </div>
       </div>
 
-      {/* Footer */}
       <div className="border-t border-border px-4 py-4">
         <div className="max-w-xl mx-auto flex justify-between">
           <Button
@@ -230,17 +223,17 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
           <Button
             variant="gold"
             onClick={handleNext}
-            disabled={!canNext() || loading || (step === 5 && otpSending)}
+            disabled={!canNext() || loading || (step === 7 && otpSending)}
           >
-            {(loading || (step === 5 && otpSending)) && (
+            {(loading || (step === 7 && otpSending)) && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
             {step === TOTAL_STEPS
               ? (loading ? "Gönderiliyor..." : "Teklif Al")
-              : step === 5
+              : step === 7
                 ? (otpSending ? "Kod Gönderiliyor..." : "Doğrulama Kodu Gönder")
                 : "Devam Et"}
-            {step < 5 && <ArrowRight className="ml-2 h-4 w-4" />}
+            {step < 7 && <ArrowRight className="ml-2 h-4 w-4" />}
           </Button>
         </div>
       </div>

@@ -2,37 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { X, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LeadFormData, initialFormData } from "@/lib/leadFormData";
-import StepService from "./StepService";
-import StepOption from "./StepOption";
-import StepLocation from "./StepLocation";
+import { LeadFormData, initialFormData, SCOPE_OPTIONS } from "@/lib/leadFormData";
+import StepProjectType from "./StepProjectType";
+import StepServiceType from "./StepServiceType";
+import StepScope from "./StepScope";
+import StepProjectDetails from "./StepProjectDetails";
 import StepContact from "./StepContact";
 import StepOtp from "./StepOtp";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const TOTAL_STEPS = 7;
-
-const projectSizeOptions = [
-  { value: "0-100", label: "0–100 m²" },
-  { value: "100-500", label: "100–500 m²" },
-  { value: "500-1000", label: "500–1.000 m²" },
-  { value: "1000+", label: "1.000 m² üzeri" },
-];
-
-const budgetOptions = [
-  { value: "0-10000", label: "10.000 ₺ altı" },
-  { value: "10000-30000", label: "10.000 – 30.000 ₺" },
-  { value: "30000-100000", label: "30.000 – 100.000 ₺" },
-  { value: "100000+", label: "100.000 ₺ üzeri" },
-];
-
-const timelineOptions = [
-  { value: "hemen", label: "Hemen (1–2 hafta)" },
-  { value: "1-ay", label: "1 ay içinde" },
-  { value: "3-ay", label: "3 ay içinde" },
-  { value: "arastirma", label: "Sadece fiyat araştırıyorum" },
-];
+const TOTAL_STEPS = 6;
 
 interface LeadFormModalProps {
   open: boolean;
@@ -72,15 +52,40 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
 
   const canNext = (): boolean => {
     switch (step) {
-      case 1: return !!data.serviceType;
-      case 2: return !!data.projectSize;
-      case 3: return !!data.budget;
-      case 4: return !!data.timeline;
-      case 5: return !!data.city;
-      case 6: return !!data.fullName && !!data.phone && !!data.email && data.kvkkAccepted;
-      case 7: return otpCode.length === 6;
+      case 1: return !!data.projectType;
+      case 2: return !!data.serviceType;
+      case 3: {
+        if (data.serviceType === "sulama-sistemi") {
+          return !!data.irrigationType && !!data.irrigationSystem && !!data.waterSource;
+        }
+        const scopeOpts = SCOPE_OPTIONS[data.serviceType];
+        // If no scope options, allow skip
+        if (!scopeOpts || scopeOpts.length === 0) return true;
+        return data.scope.length > 0;
+      }
+      case 4:
+        return !!data.city && !!data.propertyType && !!data.areaSize && !!data.currentCondition && !!data.budget && !!data.timeline;
+      case 5:
+        return !!data.fullName && !!data.phone && !!data.email && data.kvkkAccepted;
+      case 6:
+        return otpCode.length === 6;
       default: return false;
     }
+  };
+
+  const uploadPhotos = async (userId: string): Promise<string[]> => {
+    if (data.photos.length === 0) return [];
+    const urls: string[] = [];
+    for (const file of data.photos) {
+      const ext = file.name.split(".").pop();
+      const path = `${userId}/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("lead-photos").upload(path, file);
+      if (!error) {
+        const { data: urlData } = supabase.storage.from("lead-photos").getPublicUrl(path);
+        urls.push(urlData.publicUrl);
+      }
+    }
+    return urls;
   };
 
   const handleSubmit = async () => {
@@ -109,21 +114,34 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
         });
       }
 
+      // Upload photos
+      const photoUrls = await uploadPhotos(userId);
+
       // Save lead
       const { error: leadError } = await supabase.from("leads").insert({
+        project_type: data.projectType || null,
         service_type: data.serviceType,
-        project_size: data.projectSize,
+        project_size: data.areaSize || null,
+        area_size: data.areaSize || null,
+        scope: data.scope.length > 0 ? data.scope : null,
+        irrigation_type: data.irrigationType || null,
+        irrigation_system: data.irrigationSystem || null,
+        water_source: data.waterSource || null,
+        property_type: data.propertyType || null,
+        current_condition: data.currentCondition || null,
         budget: data.budget,
         timeline: data.timeline,
         city: data.city,
         district: data.district || null,
         address: data.address || null,
+        notes: data.notes || null,
+        photo_urls: photoUrls.length > 0 ? photoUrls : null,
         full_name: data.fullName,
         phone: data.phone,
         email: data.email,
         user_id: userId,
         status: "active",
-      });
+      } as any);
 
       if (leadError) throw leadError;
 
@@ -141,11 +159,11 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
   };
 
   const handleNext = async () => {
-    if (step === 6) {
-      // Send OTP before moving to step 7
+    if (step === 5) {
+      // Send OTP before moving to step 6
       try {
         await sendOtp();
-        setStep(7);
+        setStep(6);
       } catch {
         // Error already shown via toast
       }
@@ -179,41 +197,14 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto flex items-center justify-center px-4 py-8">
+      <div className="flex-1 overflow-y-auto flex items-start justify-center px-4 py-8">
         <div className="w-full max-w-xl">
-          {step === 1 && <StepService data={data} onChange={updateData} />}
-          {step === 2 && (
-            <StepOption
-              data={data}
-              onChange={updateData}
-              field="projectSize"
-              question="Alanınızın büyüklüğü nedir?"
-              subtitle="Projenizin kapsamını anlamamıza yardımcı olur."
-              options={projectSizeOptions}
-            />
-          )}
-          {step === 3 && (
-            <StepOption
-              data={data}
-              onChange={updateData}
-              field="budget"
-              question="Yaklaşık bütçeniz nedir?"
-              subtitle="Size uygun firmaları eşleştirebilmemiz için."
-              options={budgetOptions}
-            />
-          )}
-          {step === 4 && (
-            <StepOption
-              data={data}
-              onChange={updateData}
-              field="timeline"
-              question="Projeye ne zaman başlamak istiyorsunuz?"
-              options={timelineOptions}
-            />
-          )}
-          {step === 5 && <StepLocation data={data} onChange={updateData} />}
-          {step === 6 && <StepContact data={data} onChange={updateData} />}
-          {step === 7 && (
+          {step === 1 && <StepProjectType data={data} onChange={updateData} />}
+          {step === 2 && <StepServiceType data={data} onChange={updateData} />}
+          {step === 3 && <StepScope data={data} onChange={updateData} />}
+          {step === 4 && <StepProjectDetails data={data} onChange={updateData} />}
+          {step === 5 && <StepContact data={data} onChange={updateData} />}
+          {step === 6 && (
             <StepOtp
               email={data.email}
               otpCode={otpCode}
@@ -239,17 +230,17 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
           <Button
             variant="gold"
             onClick={handleNext}
-            disabled={!canNext() || loading || (step === 6 && otpSending)}
+            disabled={!canNext() || loading || (step === 5 && otpSending)}
           >
-            {(loading || (step === 6 && otpSending)) && (
+            {(loading || (step === 5 && otpSending)) && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
             {step === TOTAL_STEPS
               ? (loading ? "Gönderiliyor..." : "Teklif Al")
-              : step === 6
+              : step === 5
                 ? (otpSending ? "Kod Gönderiliyor..." : "Doğrulama Kodu Gönder")
                 : "Devam Et"}
-            {step < 6 && <ArrowRight className="ml-2 h-4 w-4" />}
+            {step < 5 && <ArrowRight className="ml-2 h-4 w-4" />}
           </Button>
         </div>
       </div>

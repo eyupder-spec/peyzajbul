@@ -395,60 +395,90 @@ export type Database = {
       leads: {
         Row: {
           address: string | null
+          area_size: string | null
           assigned_firms: string[] | null
           budget: string
           city: string
           created_at: string
+          current_condition: string | null
           district: string | null
           email: string
           full_name: string
           id: string
+          irrigation_system: string | null
+          irrigation_type: string | null
           lead_score: number | null
+          notes: string | null
           phone: string
-          project_size: string
+          photo_urls: string[] | null
+          project_size: string | null
+          project_type: string | null
+          property_type: string | null
+          scope: string[] | null
           service_type: string
           status: string
           timeline: string
           updated_at: string
           user_id: string
+          water_source: string | null
         }
         Insert: {
           address?: string | null
+          area_size?: string | null
           assigned_firms?: string[] | null
           budget: string
           city: string
           created_at?: string
+          current_condition?: string | null
           district?: string | null
           email: string
           full_name: string
           id?: string
+          irrigation_system?: string | null
+          irrigation_type?: string | null
           lead_score?: number | null
+          notes?: string | null
           phone: string
-          project_size: string
+          photo_urls?: string[] | null
+          project_size?: string | null
+          project_type?: string | null
+          property_type?: string | null
+          scope?: string[] | null
           service_type: string
           status?: string
           timeline: string
           updated_at?: string
           user_id: string
+          water_source?: string | null
         }
         Update: {
           address?: string | null
+          area_size?: string | null
           assigned_firms?: string[] | null
           budget?: string
           city?: string
           created_at?: string
+          current_condition?: string | null
           district?: string | null
           email?: string
           full_name?: string
           id?: string
+          irrigation_system?: string | null
+          irrigation_type?: string | null
           lead_score?: number | null
+          notes?: string | null
           phone?: string
-          project_size?: string
+          photo_urls?: string[] | null
+          project_size?: string | null
+          project_type?: string | null
+          property_type?: string | null
+          scope?: string[] | null
           service_type?: string
           status?: string
           timeline?: string
           updated_at?: string
           user_id?: string
+          water_source?: string | null
         }
         Relationships: []
       }

@@ -3,6 +3,39 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+async function scrapeUrl(apiKey: string, url: string, prompt: string) {
+  const response = await fetch('https://api.firecrawl.dev/v1/scrape', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      url,
+      formats: ['extract', 'links'],
+      extract: {
+        prompt,
+        schema: {
+          type: 'object',
+          properties: {
+            company_name: { type: 'string', description: 'Official company/brand name' },
+            phone: { type: 'string', description: 'Primary phone number with country code if available. Look in header, footer, contact sections, meta tags.' },
+            phones: { type: 'array', items: { type: 'string' }, description: 'All phone numbers found on the page' },
+            email: { type: 'string', description: 'Primary email address. Look in header, footer, contact sections, mailto links.' },
+            emails: { type: 'array', items: { type: 'string' }, description: 'All email addresses found on the page' },
+            address: { type: 'string', description: 'Full physical/street address' },
+            city: { type: 'string', description: 'City name in Turkish (e.g. İstanbul, Ankara, İzmir)' },
+            district: { type: 'string', description: 'District/ilçe name (e.g. Kadıköy, Çankaya, Karşıyaka)' },
+            description: { type: 'string', description: 'Company description, about text, or slogan' },
+            services: { type: 'array', items: { type: 'string' }, description: 'List of services offered' },
+          },
+        },
+      },
+    }),
+  });
+  return response.json();
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -32,47 +65,106 @@ Deno.serve(async (req) => {
 
     console.log('Scraping company info from:', formattedUrl);
 
-    const response = await fetch('https://api.firecrawl.dev/v1/scrape', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: formattedUrl,
-        formats: ['extract'],
-        extract: {
-          prompt: 'Extract company information from this website. Find: company name, phone number(s), email address(es), physical address, city, description/about text, and list of services they offer. Return in Turkish if available.',
-          schema: {
-            type: 'object',
-            properties: {
-              company_name: { type: 'string' },
-              phone: { type: 'string' },
-              email: { type: 'string' },
-              address: { type: 'string' },
-              city: { type: 'string' },
-              description: { type: 'string' },
-              services: {
-                type: 'array',
-                items: { type: 'string' },
-              },
-            },
-          },
-        },
-      }),
-    });
+    const mainPrompt = `Bu bir Türk peyzaj/bahçe/çevre düzenleme firmasının web sitesidir. Aşağıdaki bilgileri dikkatli bir şekilde çıkar:
 
-    const data = await response.json();
+1. TELEFON: Sayfanın header, footer, sidebar, iletişim bölümü, "Bizi Arayın" butonları, tel: linkleri, WhatsApp linkleri dahil HER YERİNE bak. Telefon numarasını +90 veya 0 ile başlayan formatta ver.
+2. E-POSTA: mailto: linkleri, footer, iletişim bölümü, header dahil her yere bak. 
+3. ADRES: Tam fiziksel adres.
+4. İL (city): Firmanın bulunduğu il. Adres, footer, "Hakkımızda" bölümünden çıkar. Türkçe il adı olmalı (İstanbul, Ankara, İzmir vb.)
+5. İLÇE (district): Firmanın bulunduğu ilçe.
+6. FİRMA ADI: Resmi firma/marka adı.
+7. AÇIKLAMA: Firma hakkında kısa açıklama veya slogan.
+8. HİZMETLER: Sunulan hizmetlerin listesi.
 
-    if (!response.ok) {
-      console.error('Firecrawl API error:', data);
+ÖNEMLİ: "Not provided" veya boş string DÖNDÜRME. Bilgiyi bulamıyorsan null dön. Telefon ve e-posta bilgisi sayfanın herhangi bir yerinde olabilir - özellikle footer, header ve sidebar'ı kontrol et.`;
+
+    // Scrape main page
+    const mainData = await scrapeUrl(apiKey, formattedUrl, mainPrompt);
+
+    if (!mainData?.success && !mainData?.data) {
+      console.error('Firecrawl API error:', mainData);
       return new Response(
-        JSON.stringify({ success: false, error: data.error || `İstek başarısız: ${response.status}` }),
-        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: false, error: mainData?.error || 'Sayfa taranamadı' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const extracted = data?.data?.extract || data?.extract || null;
+    let extracted = mainData?.data?.extract || mainData?.extract || null;
+    const links = mainData?.data?.links || mainData?.links || [];
+
+    console.log('Main page extracted:', JSON.stringify(extracted));
+    console.log('Found links:', links?.length);
+
+    // If phone or email is missing, try contact/iletisim page
+    const needsMore = !extracted?.phone || extracted?.phone === 'Not provided' || extracted?.phone === '' ||
+                      !extracted?.email || extracted?.email === 'Not provided' || extracted?.email === '';
+
+    if (needsMore && links && links.length > 0) {
+      // Find contact page URL
+      const contactPatterns = ['iletisim', 'iletişim', 'contact', 'bize-ulasin', 'bize-ulaşın', 'hakkimizda', 'hakkımızda', 'about'];
+      const contactUrl = links.find((link: string) => 
+        contactPatterns.some(p => link.toLowerCase().includes(p))
+      );
+
+      if (contactUrl) {
+        console.log('Scraping contact page:', contactUrl);
+        try {
+          const contactData = await scrapeUrl(apiKey, contactUrl, 
+            `Bu bir iletişim/hakkımızda sayfasıdır. Telefon numarası, e-posta adresi, fiziksel adres, il ve ilçe bilgilerini çıkar. Tüm telefon numaralarını ve e-posta adreslerini bul. Header, footer, ana içerik alanı dahil her yere bak.`
+          );
+          
+          const contactExtracted = contactData?.data?.extract || contactData?.extract || null;
+          console.log('Contact page extracted:', JSON.stringify(contactExtracted));
+
+          if (contactExtracted) {
+            // Merge: prefer contact page data for missing fields
+            if ((!extracted.phone || extracted.phone === 'Not provided' || extracted.phone === '') && contactExtracted.phone && contactExtracted.phone !== 'Not provided') {
+              extracted.phone = contactExtracted.phone;
+            }
+            if ((!extracted.email || extracted.email === 'Not provided' || extracted.email === '') && contactExtracted.email && contactExtracted.email !== 'Not provided') {
+              extracted.email = contactExtracted.email;
+            }
+            if ((!extracted.address || extracted.address === 'Not provided' || extracted.address === '') && contactExtracted.address && contactExtracted.address !== 'Not provided') {
+              extracted.address = contactExtracted.address;
+            }
+            if ((!extracted.city || extracted.city === 'Not provided' || extracted.city === '') && contactExtracted.city && contactExtracted.city !== 'Not provided') {
+              extracted.city = contactExtracted.city;
+            }
+            if ((!extracted.district || extracted.district === 'Not provided' || extracted.district === '') && contactExtracted.district && contactExtracted.district !== 'Not provided') {
+              extracted.district = contactExtracted.district;
+            }
+            // Use phones/emails arrays as fallback
+            if ((!extracted.phone || extracted.phone === 'Not provided' || extracted.phone === '') && contactExtracted.phones?.length > 0) {
+              extracted.phone = contactExtracted.phones[0];
+            }
+            if ((!extracted.email || extracted.email === 'Not provided' || extracted.email === '') && contactExtracted.emails?.length > 0) {
+              extracted.email = contactExtracted.emails[0];
+            }
+          }
+        } catch (e) {
+          console.error('Contact page scrape failed:', e);
+        }
+      }
+    }
+
+    // Use phones/emails arrays from main extraction as fallback
+    if (extracted) {
+      if ((!extracted.phone || extracted.phone === 'Not provided' || extracted.phone === '') && extracted.phones?.length > 0) {
+        extracted.phone = extracted.phones[0];
+      }
+      if ((!extracted.email || extracted.email === 'Not provided' || extracted.email === '') && extracted.emails?.length > 0) {
+        extracted.email = extracted.emails[0];
+      }
+      // Clean up "Not provided" values to empty string
+      for (const key of ['phone', 'email', 'address', 'city', 'district']) {
+        if (extracted[key] === 'Not provided' || extracted[key] === null) {
+          extracted[key] = '';
+        }
+      }
+      // Remove helper arrays from response
+      delete extracted.phones;
+      delete extracted.emails;
+    }
 
     if (!extracted) {
       return new Response(
@@ -81,7 +173,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Extracted company info:', extracted);
+    console.log('Final extracted company info:', JSON.stringify(extracted));
 
     return new Response(
       JSON.stringify({ success: true, company: extracted }),

@@ -9,7 +9,7 @@ const StepContact = ({ data, onChange }: StepContactProps) => {
   return (
     <div>
       <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
-        Kişisel Bilgileriniz
+        İletişim Bilgileriniz
       </h2>
       <p className="text-muted-foreground text-center mb-8 font-body text-sm">
         Firmalar sizinle iletişime geçebilsin ve hesabınız oluşturulsun.
@@ -22,6 +22,7 @@ const StepContact = ({ data, onChange }: StepContactProps) => {
             value={data.fullName}
             onChange={(e) => onChange({ fullName: e.target.value })}
             placeholder="Adınız Soyadınız"
+            maxLength={100}
             className="w-full px-4 py-2.5 rounded-md border border-input bg-background text-sm font-body focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
@@ -32,6 +33,7 @@ const StepContact = ({ data, onChange }: StepContactProps) => {
             value={data.phone}
             onChange={(e) => onChange({ phone: e.target.value })}
             placeholder="05XX XXX XX XX"
+            maxLength={20}
             className="w-full px-4 py-2.5 rounded-md border border-input bg-background text-sm font-body focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
@@ -42,6 +44,7 @@ const StepContact = ({ data, onChange }: StepContactProps) => {
             value={data.email}
             onChange={(e) => onChange({ email: e.target.value })}
             placeholder="ornek@email.com"
+            maxLength={255}
             className="w-full px-4 py-2.5 rounded-md border border-input bg-background text-sm font-body focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>

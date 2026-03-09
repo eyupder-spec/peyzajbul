@@ -15,33 +15,43 @@ export const getScoreBadge = (score: number | null): ScoreBadge => {
 export const getScoreBreakdown = (lead: {
   budget: string;
   timeline: string;
-  project_size: string;
+  project_size?: string;
+  area_size?: string;
+  project_type?: string;
   phone: string;
 }) => {
   const breakdown: { label: string; points: number }[] = [];
 
+  // Project type
+  if (lead.project_type === "commercial") {
+    breakdown.push({ label: "Ticari proje", points: 10 });
+  }
+
   // Budget
   switch (lead.budget) {
-    case "100000+": breakdown.push({ label: "Bütçe: 100k+ ₺", points: 30 }); break;
-    case "30000-100000": breakdown.push({ label: "Bütçe: 30k–100k ₺", points: 20 }); break;
-    case "10000-30000": breakdown.push({ label: "Bütçe: 10k–30k ₺", points: 10 }); break;
-    default: breakdown.push({ label: "Bütçe: 10k altı", points: 0 });
+    case "200000+": case "2000000+": breakdown.push({ label: "Bütçe: Yüksek", points: 30 }); break;
+    case "75000-200000": case "750000-2000000": breakdown.push({ label: "Bütçe: Orta-Yüksek", points: 25 }); break;
+    case "25000-75000": case "250000-750000": breakdown.push({ label: "Bütçe: Orta", points: 15 }); break;
+    case "25000-alti": case "250000-alti": breakdown.push({ label: "Bütçe: Düşük", points: 5 }); break;
+    default: breakdown.push({ label: "Bütçe: Belirsiz", points: 0 });
   }
 
   // Timeline
   switch (lead.timeline) {
     case "hemen": breakdown.push({ label: "Zaman: Hemen", points: 25 }); break;
-    case "1-ay": breakdown.push({ label: "Zaman: 1 ay", points: 15 }); break;
-    case "3-ay": breakdown.push({ label: "Zaman: 3 ay", points: 5 }); break;
+    case "1-ay": breakdown.push({ label: "Zaman: 1 ay", points: 20 }); break;
+    case "1-3-ay": breakdown.push({ label: "Zaman: 1–3 ay", points: 10 }); break;
+    case "3-6-ay": breakdown.push({ label: "Zaman: 3–6 ay", points: 5 }); break;
     default: breakdown.push({ label: "Zaman: Araştırma", points: 0 });
   }
 
-  // Project size
-  switch (lead.project_size) {
-    case "1000+": breakdown.push({ label: "Alan: 1000m²+", points: 20 }); break;
-    case "500-1000": breakdown.push({ label: "Alan: 500–1000m²", points: 15 }); break;
-    case "100-500": breakdown.push({ label: "Alan: 100–500m²", points: 10 }); break;
-    default: breakdown.push({ label: "Alan: 0–100m²", points: 5 });
+  // Area size
+  const size = lead.area_size || lead.project_size;
+  switch (size) {
+    case "1000+": case "20000+": breakdown.push({ label: "Alan: Büyük", points: 20 }); break;
+    case "500-1000": case "5000-20000": breakdown.push({ label: "Alan: Orta-Büyük", points: 15 }); break;
+    case "150-500": case "1000-5000": breakdown.push({ label: "Alan: Orta", points: 10 }); break;
+    default: breakdown.push({ label: "Alan: Küçük", points: 5 });
   }
 
   // Email verified
@@ -49,7 +59,7 @@ export const getScoreBreakdown = (lead: {
 
   // Phone
   if (lead.phone) {
-    breakdown.push({ label: "Telefon doğrulandı", points: 15 });
+    breakdown.push({ label: "Telefon mevcut", points: 5 });
   }
 
   return breakdown;

@@ -75,6 +75,7 @@ const SIDEBAR_ITEMS = [
   { title: "Dashboard", key: "dashboard", icon: LayoutDashboard },
   { title: "Leadler", key: "leads", icon: FileText },
   { title: "Firmalar", key: "firms", icon: Building2 },
+  { title: "Toplu Ekle", key: "bulk", icon: Upload },
   { title: "Sahiplenme", key: "claims", icon: HandshakeIcon },
   { title: "Jetonlar", key: "jetonlar", icon: Coins },
   { title: "Blog", key: "blog", icon: BookOpen },

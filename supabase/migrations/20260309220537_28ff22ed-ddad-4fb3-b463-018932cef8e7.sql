@@ -1,0 +1,1 @@
+ALTER TABLE public.firms DROP CONSTRAINT IF EXISTS firms_user_id_key;

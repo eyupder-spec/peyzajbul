@@ -122,7 +122,7 @@ export default function AdminBulkFirmTab() {
             phone: c.phone || "",
             email: c.email || "",
             city: c.city || "",
-            district: "",
+            district: c.district || "",
             address: c.address || "",
             website: url,
             description: c.description || "",

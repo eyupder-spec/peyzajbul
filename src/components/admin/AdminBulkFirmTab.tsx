@@ -297,6 +297,7 @@ export default function AdminBulkFirmTab() {
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[140px]">Email</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">İl</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">İlçe</th>
+                    <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[160px]">Adres</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[120px]">Website</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium">Durum</th>
                     <th className="px-2 py-1.5"></th>
@@ -320,6 +321,9 @@ export default function AdminBulkFirmTab() {
                       </td>
                       <td className="px-2 py-1">
                         <Input value={row.district} onChange={(e) => updateRow(idx, "district", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input value={row.address} onChange={(e) => updateRow(idx, "address", e.target.value)} className="h-7 text-xs" />
                       </td>
                       <td className="px-2 py-1">
                         <Input value={row.website} onChange={(e) => updateRow(idx, "website", e.target.value)} className="h-7 text-xs" />

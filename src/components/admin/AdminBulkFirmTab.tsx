@@ -323,6 +323,9 @@ export default function AdminBulkFirmTab() {
                         <Input value={row.district} onChange={(e) => updateRow(idx, "district", e.target.value)} className="h-7 text-xs" />
                       </td>
                       <td className="px-2 py-1">
+                        <Input value={row.address} onChange={(e) => updateRow(idx, "address", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1">
                         <Input value={row.website} onChange={(e) => updateRow(idx, "website", e.target.value)} className="h-7 text-xs" />
                       </td>
                       <td className="px-2 py-1">

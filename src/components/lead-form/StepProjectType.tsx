@@ -1,4 +1,6 @@
 import { LeadFormData } from "@/lib/leadFormData";
+import residentialImg from "@/assets/form/residential.png";
+import commercialImg from "@/assets/form/commercial.png";
 
 interface StepProjectTypeProps {
   data: LeadFormData;
@@ -6,8 +8,8 @@ interface StepProjectTypeProps {
 }
 
 const options = [
-  { value: "residential" as const, label: "Konut", icon: "🏠", desc: "Villa, müstakil ev, site, yazlık" },
-  { value: "commercial" as const, label: "Ticari", icon: "🏢", desc: "Otel, AVM, konut projesi, kamu" },
+  { value: "residential" as const, label: "Konut", img: residentialImg, desc: "Villa, müstakil ev, site, yazlık" },
+  { value: "commercial" as const, label: "Ticari", img: commercialImg, desc: "Otel, AVM, konut projesi, kamu" },
 ];
 
 const StepProjectType = ({ data, onChange }: StepProjectTypeProps) => {
@@ -24,13 +26,13 @@ const StepProjectType = ({ data, onChange }: StepProjectTypeProps) => {
           <button
             key={opt.value}
             onClick={() => onChange({ projectType: opt.value, serviceType: "", scope: [], irrigationType: "", irrigationSystem: "", waterSource: "" })}
-            className={`flex flex-col items-center gap-3 p-6 rounded-lg border-2 transition-all font-body ${
+            className={`flex flex-col items-center gap-3 p-5 rounded-lg border-2 transition-all font-body ${
               data.projectType === opt.value
                 ? "border-accent bg-accent/10 shadow-md"
                 : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
             }`}
           >
-            <span className="text-5xl">{opt.icon}</span>
+            <img src={opt.img} alt={opt.label} className="w-20 h-20 object-contain" />
             <span className="text-lg font-semibold text-foreground">{opt.label}</span>
             <span className="text-xs text-muted-foreground">{opt.desc}</span>
           </button>

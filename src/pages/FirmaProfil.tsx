@@ -127,7 +127,7 @@ const FirmaProfil = () => {
 
       const { data: firm } = await supabase
         .from("firms")
-        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved, logo_url, telegram_chat_id")
+        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved, logo_url, telegram_chat_id, social_instagram, social_facebook, social_x, social_youtube, social_linkedin")
         .eq("user_id", user.id)
         .single();
 
@@ -149,6 +149,11 @@ const FirmaProfil = () => {
         description: firm.description || "",
         services: firm.services || [],
         telegram_chat_id: (firm as any).telegram_chat_id || "",
+        social_instagram: (firm as any).social_instagram || "",
+        social_facebook: (firm as any).social_facebook || "",
+        social_x: (firm as any).social_x || "",
+        social_youtube: (firm as any).social_youtube || "",
+        social_linkedin: (firm as any).social_linkedin || "",
       });
       setLoading(false);
     };

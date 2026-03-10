@@ -214,7 +214,12 @@ const FirmaProfil = () => {
         description: form.description || null,
         services: form.services,
         telegram_chat_id: form.telegram_chat_id || null,
-        is_approved: false, // Goes back to pending approval
+        social_instagram: form.social_instagram || null,
+        social_facebook: form.social_facebook || null,
+        social_x: form.social_x || null,
+        social_youtube: form.social_youtube || null,
+        social_linkedin: form.social_linkedin || null,
+        is_approved: false,
       } as any).eq("id", firmId);
 
       if (error) throw error;

@@ -262,11 +262,13 @@ const FirmaDetay = () => {
                 {firm.is_premium && (
                   (() => {
                     const socials = [
-                      { url: (firm as any).social_instagram, icon: Instagram, label: "Instagram", color: "text-[#E4405F]" },
-                      { url: (firm as any).social_facebook, icon: Facebook, label: "Facebook", color: "text-[#1877F2]" },
-                      { url: (firm as any).social_x, icon: () => <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>, label: "X", color: "text-foreground" },
-                      { url: (firm as any).social_youtube, icon: Youtube, label: "YouTube", color: "text-[#FF0000]" },
-                      { url: (firm as any).social_linkedin, icon: Linkedin, label: "LinkedIn", color: "text-[#0A66C2]" },
+                    const XIcon = () => <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>;
+                    const socials: { url: string; icon: React.ReactNode; label: string; color: string }[] = [
+                      { url: (firm as any).social_instagram, icon: <Instagram className="h-5 w-5" />, label: "Instagram", color: "text-[#E4405F]" },
+                      { url: (firm as any).social_facebook, icon: <Facebook className="h-5 w-5" />, label: "Facebook", color: "text-[#1877F2]" },
+                      { url: (firm as any).social_x, icon: <XIcon />, label: "X", color: "text-foreground" },
+                      { url: (firm as any).social_youtube, icon: <Youtube className="h-5 w-5" />, label: "YouTube", color: "text-[#FF0000]" },
+                      { url: (firm as any).social_linkedin, icon: <Linkedin className="h-5 w-5" />, label: "LinkedIn", color: "text-[#0A66C2]" },
                     ].filter(s => s.url);
                     if (socials.length === 0) return null;
                     return (
@@ -275,7 +277,7 @@ const FirmaDetay = () => {
                         <div className="flex items-center gap-3">
                           {socials.map((s) => (
                             <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" className={`${s.color} hover:opacity-70 transition-opacity`} title={s.label}>
-                              {typeof s.icon === 'function' ? <s.icon /> : <s.icon className="h-5 w-5" />}
+                              {s.icon}
                             </a>
                           ))}
                         </div>

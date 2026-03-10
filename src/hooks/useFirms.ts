@@ -16,6 +16,11 @@ export type PublicFirm = {
   slug: string | null;
   website: string | null;
   logo_url: string | null;
+  social_instagram: string | null;
+  social_facebook: string | null;
+  social_x: string | null;
+  social_youtube: string | null;
+  social_linkedin: string | null;
 };
 
 export function useApprovedFirms() {

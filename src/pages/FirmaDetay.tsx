@@ -258,6 +258,32 @@ const FirmaDetay = () => {
                   </div>
                 </div>
 
+                {/* Social Media Links - Premium Only */}
+                {firm.is_premium && (
+                  (() => {
+                    const socials = [
+                      { url: (firm as any).social_instagram, icon: Instagram, label: "Instagram", color: "text-[#E4405F]" },
+                      { url: (firm as any).social_facebook, icon: Facebook, label: "Facebook", color: "text-[#1877F2]" },
+                      { url: (firm as any).social_x, icon: () => <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>, label: "X", color: "text-foreground" },
+                      { url: (firm as any).social_youtube, icon: Youtube, label: "YouTube", color: "text-[#FF0000]" },
+                      { url: (firm as any).social_linkedin, icon: Linkedin, label: "LinkedIn", color: "text-[#0A66C2]" },
+                    ].filter(s => s.url);
+                    if (socials.length === 0) return null;
+                    return (
+                      <div className="border-t border-border pt-3">
+                        <p className="text-xs font-medium text-muted-foreground mb-2">Sosyal Medya</p>
+                        <div className="flex items-center gap-3">
+                          {socials.map((s) => (
+                            <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" className={`${s.color} hover:opacity-70 transition-opacity`} title={s.label}>
+                              {typeof s.icon === 'function' ? <s.icon /> : <s.icon className="h-5 w-5" />}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()
+                )}
+
                 {/* WhatsApp Button */}
                 <a
                   href={`https://wa.me/${firm.phone.replace(/\D/g, "").replace(/^0/, "90")}`}

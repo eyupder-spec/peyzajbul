@@ -106,6 +106,11 @@ const FirmaProfil = () => {
     description: "",
     services: [],
     telegram_chat_id: "",
+    social_instagram: "",
+    social_facebook: "",
+    social_x: "",
+    social_youtube: "",
+    social_linkedin: "",
   });
 
   useEffect(() => {

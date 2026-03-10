@@ -387,6 +387,34 @@ const FirmaProfil = () => {
                     </div>
                   </div>
 
+                  {/* Sosyal Medya */}
+                  <div className="space-y-2">
+                    <Label>Sosyal Medya Linkleri</Label>
+                    <p className="text-xs text-muted-foreground">Sosyal medya hesaplarınız sadece Premium profillerde gösterilir.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Instagram</Label>
+                        <Input placeholder="https://instagram.com/firma" value={form.social_instagram} onChange={(e) => update({ social_instagram: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Facebook</Label>
+                        <Input placeholder="https://facebook.com/firma" value={form.social_facebook} onChange={(e) => update({ social_facebook: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">X (Twitter)</Label>
+                        <Input placeholder="https://x.com/firma" value={form.social_x} onChange={(e) => update({ social_x: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">YouTube</Label>
+                        <Input placeholder="https://youtube.com/@firma" value={form.social_youtube} onChange={(e) => update({ social_youtube: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">LinkedIn</Label>
+                        <Input placeholder="https://linkedin.com/company/firma" value={form.social_linkedin} onChange={(e) => update({ social_linkedin: e.target.value })} />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-1.5">
                     <Label>Hizmetler</Label>
                     <div className="flex flex-wrap gap-2">

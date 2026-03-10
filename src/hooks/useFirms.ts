@@ -29,7 +29,7 @@ export function useApprovedFirms() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url")
+        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin")
         .eq("is_approved", true)
         .eq("is_active", true)
         .order("is_premium", { ascending: false })
@@ -46,7 +46,7 @@ export function useFirmsByCity(city: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url")
+        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin")
         .eq("is_approved", true)
         .eq("is_active", true)
         .eq("city", city)

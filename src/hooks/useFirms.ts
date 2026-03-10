@@ -16,6 +16,11 @@ export type PublicFirm = {
   slug: string | null;
   website: string | null;
   logo_url: string | null;
+  social_instagram: string | null;
+  social_facebook: string | null;
+  social_x: string | null;
+  social_youtube: string | null;
+  social_linkedin: string | null;
 };
 
 export function useApprovedFirms() {
@@ -24,7 +29,7 @@ export function useApprovedFirms() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url")
+        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin")
         .eq("is_approved", true)
         .eq("is_active", true)
         .order("is_premium", { ascending: false })
@@ -41,7 +46,7 @@ export function useFirmsByCity(city: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url")
+        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin")
         .eq("is_approved", true)
         .eq("is_active", true)
         .eq("city", city)
@@ -60,7 +65,7 @@ export function useFirmById(firmId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, address, is_premium, google_maps_url, detailed_services, slug, website, logo_url")
+        .select("id, company_name, city, district, services, description, phone, email, address, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin")
         .eq("id", firmId)
         .eq("is_approved", true)
         .eq("is_active", true)

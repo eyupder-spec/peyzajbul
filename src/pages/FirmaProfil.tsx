@@ -77,6 +77,11 @@ type FirmData = {
   description: string;
   services: string[];
   telegram_chat_id: string;
+  social_instagram: string;
+  social_facebook: string;
+  social_x: string;
+  social_youtube: string;
+  social_linkedin: string;
 };
 
 const FirmaProfil = () => {
@@ -101,6 +106,11 @@ const FirmaProfil = () => {
     description: "",
     services: [],
     telegram_chat_id: "",
+    social_instagram: "",
+    social_facebook: "",
+    social_x: "",
+    social_youtube: "",
+    social_linkedin: "",
   });
 
   useEffect(() => {
@@ -117,7 +127,7 @@ const FirmaProfil = () => {
 
       const { data: firm } = await supabase
         .from("firms")
-        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved, logo_url, telegram_chat_id")
+        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved, logo_url, telegram_chat_id, social_instagram, social_facebook, social_x, social_youtube, social_linkedin")
         .eq("user_id", user.id)
         .single();
 
@@ -139,6 +149,11 @@ const FirmaProfil = () => {
         description: firm.description || "",
         services: firm.services || [],
         telegram_chat_id: (firm as any).telegram_chat_id || "",
+        social_instagram: (firm as any).social_instagram || "",
+        social_facebook: (firm as any).social_facebook || "",
+        social_x: (firm as any).social_x || "",
+        social_youtube: (firm as any).social_youtube || "",
+        social_linkedin: (firm as any).social_linkedin || "",
       });
       setLoading(false);
     };
@@ -199,7 +214,12 @@ const FirmaProfil = () => {
         description: form.description || null,
         services: form.services,
         telegram_chat_id: form.telegram_chat_id || null,
-        is_approved: false, // Goes back to pending approval
+        social_instagram: form.social_instagram || null,
+        social_facebook: form.social_facebook || null,
+        social_x: form.social_x || null,
+        social_youtube: form.social_youtube || null,
+        social_linkedin: form.social_linkedin || null,
+        is_approved: false,
       } as any).eq("id", firmId);
 
       if (error) throw error;
@@ -364,6 +384,34 @@ const FirmaProfil = () => {
                           <span>Chat ID'nizi yukarıdaki alana yapıştırın ve kaydedin. Artık her yeni lead'de bildirim alacaksınız! 🎉</span>
                         </li>
                       </ol>
+                    </div>
+                  </div>
+
+                  {/* Sosyal Medya */}
+                  <div className="space-y-2">
+                    <Label>Sosyal Medya Linkleri</Label>
+                    <p className="text-xs text-muted-foreground">Sosyal medya hesaplarınız sadece Premium profillerde gösterilir.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Instagram</Label>
+                        <Input placeholder="https://instagram.com/firma" value={form.social_instagram} onChange={(e) => update({ social_instagram: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Facebook</Label>
+                        <Input placeholder="https://facebook.com/firma" value={form.social_facebook} onChange={(e) => update({ social_facebook: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">X (Twitter)</Label>
+                        <Input placeholder="https://x.com/firma" value={form.social_x} onChange={(e) => update({ social_x: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">YouTube</Label>
+                        <Input placeholder="https://youtube.com/@firma" value={form.social_youtube} onChange={(e) => update({ social_youtube: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">LinkedIn</Label>
+                        <Input placeholder="https://linkedin.com/company/firma" value={form.social_linkedin} onChange={(e) => update({ social_linkedin: e.target.value })} />
+                      </div>
                     </div>
                   </div>
 

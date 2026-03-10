@@ -1,0 +1,6 @@
+ALTER TABLE public.firms
+  ADD COLUMN IF NOT EXISTS social_instagram text DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS social_facebook text DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS social_x text DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS social_youtube text DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS social_linkedin text DEFAULT NULL;

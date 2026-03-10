@@ -282,6 +282,11 @@ export type Database = {
           premium_until: string | null
           services: string[] | null
           slug: string | null
+          social_facebook: string | null
+          social_instagram: string | null
+          social_linkedin: string | null
+          social_x: string | null
+          social_youtube: string | null
           tax_number: string | null
           telegram_chat_id: string | null
           updated_at: string
@@ -309,6 +314,11 @@ export type Database = {
           premium_until?: string | null
           services?: string[] | null
           slug?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_linkedin?: string | null
+          social_x?: string | null
+          social_youtube?: string | null
           tax_number?: string | null
           telegram_chat_id?: string | null
           updated_at?: string
@@ -336,6 +346,11 @@ export type Database = {
           premium_until?: string | null
           services?: string[] | null
           slug?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_linkedin?: string | null
+          social_x?: string | null
+          social_youtube?: string | null
           tax_number?: string | null
           telegram_chat_id?: string | null
           updated_at?: string

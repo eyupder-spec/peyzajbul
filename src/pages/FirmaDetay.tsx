@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Mail, ArrowLeft, Building2, Crown, Star, Image as ImageIcon, Globe, Eye, MessageCircle } from "lucide-react";
+import { MapPin, Phone, Mail, ArrowLeft, Building2, Crown, Star, Image as ImageIcon, Globe, Eye, MessageCircle, Instagram, Facebook, Youtube, Linkedin } from "lucide-react";
 import { extractFirmIdFromSlug } from "@/lib/firmUtils";
 import { useApprovedFirms, useFirmGallery, useFirmReviews } from "@/hooks/useFirms";
 import { getCitySlug } from "@/lib/cities";

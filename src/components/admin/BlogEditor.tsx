@@ -23,7 +23,7 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: { levels: [2, 3] },
+        heading: { levels: [1, 2, 3] },
       }),
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary underline" } }),

@@ -70,7 +70,7 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
       case 7: {
         const nameOk = data.fullName.trim().length >= 3 && data.fullName.trim().includes(" ") && /^[a-zA-ZçÇğĞıİöÖşŞüÜ\s]+$/.test(data.fullName.trim());
         const phoneDigits = data.phone.replace(/\D/g, "");
-        const phoneOk = phoneDigits.length === 10 && phoneDigits.startsWith("05");
+        const phoneOk = phoneDigits.length === 11 && phoneDigits.startsWith("05");
         const emailOk = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data.email.trim());
         return nameOk && phoneOk && emailOk && data.kvkkAccepted;
       }

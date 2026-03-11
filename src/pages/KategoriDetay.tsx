@@ -87,6 +87,9 @@ const KategoriDetay = () => {
               <p className="text-sm font-body">Bu kategoride yakında firmalar eklenecek.</p>
             </div>
           )}
+
+          {/* Related Blog Posts */}
+          <RelatedBlogPosts categorySlug={slug} title={`${category.label} Hakkında Yazılar`} />
         </div>
       </main>
       <Footer />

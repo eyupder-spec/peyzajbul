@@ -104,6 +104,9 @@ const IlFirmalari = () => {
             </div>
           )}
 
+          {/* Related Blog Posts */}
+          <RelatedBlogPosts citySlug={citySlug} title={`${city.name} Hakkında Blog Yazıları`} />
+
           {/* Other cities */}
           <div className="mt-16">
             <h3 className="font-heading text-xl font-semibold text-foreground mb-4">Diğer İller</h3>

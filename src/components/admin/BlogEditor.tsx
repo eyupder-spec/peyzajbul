@@ -98,6 +98,9 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
           <Italic className="h-4 w-4" />
         </ToolButton>
         <div className="w-px bg-border mx-1" />
+        <ToolButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })} title="Başlık 1">
+          <Heading1 className="h-4 w-4" />
+        </ToolButton>
         <ToolButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })} title="Başlık 2">
           <Heading2 className="h-4 w-4" />
         </ToolButton>

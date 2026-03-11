@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Bold, Italic, Heading2, Heading3, List, ListOrdered,
+  Bold, Italic, Heading1, Heading2, Heading3, List, ListOrdered,
   Link as LinkIcon, ImageIcon, Undo, Redo, Quote,
 } from "lucide-react";
 import { useRef } from "react";

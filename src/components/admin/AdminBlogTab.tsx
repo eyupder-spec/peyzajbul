@@ -253,10 +253,10 @@ const AdminBlogTab = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <Label>Kategori</Label>
-                <Select value={categorySlug} onValueChange={setCategorySlug}>
+                <Select value={categorySlug || "none"} onValueChange={(v) => setCategorySlug(v === "none" ? "" : v)}>
                   <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Yok</SelectItem>
+                    <SelectItem value="none">Yok</SelectItem>
                     {CATEGORIES.map(c => (
                       <SelectItem key={c.slug} value={c.slug}>{c.label}</SelectItem>
                     ))}
@@ -265,10 +265,10 @@ const AdminBlogTab = () => {
               </div>
               <div className="space-y-1.5">
                 <Label>Şehir</Label>
-                <Select value={citySlug} onValueChange={setCitySlug}>
+                <Select value={citySlug || "none"} onValueChange={(v) => setCitySlug(v === "none" ? "" : v)}>
                   <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Yok</SelectItem>
+                    <SelectItem value="none">Yok</SelectItem>
                     {CITIES.map(c => (
                       <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
                     ))}

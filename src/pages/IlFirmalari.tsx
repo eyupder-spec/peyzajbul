@@ -7,6 +7,7 @@ import { getCityBySlug, generateCitySeoContent, CITIES } from "@/lib/cities";
 import { useFirmsByCity } from "@/hooks/useFirms";
 import { ArrowLeft, MapPin } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import RelatedBlogPosts from "@/components/RelatedBlogPosts";
 
 const IlFirmalari = () => {
   const { slug } = useParams<{ slug: string }>();

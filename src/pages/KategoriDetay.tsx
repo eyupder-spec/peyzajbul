@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import FirmCard from "@/components/FirmCard";
 import { getCategoryBySlug } from "@/lib/categories";
 import { useApprovedFirms } from "@/hooks/useFirms";
+import RelatedBlogPosts from "@/components/RelatedBlogPosts";
 import NotFound from "./NotFound";
 
 const KategoriDetay = () => {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Bold, Italic, Heading2, Heading3, List, ListOrdered,
+  Bold, Italic, Heading1, Heading2, Heading3, List, ListOrdered,
   Link as LinkIcon, ImageIcon, Undo, Redo, Quote,
 } from "lucide-react";
 import { useRef } from "react";
@@ -23,7 +23,7 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: { levels: [2, 3] },
+        heading: { levels: [1, 2, 3] },
       }),
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary underline" } }),
@@ -98,6 +98,9 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
           <Italic className="h-4 w-4" />
         </ToolButton>
         <div className="w-px bg-border mx-1" />
+        <ToolButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })} title="Başlık 1">
+          <Heading1 className="h-4 w-4" />
+        </ToolButton>
         <ToolButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })} title="Başlık 2">
           <Heading2 className="h-4 w-4" />
         </ToolButton>

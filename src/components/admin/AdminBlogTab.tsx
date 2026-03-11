@@ -265,10 +265,10 @@ const AdminBlogTab = () => {
               </div>
               <div className="space-y-1.5">
                 <Label>Şehir</Label>
-                <Select value={citySlug} onValueChange={setCitySlug}>
+                <Select value={citySlug || "none"} onValueChange={(v) => setCitySlug(v === "none" ? "" : v)}>
                   <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Yok</SelectItem>
+                    <SelectItem value="none">Yok</SelectItem>
                     {CITIES.map(c => (
                       <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
                     ))}

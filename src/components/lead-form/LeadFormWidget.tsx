@@ -113,16 +113,42 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
         },
       });
 
-      if (verifyError || verifyRes?.error) {
-        const errMsg = verifyRes?.error || verifyError?.message || "";
+      // Edge Function non-2xx hata yakalama
+      if (verifyError) {
+        // verifyError.context içinden gerçek hata mesajını okumaya çalış
+        let errMsg = "";
+        try {
+          const ctx = (verifyError as any).context;
+          if (ctx && typeof ctx.json === "function") {
+            const body = await ctx.json();
+            errMsg = body?.error || "";
+          }
+        } catch {
+          // context okunamazsa devam et
+        }
+
+        // Geçersiz/süresi dolmuş kod kontrolü
+        if (errMsg.includes("Geçersiz") || errMsg.includes("süresi dolmuş") || 
+            verifyError.message?.includes("non-2xx")) {
+          setOtpError("Girdiğiniz kod geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.");
+          setOtpCode("");
+          toast.error("Geçersiz veya süresi dolmuş kod. Lütfen kontrol edip tekrar deneyin.");
+          return;
+        }
+        throw new Error(errMsg || verifyError.message || "Doğrulama sırasında bir hata oluştu.");
+      }
+
+      if (verifyRes?.error) {
+        const errMsg = verifyRes.error;
         if (errMsg.includes("Geçersiz") || errMsg.includes("süresi dolmuş")) {
           setOtpError("Girdiğiniz kod geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.");
           setOtpCode("");
           toast.error("Geçersiz veya süresi dolmuş kod. Lütfen kontrol edip tekrar deneyin.");
           return;
         }
-        throw new Error(errMsg || "Doğrulama sırasında bir hata oluştu.");
+        throw new Error(errMsg);
       }
+
 
       const userId = verifyRes.userId;
 

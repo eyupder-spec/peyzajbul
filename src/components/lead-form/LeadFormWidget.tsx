@@ -29,6 +29,7 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
   const [loading, setLoading] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [otpSending, setOtpSending] = useState(false);
+  const [otpError, setOtpError] = useState("");
   const router = useRouter();
 
   const updateData = (partial: Partial<LeadFormData>) => {
@@ -101,6 +102,7 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
 
   const handleSubmit = async () => {
     setLoading(true);
+    setOtpError("");
     try {
       const { data: verifyRes, error: verifyError } = await supabase.functions.invoke("verify-otp", {
         body: {
@@ -111,8 +113,16 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
         },
       });
 
-      if (verifyError) throw verifyError;
-      if (verifyRes?.error) throw new Error(verifyRes.error);
+      if (verifyError || verifyRes?.error) {
+        const errMsg = verifyRes?.error || verifyError?.message || "";
+        if (errMsg.includes("Geçersiz") || errMsg.includes("süresi dolmuş")) {
+          setOtpError("Girdiğiniz kod geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.");
+          setOtpCode("");
+          toast.error("Geçersiz veya süresi dolmuş kod. Lütfen kontrol edip tekrar deneyin.");
+          return;
+        }
+        throw new Error(errMsg || "Doğrulama sırasında bir hata oluştu.");
+      }
 
       const userId = verifyRes.userId;
 
@@ -188,6 +198,7 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
       router.push("/hesabim");
       
     } catch (err: any) {
+      setOtpError("");
       toast.error(err.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
       setLoading(false);
@@ -236,9 +247,10 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
             <StepOtp
               email={data.email}
               otpCode={otpCode}
-              onOtpChange={setOtpCode}
+              onOtpChange={(code) => { setOtpCode(code); setOtpError(""); }}
               onResend={sendOtp}
               sending={otpSending}
+              error={otpError}
             />
           )}
       </div>

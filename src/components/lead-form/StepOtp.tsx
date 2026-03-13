@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { Loader2, MailCheck } from "lucide-react";
+import { Loader2, MailCheck, AlertCircle } from "lucide-react";
 
 interface StepOtpProps {
   email: string;
@@ -9,9 +9,10 @@ interface StepOtpProps {
   onOtpChange: (code: string) => void;
   onResend: () => Promise<void>;
   sending: boolean;
+  error?: string;
 }
 
-const StepOtp = ({ email, otpCode, onOtpChange, onResend, sending }: StepOtpProps) => {
+const StepOtp = ({ email, otpCode, onOtpChange, onResend, sending, error }: StepOtpProps) => {
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
@@ -56,6 +57,12 @@ const StepOtp = ({ email, otpCode, onOtpChange, onResend, sending }: StepOtpProp
           </InputOTPGroup>
         </InputOTP>
       </div>
+      {error && (
+        <div className="flex items-center justify-center gap-2 mb-6 px-4 py-3 rounded-xl bg-destructive/10 border border-destructive/20 animate-in fade-in slide-in-from-top-2 duration-300">
+          <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0" />
+          <p className="text-sm text-destructive font-medium">{error}</p>
+        </div>
+      )}
       <div className="text-center">
         {canResend ? (
           <Button

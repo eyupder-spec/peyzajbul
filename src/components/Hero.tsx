@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Search, Building2, Users, MapPinned } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import Image from "next/image";
 import heroBg from "@/assets/hero-bg.jpg";
 
 interface HeroProps {
@@ -16,12 +17,13 @@ const stats = [
 const Hero = ({ onTeklifAl }: HeroProps) => {
   return (
     <section className="relative pt-16">
-      <div className="relative bg-primary overflow-hidden">
-        <img
+      <div className="relative bg-primary overflow-hidden min-h-[400px]">
+        <Image
           src={heroBg}
           alt="Peyzaj bahçe tasarımı"
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-          loading="eager"
+          fill
+          className="object-cover opacity-30"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/90" />
         <div className="container mx-auto px-4 py-24 md:py-36 text-center relative z-10">
@@ -44,7 +46,7 @@ const Hero = ({ onTeklifAl }: HeroProps) => {
               <Search className="mr-2 h-5 w-5" />
               Ücretsiz Teklif Al
             </Button>
-            <Link to="/firmalar">
+            <Link href="/firmalar">
               <Button
                 variant="outline"
                 size="lg"
@@ -77,3 +79,5 @@ const Hero = ({ onTeklifAl }: HeroProps) => {
 };
 
 export default Hero;
+
+

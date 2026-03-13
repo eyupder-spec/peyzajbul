@@ -6,21 +6,21 @@ interface StepConditionBudgetProps {
 }
 
 const RadioGroup = ({ label, options, value, onSelect }: { label: string; options: { value: string; label: string }[]; value: string; onSelect: (v: string) => void }) => (
-  <div>
-    <label className="block text-sm font-semibold text-foreground mb-2 font-body">{label}</label>
-    <div className="grid grid-cols-2 gap-2">
+  <div className="space-y-3">
+    <label className="block text-sm font-semibold text-foreground font-body">{label}</label>
+    <div className="grid grid-cols-2 gap-3">
       {options.map((opt) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onSelect(opt.value)}
-          className={`p-2.5 rounded-md border-2 transition-all font-body text-xs text-center ${
+          className={`p-4 rounded-xl border-2 transition-all font-body text-xs text-center ${
             value === opt.value
-              ? "border-accent bg-accent/10 shadow-sm"
-              : "border-border bg-card hover:border-primary/30"
+              ? "border-accent bg-accent/5 shadow-sm scale-[1.02]"
+              : "border-border bg-card hover:border-primary/20 hover:bg-muted/30"
           }`}
         >
-          {opt.label}
+          <span className="font-medium">{opt.label}</span>
         </button>
       ))}
     </div>
@@ -32,19 +32,20 @@ const StepConditionBudget = ({ data, onChange }: StepConditionBudgetProps) => {
   const budgets = isCommercial ? COMMERCIAL_BUDGETS : RESIDENTIAL_BUDGETS;
 
   return (
-    <div>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
         Mevcut Durum ve Bütçe
       </h2>
-      <p className="text-muted-foreground text-center mb-6 font-body text-sm">
-        Firmaların size doğru teklif verebilmesi için.
+      <p className="text-muted-foreground text-center mb-8 font-body text-sm">
+        Projeniz için ayırdığınız bütçeye en yakın firmaları önereceğiz.
       </p>
-      <div className="max-w-md mx-auto space-y-5">
+      <div className="max-w-md mx-auto space-y-8">
         <RadioGroup label="Mevcut Durum *" options={CURRENT_CONDITION_OPTIONS} value={data.currentCondition} onSelect={(v) => onChange({ currentCondition: v })} />
-        <RadioGroup label="Bütçe *" options={budgets} value={data.budget} onSelect={(v) => onChange({ budget: v })} />
+        <RadioGroup label="Hedeflenen Bütçe *" options={budgets} value={data.budget} onSelect={(v) => onChange({ budget: v })} />
       </div>
     </div>
   );
 };
+
 
 export default StepConditionBudget;

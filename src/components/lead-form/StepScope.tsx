@@ -21,7 +21,7 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
 
   if (isIrrigation) {
     return (
-      <div>
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
           Sulama sistemi detayları
         </h2>
@@ -29,7 +29,6 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
           İhtiyacınıza en uygun teklifi alabilmeniz için.
         </p>
         <div className="max-w-md mx-auto space-y-6">
-          {/* Question 1: What do you want to do? */}
           <div>
             <label className="block text-sm font-semibold text-foreground mb-3 font-body">Ne yapmak istiyorsunuz?</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -37,10 +36,10 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
                 <button
                   key={opt.value}
                   onClick={() => onChange({ irrigationType: opt.value })}
-                  className={`p-3 rounded-lg border-2 transition-all font-body text-sm text-center ${
+                  className={`p-3 rounded-xl border-2 transition-all font-body text-sm text-center ${
                     data.irrigationType === opt.value
-                      ? "border-accent bg-accent/10 shadow-sm"
-                      : "border-border bg-card hover:border-primary/30"
+                      ? "border-accent bg-accent/5 shadow-sm scale-[1.02]"
+                      : "border-border bg-card hover:border-primary/20 hover:bg-muted/30"
                   }`}
                 >
                   {opt.label}
@@ -49,7 +48,6 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
             </div>
           </div>
 
-          {/* Question 2: System type */}
           <div>
             <label className="block text-sm font-semibold text-foreground mb-3 font-body">Sistem tipi</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -57,10 +55,10 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
                 <button
                   key={opt.value}
                   onClick={() => onChange({ irrigationSystem: opt.value })}
-                  className={`p-3 rounded-lg border-2 transition-all font-body text-sm text-center ${
+                  className={`p-3 rounded-xl border-2 transition-all font-body text-sm text-center ${
                     data.irrigationSystem === opt.value
-                      ? "border-accent bg-accent/10 shadow-sm"
-                      : "border-border bg-card hover:border-primary/30"
+                      ? "border-accent bg-accent/5 shadow-sm scale-[1.02]"
+                      : "border-border bg-card hover:border-primary/20 hover:bg-muted/30"
                   }`}
                 >
                   {opt.label}
@@ -69,7 +67,6 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
             </div>
           </div>
 
-          {/* Question 3: Water source */}
           <div>
             <label className="block text-sm font-semibold text-foreground mb-3 font-body">Su kaynağı</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -77,10 +74,10 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
                 <button
                   key={opt.value}
                   onClick={() => onChange({ waterSource: opt.value })}
-                  className={`p-3 rounded-lg border-2 transition-all font-body text-sm text-center ${
+                  className={`p-3 rounded-xl border-2 transition-all font-body text-sm text-center ${
                     data.waterSource === opt.value
-                      ? "border-accent bg-accent/10 shadow-sm"
-                      : "border-border bg-card hover:border-primary/30"
+                      ? "border-accent bg-accent/5 shadow-sm scale-[1.02]"
+                      : "border-border bg-card hover:border-primary/20 hover:bg-muted/30"
                   }`}
                 >
                   {opt.label}
@@ -93,10 +90,9 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
     );
   }
 
-  // If no scope options for this service, show a generic message
   if (scopeOptions.length === 0) {
     return (
-      <div>
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
           Detaylı bilgi
         </h2>
@@ -108,7 +104,7 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
   }
 
   return (
-    <div>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
         Hangi işleri kapsıyor?
       </h2>
@@ -119,22 +115,23 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
         {scopeOptions.map((opt) => (
           <label
             key={opt.value}
-            className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all cursor-pointer font-body text-sm ${
+            className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer font-body text-sm ${
               data.scope.includes(opt.value)
-                ? "border-accent bg-accent/10"
-                : "border-border bg-card hover:border-primary/30"
+                ? "border-accent bg-accent/5 scale-[1.02]"
+                : "border-border bg-card hover:border-primary/20 hover:bg-muted/30"
             }`}
           >
             <Checkbox
               checked={data.scope.includes(opt.value)}
               onCheckedChange={() => toggleScope(opt.value)}
             />
-            <span className="text-foreground">{opt.label}</span>
+            <span className="text-foreground font-medium">{opt.label}</span>
           </label>
         ))}
       </div>
     </div>
   );
 };
+
 
 export default StepScope;

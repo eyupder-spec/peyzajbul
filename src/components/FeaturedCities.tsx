@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 
@@ -44,14 +45,15 @@ const FeaturedCities = () => {
           {FEATURED_CITIES.map((city) => (
             <Link
               key={city.slug}
-              to={`/iller/${city.slug}-peyzaj-firmalari`}
+              href={`/iller/${city.slug}-peyzaj-firmalari`}
               className="group relative rounded-xl overflow-hidden aspect-[4/3] block shadow-md hover:shadow-xl transition-shadow duration-300"
             >
-              <img
+              <Image
                 src={city.image}
                 alt={`${city.name} peyzaj firmaları`}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                loading="lazy"
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-300" />
               <div className="absolute inset-0 bg-accent/0 group-hover:bg-accent/10 transition-colors duration-300" />
@@ -68,7 +70,7 @@ const FeaturedCities = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Link to="/iller">
+          <Link href="/iller">
             <Button variant="outline" size="lg" className="hover:scale-105 transition-transform">
               Tüm İlleri Görüntüle
             </Button>
@@ -80,3 +82,5 @@ const FeaturedCities = () => {
 };
 
 export default FeaturedCities;
+
+

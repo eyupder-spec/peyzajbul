@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Globe, X, Crown, Plus, Trash2, Upload, Camera } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { TURKISH_CITIES } from "@/lib/leadFormData";
 import { SERVICE_LABELS } from "@/lib/categories";
@@ -37,6 +37,10 @@ export type FirmFormData = {
   google_maps_url?: string;
   detailed_services?: { title: string; description: string }[];
   logo_url?: string;
+  response_time?: string;
+  trust_badges?: { icon: string; label: string }[];
+  faq_items?: { question: string; answer: string }[];
+  before_after?: { before: string; after: string };
 };
 
 const emptyForm: FirmFormData = {
@@ -56,6 +60,10 @@ const emptyForm: FirmFormData = {
   premium_until: "",
   google_maps_url: "",
   detailed_services: [],
+  response_time: "",
+  trust_badges: [],
+  faq_items: [],
+  before_after: undefined,
 };
 
 interface FirmFormDialogProps {
@@ -148,6 +156,10 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           premium_until: form.premium_until || null,
           google_maps_url: form.google_maps_url || null,
           detailed_services: form.detailed_services || [],
+          response_time: form.response_time || null,
+          trust_badges: form.trust_badges?.length ? form.trust_badges : null,
+          faq_items: form.faq_items?.length ? form.faq_items : null,
+          before_after: form.before_after || null,
         }).eq("id", initialData.id);
         if (error) throw error;
         toast.success("Firma güncellendi!");
@@ -439,6 +451,109 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                   </Button>
                 </div>
               </div>
+
+              {/* Ekstra Premium İçerikler */}
+              <div className="space-y-1.5 mt-6 border-t border-border pt-4">
+                <Label>Yanıt Süresi (örn: Genellikle 2 saat içinde yanıtlar)</Label>
+                <Input
+                  value={form.response_time || ""}
+                  onChange={(e) => update({ response_time: e.target.value })}
+                />
+              </div>
+
+              {/* Trust Badges */}
+              <div className="space-y-2">
+                <Label>Trust Rozetleri</Label>
+                <div className="space-y-2">
+                  {(form.trust_badges || []).map((b, i) => (
+                    <div key={i} className="flex gap-2">
+                      <Input
+                        placeholder="Emoji"
+                        value={b.icon}
+                        onChange={(e) => {
+                          const updated = [...(form.trust_badges || [])];
+                          updated[i] = { ...updated[i], icon: e.target.value };
+                          update({ trust_badges: updated });
+                        }}
+                        className="w-20"
+                      />
+                      <Input
+                        placeholder="Rozet metni"
+                        value={b.label}
+                        onChange={(e) => {
+                          const updated = [...(form.trust_badges || [])];
+                          updated[i] = { ...updated[i], label: e.target.value };
+                          update({ trust_badges: updated });
+                        }}
+                      />
+                      <Button variant="ghost" size="icon" onClick={() => update({ trust_badges: (form.trust_badges || []).filter((_, j) => j !== i) })}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" onClick={() => update({ trust_badges: [...(form.trust_badges || []), { icon: "", label: "" }] })}>
+                    <Plus className="h-4 w-4 mr-1" /> Rozet Ekle
+                  </Button>
+                </div>
+              </div>
+
+              {/* Before/After */}
+              <div className="space-y-2">
+                <Label>Önce/Sonra Fotoğrafları</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Önce URL</Label>
+                    <Input
+                      value={form.before_after?.before || ""}
+                      onChange={(e) => update({ before_after: { before: e.target.value, after: form.before_after?.after || "" } })}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Sonra URL</Label>
+                    <Input
+                      value={form.before_after?.after || ""}
+                      onChange={(e) => update({ before_after: { before: form.before_after?.before || "", after: e.target.value } })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ Items */}
+              <div className="space-y-2">
+                <Label>Sık Sorulan Sorular</Label>
+                <div className="space-y-3">
+                  {(form.faq_items || []).map((faq, i) => (
+                    <div key={i} className="bg-muted/50 rounded-lg p-3 space-y-2 relative">
+                      <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-6 w-6 text-destructive" onClick={() => update({ faq_items: (form.faq_items || []).filter((_, j) => j !== i) })}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                      <Input
+                        placeholder="Soru"
+                        value={faq.question}
+                        onChange={(e) => {
+                          const updated = [...(form.faq_items || [])];
+                          updated[i] = { ...updated[i], question: e.target.value };
+                          update({ faq_items: updated });
+                        }}
+                        className="pr-8"
+                      />
+                      <Textarea
+                        placeholder="Cevap"
+                        value={faq.answer}
+                        rows={2}
+                        onChange={(e) => {
+                          const updated = [...(form.faq_items || [])];
+                          updated[i] = { ...updated[i], answer: e.target.value };
+                          update({ faq_items: updated });
+                        }}
+                      />
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" onClick={() => update({ faq_items: [...(form.faq_items || []), { question: "", answer: "" }] })}>
+                    <Plus className="h-4 w-4 mr-1" /> Soru Ekle
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -456,3 +571,4 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
 };
 
 export default FirmFormDialog;
+

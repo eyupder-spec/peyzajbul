@@ -41,4 +41,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://peyzaj-rehberi-turkiye.lovable.app/sitemap.xml
+Sitemap: https://peyzajbul.com/sitemap.xml

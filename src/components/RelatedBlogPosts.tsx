@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowRight, BookOpen } from "lucide-react";
 import { CATEGORIES } from "@/lib/categories";
@@ -48,16 +49,17 @@ const RelatedBlogPosts = ({ citySlug, categorySlug, title, limit = 6 }: RelatedB
         {posts.map((post) => (
           <Link
             key={post.id}
-            to={`/blog/${post.slug}`}
+            href={`/blog/${post.slug}`}
             className="group bg-card rounded-lg border border-border overflow-hidden hover:shadow-lg transition-shadow"
           >
             {post.cover_image_url && (
-              <div className="aspect-[16/9] overflow-hidden">
-                <img
+              <div className="aspect-[16/9] overflow-hidden relative">
+                <Image
                   src={post.cover_image_url}
                   alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
             )}
@@ -98,3 +100,4 @@ const RelatedBlogPosts = ({ citySlug, categorySlug, title, limit = 6 }: RelatedB
 };
 
 export default RelatedBlogPosts;
+

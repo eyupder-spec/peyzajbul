@@ -1,44 +1,44 @@
-# Peyzaj Rehberi - Türkiye'nin Peyzaj Firma Rehberi
+# Peyzajbul - Türkiye'nin Peyzaj Firma Rehberi
 
-> Peyzaj Rehberi, Türkiye genelinde 81 ilde peyzaj firmalarını listeleyen, karşılaştıran ve ücretsiz teklif almayı sağlayan bir platformdur.
+> Peyzajbul, Türkiye genelinde 81 ilde peyzaj firmalarını listeleyen, karşılaştıran ve ücretsiz teklif almayı sağlayan bir platformdur.
 
 ## Ana Sayfalar
 
-- [Ana Sayfa](https://peyzaj-rehberi-turkiye.lovable.app/): Öne çıkan firmalar, kategoriler ve nasıl çalışır bölümü
-- [Tüm Firmalar](https://peyzaj-rehberi-turkiye.lovable.app/firmalar): Onaylı peyzaj firmalarının tam listesi
-- [İller](https://peyzaj-rehberi-turkiye.lovable.app/iller): 81 il bazında peyzaj firmaları
-- [Kategoriler](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler): 20 hizmet kategorisi
+- [Ana Sayfa](https://peyzajbul.com/): Öne çıkan firmalar, hizmetler ve nasıl çalışır bölümü
+- [Tüm Firmalar](https://peyzajbul.com/firmalar): Onaylı peyzaj firmalarının tam listesi
+- [İller](https://peyzajbul.com/iller): 81 il bazında peyzaj firmaları
+- [Kategoriler](https://peyzajbul.com/hizmetler): 20 hizmet kategorisi
 
 ## Hizmet Kategorileri
 
-- [Peyzaj Mimarlığı](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/peyzaj-mimarligi)
-- [Bahçe Tasarımı](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/bahce-tasarimi)
-- [Bahçe Bakımı & Bahçıvanlık](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/bahce-bakimi)
-- [Çim Serme & Çim Bakımı](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/cim-serme)
-- [Ağaçlandırma & Fidan](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/agaclandirma)
-- [Ağaç Budama & Kesim](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/agac-budama)
-- [Sulama Sistemleri](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/sulama-sistemleri)
-- [Sert Zemin (Hardscape)](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/sert-zemin)
-- [Peyzaj Aydınlatma](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/peyzaj-aydinlatma)
-- [Havuz Yapımı & Çevresi](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/havuz-yapimi)
-- [Süs Havuzu & Şelale](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/sus-havuzu)
-- [Çatı Bahçesi & Teras](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/cati-bahcesi)
-- [Dikey Bahçe](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/dikey-bahce)
-- [Kentsel Peyzaj](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/kentsel-peyzaj)
-- [Park & Oyun Alanı](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/park-oyun-alani)
-- [Çit & Pergola](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/cit-pergola)
-- [Peyzaj Malzemeleri Satışı](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/peyzaj-malzemeleri)
-- [Doğal Taş & Kaplama](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/dogal-tas)
-- [Bitki Satışı & Fidanlık](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/bitki-satisi)
-- [Toprak & Gübre Hizmetleri](https://peyzaj-rehberi-turkiye.lovable.app/kategoriler/toprak-gubre)
+- [Peyzaj Mimarlığı](https://peyzajbul.com/hizmetler/peyzaj-mimarligi)
+- [Bahçe Tasarımı](https://peyzajbul.com/hizmetler/bahce-tasarimi)
+- [Bahçe Bakımı & Bahçıvanlık](https://peyzajbul.com/hizmetler/bahce-bakimi)
+- [Çim Serme & Çim Bakımı](https://peyzajbul.com/hizmetler/cim-serme)
+- [Ağaçlandırma & Fidan](https://peyzajbul.com/hizmetler/agaclandirma)
+- [Ağaç Budama & Kesim](https://peyzajbul.com/hizmetler/agac-budama)
+- [Sulama Sistemleri](https://peyzajbul.com/hizmetler/sulama-sistemleri)
+- [Sert Zemin (Hardscape)](https://peyzajbul.com/hizmetler/sert-zemin)
+- [Peyzaj Aydınlatma](https://peyzajbul.com/hizmetler/peyzaj-aydinlatma)
+- [Havuz Yapımı & Çevresi](https://peyzajbul.com/hizmetler/havuz-yapimi)
+- [Süs Havuzu & Şelale](https://peyzajbul.com/hizmetler/sus-havuzu)
+- [Çatı Bahçesi & Teras](https://peyzajbul.com/hizmetler/cati-bahcesi)
+- [Dikey Bahçe](https://peyzajbul.com/hizmetler/dikey-bahce)
+- [Kentsel Peyzaj](https://peyzajbul.com/hizmetler/kentsel-peyzaj)
+- [Park & Oyun Alanı](https://peyzajbul.com/hizmetler/park-oyun-alani)
+- [Çit & Pergola](https://peyzajbul.com/hizmetler/cit-pergola)
+- [Peyzaj Malzemeleri Satışı](https://peyzajbul.com/hizmetler/peyzaj-malzemeleri)
+- [Doğal Taş & Kaplama](https://peyzajbul.com/hizmetler/dogal-tas)
+- [Bitki Satışı & Fidanlık](https://peyzajbul.com/hizmetler/bitki-satisi)
+- [Toprak & Gübre Hizmetleri](https://peyzajbul.com/hizmetler/toprak-gubre)
 
 ## Popüler İller
 
-- [İstanbul Peyzaj Firmaları](https://peyzaj-rehberi-turkiye.lovable.app/iller/istanbul-peyzaj-firmalari)
-- [Ankara Peyzaj Firmaları](https://peyzaj-rehberi-turkiye.lovable.app/iller/ankara-peyzaj-firmalari)
-- [İzmir Peyzaj Firmaları](https://peyzaj-rehberi-turkiye.lovable.app/iller/izmir-peyzaj-firmalari)
-- [Antalya Peyzaj Firmaları](https://peyzaj-rehberi-turkiye.lovable.app/iller/antalya-peyzaj-firmalari)
-- [Bursa Peyzaj Firmaları](https://peyzaj-rehberi-turkiye.lovable.app/iller/bursa-peyzaj-firmalari)
+- [İstanbul Peyzaj Firmaları](https://peyzajbul.com/iller/istanbul-peyzaj-firmalari)
+- [Ankara Peyzaj Firmaları](https://peyzajbul.com/iller/ankara-peyzaj-firmalari)
+- [İzmir Peyzaj Firmaları](https://peyzajbul.com/iller/izmir-peyzaj-firmalari)
+- [Antalya Peyzaj Firmaları](https://peyzajbul.com/iller/antalya-peyzaj-firmalari)
+- [Bursa Peyzaj Firmaları](https://peyzajbul.com/iller/bursa-peyzaj-firmalari)
 
 ## Platform Özellikleri
 

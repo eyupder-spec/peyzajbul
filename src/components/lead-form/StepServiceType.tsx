@@ -12,7 +12,9 @@ import yesilCatiImg from "@/assets/form/yesil-cati.png";
 import otoparkYolImg from "@/assets/form/otopark-yol.png";
 import periyodikBakimImg from "@/assets/form/periyodik-bakim.png";
 
-const SERVICE_IMAGES: Record<string, string> = {
+import { StaticImageData } from "next/image";
+
+const SERVICE_IMAGES: Record<string, StaticImageData | string> = {
   "bahce-tasarimi": bahceTasarimiImg,
   "bahce-bakimi": bahceBakimiImg,
   "sulama-sistemi": sulamaSistemiImg,
@@ -27,6 +29,7 @@ const SERVICE_IMAGES: Record<string, string> = {
   "periyodik-bakim": periyodikBakimImg,
 };
 
+
 interface StepServiceTypeProps {
   data: LeadFormData;
   onChange: (data: Partial<LeadFormData>) => void;
@@ -36,7 +39,7 @@ const StepServiceType = ({ data, onChange }: StepServiceTypeProps) => {
   const services = data.projectType === "commercial" ? COMMERCIAL_SERVICES : RESIDENTIAL_SERVICES;
 
   return (
-    <div>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
         Ne tür bir hizmet istiyorsunuz?
       </h2>
@@ -48,17 +51,18 @@ const StepServiceType = ({ data, onChange }: StepServiceTypeProps) => {
           <button
             key={s.value}
             onClick={() => onChange({ serviceType: s.value, scope: [], irrigationType: "", irrigationSystem: "", waterSource: "" })}
-            className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all font-body text-sm font-medium ${
+            className={`flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all font-body text-sm font-medium ${
               data.serviceType === s.value
-                ? "border-accent bg-accent/10 shadow-md"
-                : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
+                ? "border-accent bg-accent/5 shadow-md scale-[1.02]"
+                : "border-border bg-card hover:border-primary/20 hover:bg-muted/30"
             }`}
           >
             <img
-              src={SERVICE_IMAGES[s.value]}
+              src={typeof SERVICE_IMAGES[s.value] === 'string' ? SERVICE_IMAGES[s.value] as string : (SERVICE_IMAGES[s.value] as StaticImageData).src}
               alt={s.label}
-              className="w-14 h-14 object-contain"
+              className="w-16 h-16 object-contain mb-1"
             />
+
             <span className="text-foreground text-center leading-tight">{s.label}</span>
           </button>
         ))}
@@ -67,4 +71,7 @@ const StepServiceType = ({ data, onChange }: StepServiceTypeProps) => {
   );
 };
 
+
 export default StepServiceType;
+
+

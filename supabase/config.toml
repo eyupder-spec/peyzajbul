@@ -1,9 +1,9 @@
-project_id = "tfydaaxgaomdvthclcse"
+project_id = "vexoiwpreylhwxzdkfxc"
 
 [functions.stripe-webhook]
 verify_jwt = false
 
-[functions.create-coin-checkout]
+[functions.create-premium-checkout]
 verify_jwt = false
 
 [functions.spend-coins]
@@ -13,4 +13,10 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.approve-claim]
+verify_jwt = false
+
+[functions.assign-firm-role]
+verify_jwt = false
+
+[functions.activate-premium]
 verify_jwt = false

@@ -14,7 +14,7 @@ const options = [
 
 const StepProjectType = ({ data, onChange }: StepProjectTypeProps) => {
   return (
-    <div>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
         Projenizin türü nedir?
       </h2>
@@ -26,15 +26,19 @@ const StepProjectType = ({ data, onChange }: StepProjectTypeProps) => {
           <button
             key={opt.value}
             onClick={() => onChange({ projectType: opt.value, serviceType: "", scope: [], irrigationType: "", irrigationSystem: "", waterSource: "" })}
-            className={`flex flex-col items-center gap-3 p-5 rounded-lg border-2 transition-all font-body ${
+            className={`flex flex-col items-center gap-4 p-6 rounded-2xl border-2 transition-all font-body ${
               data.projectType === opt.value
-                ? "border-accent bg-accent/10 shadow-md"
-                : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
+                ? "border-accent bg-accent/5 shadow-md scale-[1.02]"
+                : "border-border bg-card hover:border-primary/20 hover:bg-muted/30"
             }`}
           >
-            <img src={opt.img} alt={opt.label} className="w-20 h-20 object-contain" />
-            <span className="text-lg font-semibold text-foreground">{opt.label}</span>
-            <span className="text-xs text-muted-foreground">{opt.desc}</span>
+            <div className="p-4 rounded-full bg-muted/50">
+              <img src={opt.img.src} alt={opt.label} className="w-16 h-16 object-contain" />
+            </div>
+            <div className="text-center">
+              <span className="block text-lg font-bold text-foreground mb-1">{opt.label}</span>
+              <span className="block text-xs text-muted-foreground leading-relaxed">{opt.desc}</span>
+            </div>
           </button>
         ))}
       </div>
@@ -42,4 +46,7 @@ const StepProjectType = ({ data, onChange }: StepProjectTypeProps) => {
   );
 };
 
+
 export default StepProjectType;
+
+

@@ -31,41 +31,42 @@ const StepOtp = ({ email, otpCode, onOtpChange, onResend, sending }: StepOtpProp
   };
 
   return (
-    <div>
-      <div className="flex justify-center mb-4">
-        <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center">
-          <MailCheck className="h-7 w-7 text-accent" />
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex justify-center mb-6">
+        <div className="w-20 h-20 rounded-full bg-accent/5 flex items-center justify-center border-4 border-accent/10">
+          <MailCheck className="h-10 w-10 text-accent" />
         </div>
       </div>
       <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
         E-posta Doğrulama
       </h2>
-      <p className="text-muted-foreground text-center mb-8 font-body text-sm">
-        <strong>{email}</strong> adresine 6 haneli doğrulama kodu gönderdik.
+      <p className="text-muted-foreground text-center mb-10 font-body text-sm max-w-[280px] mx-auto">
+        <strong>{email}</strong> adresine gönderilen 6 haneli kodu aşağıya giriniz.
       </p>
-      <div className="flex justify-center mb-6">
+      <div className="flex justify-center mb-10 scale-110">
         <InputOTP maxLength={6} value={otpCode} onChange={onOtpChange}>
-          <InputOTPGroup>
-            <InputOTPSlot index={0} />
-            <InputOTPSlot index={1} />
-            <InputOTPSlot index={2} />
-            <InputOTPSlot index={3} />
-            <InputOTPSlot index={4} />
-            <InputOTPSlot index={5} />
+          <InputOTPGroup className="gap-2">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <InputOTPSlot 
+                key={i} 
+                index={i} 
+                className="w-12 h-14 rounded-xl border-2 border-border focus:border-accent text-lg font-bold"
+              />
+            ))}
           </InputOTPGroup>
         </InputOTP>
       </div>
       <div className="text-center">
         {canResend ? (
           <Button
-            variant="link"
+            variant="outline"
             onClick={handleResend}
             disabled={sending}
-            className="text-sm"
+            className="text-sm rounded-xl px-8 h-10 border-2"
           >
             {sending ? (
               <>
-                <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Gönderiliyor...
               </>
             ) : (
@@ -73,13 +74,17 @@ const StepOtp = ({ email, otpCode, onOtpChange, onResend, sending }: StepOtpProp
             )}
           </Button>
         ) : (
-          <p className="text-xs text-muted-foreground font-body">
-            Kodu almadınız mı? <span className="font-medium">{countdown}s</span> sonra tekrar gönderebilirsiniz.
-          </p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+            <p className="text-xs text-muted-foreground font-body">
+              Kodu <span className="font-bold text-foreground">{countdown}s</span> sonra tekrar isteyebilirsiniz.
+            </p>
+          </div>
         )}
       </div>
     </div>
   );
 };
+
 
 export default StepOtp;

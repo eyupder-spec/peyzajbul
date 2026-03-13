@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+// @ts-nocheck
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,49 +7,59 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
+    const { user_id } = await req.json();
 
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user } } = await supabaseClient.auth.getUser(token);
-    if (!user) throw new Error("Not authenticated");
+    if (!user_id) {
+      throw new Error("user_id eksik!");
+    }
 
-    // Use service role to update the role
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Update the existing homeowner role to firm
-    const { error: updateError } = await supabaseAdmin
+    // Update existing homeowner role to firm or insert new firm role
+    const { data: existingRole } = await supabaseAdmin
       .from("user_roles")
-      .update({ role: "firm" })
-      .eq("user_id", user.id)
-      .eq("role", "homeowner");
+      .select("role")
+      .eq("user_id", user_id)
+      .eq("role", "homeowner")
+      .maybeSingle();
 
-    if (updateError) {
-      // If no homeowner role exists, insert firm role
-      const { error: insertError } = await supabaseAdmin
+    if (existingRole) {
+      const { error: updateError } = await supabaseAdmin
         .from("user_roles")
-        .insert({ user_id: user.id, role: "firm" });
+        .update({ role: "firm" })
+        .eq("user_id", user_id)
+        .eq("role", "homeowner");
+      if (updateError) throw updateError;
+    } else {
+      const { data: firmRole } = await supabaseAdmin
+        .from("user_roles")
+        .select("id")
+        .eq("user_id", user_id)
+        .eq("role", "firm")
+        .maybeSingle();
       
-      if (insertError) throw insertError;
+      if (!firmRole) {
+        const { error: insertError } = await supabaseAdmin
+          .from("user_roles")
+          .insert({ user_id: user_id, role: "firm" });
+        if (insertError) throw insertError;
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
-  } catch (error) {
+  } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

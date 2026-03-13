@@ -93,9 +93,9 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "Peyzaj Rehberi <onboarding@resend.dev>",
+            from: "Peyzajbul <onboarding@resend.dev>",
             to: [lead.email],
-            subject: "Talebiniz İlgileniliyor! - Peyzaj Rehberi",
+            subject: "Talebiniz İlgileniliyor! - Peyzajbul",
             html: `
               <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#ffffff;border-radius:12px;">
                 <h1 style="color:#1a1a1a;font-size:22px;margin-bottom:8px;">Harika Haber! 🎉</h1>
@@ -109,7 +109,7 @@ serve(async (req) => {
                   <p style="margin:4px 0;color:#555;font-size:14px;">📋 Hizmet: <strong>${lead.service_type}</strong></p>
                   <p style="margin:4px 0;color:#555;font-size:14px;">📍 Şehir: <strong>${lead.city}</strong></p>
                 </div>
-                <p style="color:#999;font-size:12px;">Bu e-posta Peyzaj Rehberi tarafından otomatik olarak gönderilmiştir.</p>
+                <p style="color:#999;font-size:12px;">Bu e-posta Peyzajbul tarafından otomatik olarak gönderilmiştir.</p>
               </div>
             `,
           }),

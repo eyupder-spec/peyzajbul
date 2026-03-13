@@ -1,0 +1,643 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Save, X, AlertTriangle, Crown, Users, Coins, Image, FileText, LogOut, Upload, Camera } from "lucide-react";
+import { TURKISH_CITIES } from "@/lib/leadFormData";
+import { SERVICE_LABELS } from "@/lib/categories";
+import { DISTRICTS_BY_CITY } from "@/lib/districts";
+import {
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
+} from "@/components/ui/sidebar";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+
+const FIRMA_MENU = [
+  { title: "Özet", key: "panel", icon: FileText, path: "/firma/panel" },
+  { title: "Profil", key: "profil", icon: Crown, path: "/firma/profil" },
+  { title: "Leadler", key: "leadler", icon: Users, path: "/firma/leadler" },
+  { title: "Jeton Yükle", key: "jeton", icon: Coins, path: "/firma/jeton" },
+  { title: "Premium", key: "premium", icon: Crown, path: "/firma/premium" },
+  { title: "Galeri", key: "galeri", icon: Image, path: "/firma/galeri" },
+];
+
+function FirmaSidebar() {
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
+  const pathname = usePathname();
+
+  return (
+    <Sidebar collapsible="icon" className="border-r border-border">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>
+            <div className="flex items-center gap-2">
+              <Crown className="h-4 w-4 text-primary" />
+              {!collapsed && <span className="font-heading font-bold">Firma Paneli</span>}
+            </div>
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {FIRMA_MENU.map((item) => {
+                const isActive = pathname ? (pathname === item.path || pathname.startsWith(`${item.path}/`)) : false;
+                return (
+                  <SidebarMenuItem key={item.key}>
+                    <SidebarMenuButton asChild>
+                      <Link 
+                        href={item.path} 
+                        className={`hover:bg-muted/50 ${isActive ? 'bg-primary/10 text-primary font-medium' : ''}`}
+                      >
+                        <item.icon className="h-4 w-4 mr-2" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+}
+
+type FirmData = {
+  id: string;
+  company_name: string;
+  phone: string;
+  email: string;
+  city: string;
+  district: string;
+  address: string;
+  website: string;
+  description: string;
+  services: string[];
+  telegram_chat_id: string;
+  social_instagram: string;
+  social_facebook: string;
+  social_x: string;
+  social_youtube: string;
+  social_linkedin: string;
+  response_time: string;
+  trust_badges: { icon: string; label: string }[];
+  faq_items: { question: string; answer: string }[];
+  before_url: string;
+  after_url: string;
+  is_premium: boolean;
+};
+
+const FirmaProfil = () => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [firmId, setFirmId] = useState("");
+  const [firmName, setFirmName] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [form, setForm] = useState<FirmData>({
+    id: "",
+    company_name: "",
+    phone: "",
+    email: "",
+    city: "",
+    district: "",
+    address: "",
+    website: "",
+    description: "",
+    services: [],
+    telegram_chat_id: "",
+    social_instagram: "",
+    social_facebook: "",
+    social_x: "",
+    social_youtube: "",
+    social_linkedin: "",
+    response_time: "",
+    trust_badges: [],
+    faq_items: [],
+    before_url: "",
+    after_url: "",
+    is_premium: false,
+  });
+
+  useEffect(() => {
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/"); return; }
+
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "firm");
+      if (!roles || roles.length === 0) { router.push("/"); return; }
+
+      const { data: firm } = await supabase
+        .from("firms")
+        .select("id, company_name, phone, email, city, district, address, website, description, services, is_approved, logo_url, telegram_chat_id, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, is_premium")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!firm) { router.push("/firma/giris"); return; }
+      if (!firm.is_approved) { router.push("/firma/giris"); return; }
+
+      setFirmId(firm.id);
+      setFirmName(firm.company_name);
+      setLogoUrl(firm.logo_url || null);
+      setForm({
+        id: firm.id,
+        company_name: firm.company_name,
+        phone: firm.phone || "",
+        email: firm.email || "",
+        city: firm.city || "",
+        district: firm.district || "",
+        address: firm.address || "",
+        website: firm.website || "",
+        description: firm.description || "",
+        services: firm.services || [],
+        telegram_chat_id: (firm as any).telegram_chat_id || "",
+        social_instagram: (firm as any).social_instagram || "",
+        social_facebook: (firm as any).social_facebook || "",
+        social_x: (firm as any).social_x || "",
+        social_youtube: (firm as any).social_youtube || "",
+        social_linkedin: (firm as any).social_linkedin || "",
+        response_time: (firm as any).response_time || "",
+        trust_badges: (firm as any).trust_badges || [],
+        faq_items: (firm as any).faq_items || [],
+        before_url: (firm as any).before_after?.before || "",
+        after_url: (firm as any).before_after?.after || "",
+        is_premium: (firm as any).is_premium || false,
+      });
+      setLoading(false);
+    };
+    load();
+  }, [router]);
+
+  const update = (partial: Partial<FirmData>) => setForm((p) => ({ ...p, ...partial }));
+  const availableDistricts = form.city ? (DISTRICTS_BY_CITY[form.city] || []) : [];
+
+  const toggleService = (s: string) => {
+    setForm((p) => ({
+      ...p,
+      services: p.services.includes(s) ? p.services.filter((x) => x !== s) : [...p.services, s],
+    }));
+  };
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !firmId) return;
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${firmId}/logo.${ext}`;
+      // Remove old logo if exists
+      await supabase.storage.from("firm-logos").remove([path]);
+      const { error: uploadError } = await supabase.storage.from("firm-logos").upload(path, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from("firm-logos").getPublicUrl(path);
+      const url = publicUrl + "?t=" + Date.now();
+      await supabase.from("firms").update({ logo_url: url }).eq("id", firmId);
+      setLogoUrl(url);
+      toast({ title: "Logo güncellendi!" });
+    } catch (err: any) {
+      toast({ title: "Logo yüklenemedi", description: err.message, variant: "destructive" });
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!form.company_name || !form.phone || !form.email || !form.city) {
+      toast({ title: "Hata", description: "Firma adı, telefon, e-posta ve il zorunludur.", variant: "destructive" });
+      return;
+    }
+    setConfirmOpen(true);
+  };
+
+  const confirmSave = async () => {
+    setConfirmOpen(false);
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("firms").update({
+        company_name: form.company_name,
+        phone: form.phone,
+        city: form.city,
+        district: form.district || null,
+        address: form.address || null,
+        website: form.website || null,
+        description: form.description || null,
+        services: form.services,
+        telegram_chat_id: form.telegram_chat_id || null,
+        social_instagram: form.social_instagram || null,
+        social_facebook: form.social_facebook || null,
+        social_x: form.social_x || null,
+        social_youtube: form.social_youtube || null,
+        social_linkedin: form.social_linkedin || null,
+        response_time: form.response_time || null,
+        trust_badges: form.trust_badges.length > 0 ? form.trust_badges : null,
+        faq_items: form.faq_items.length > 0 ? form.faq_items : null,
+        before_after: (form.before_url && form.after_url) ? { before: form.before_url, after: form.after_url } : null,
+        is_approved: false,
+      } as any).eq("id", firmId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Bilgileriniz güncellendi",
+        description: "Değişiklikleriniz admin onayına gönderildi. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir.",
+      });
+      router.push("/firma/panel");
+    } catch (err: any) {
+      toast({ title: "Hata", description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Yükleniyor...</p></div>;
+  }
+
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <FirmaSidebar />
+
+        <div className="flex-1 flex flex-col min-w-0">
+          <header className="h-14 flex items-center justify-between border-b border-border bg-card px-4 shrink-0">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger />
+              <h1 className="font-heading text-lg font-bold text-foreground">{firmName}</h1>
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
+              <LogOut className="h-4 w-4" /> Çıkış
+            </Button>
+          </header>
+
+          <main className="flex-1 overflow-auto p-6">
+            <div className="max-w-2xl mx-auto space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Firma Bilgilerini Düzenle</h2>
+                <div className="flex items-start gap-2 bg-muted border border-border rounded-lg p-3 text-sm text-foreground">
+                  <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
+                  <p>Bilgilerinizi güncelledikten sonra değişiklikler admin onayına gönderilecektir. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir.</p>
+                </div>
+              </div>
+
+              {/* Logo */}
+              <Card className="border-border">
+                <CardContent className="pt-6">
+                  <Label className="mb-3 block">Firma Logosu</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-lg border border-border bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                      {logoUrl ? (
+                        <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                      ) : (
+                        <Camera className="h-8 w-8 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="cursor-pointer">
+                        <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" disabled={uploadingLogo} />
+                        <Button asChild variant="outline" size="sm" disabled={uploadingLogo}>
+                          <span>{uploadingLogo ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Yükleniyor...</> : <><Upload className="h-4 w-4 mr-2" /> Logo Yükle</>}</span>
+                        </Button>
+                      </label>
+                      <p className="text-xs text-muted-foreground">PNG veya JPG, max 2MB önerilir</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border">
+                <CardContent className="pt-6 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label>Firma Adı *</Label>
+                      <Input value={form.company_name} onChange={(e) => update({ company_name: e.target.value })} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>E-posta *</Label>
+                      <Input type="email" value={form.email} disabled className="bg-muted" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label>Telefon *</Label>
+                      <Input value={form.phone} onChange={(e) => update({ phone: e.target.value })} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Web Sitesi</Label>
+                      <Input placeholder="https://firma.com" value={form.website} onChange={(e) => update({ website: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label>İl *</Label>
+                      <Select value={form.city} onValueChange={(val) => update({ city: val, district: "" })}>
+                        <SelectTrigger><SelectValue placeholder="İl seçin" /></SelectTrigger>
+                        <SelectContent>
+                          {TURKISH_CITIES.map((c) => (
+                            <SelectItem key={c} value={c}>{c}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>İlçe</Label>
+                      <Select value={form.district} onValueChange={(val) => update({ district: val })} disabled={!form.city}>
+                        <SelectTrigger><SelectValue placeholder={form.city ? "İlçe seçin" : "Önce il seçin"} /></SelectTrigger>
+                        <SelectContent>
+                          {availableDistricts.map((d) => (
+                            <SelectItem key={d} value={d}>{d}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label>Adres</Label>
+                    <Input value={form.address} onChange={(e) => update({ address: e.target.value })} />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label>Açıklama</Label>
+                    <Textarea value={form.description} onChange={(e) => update({ description: e.target.value })} rows={3} />
+                  </div>
+
+                  {/* Telegram Bildirim */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 text-[hsl(200,80%,50%)]">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.73 6.65-2.87 7.97-3.44 3.79-1.58 4.58-1.86 5.09-1.87.11 0 .37.03.53.17.14.12.18.28.2.45-.01.06.01.24 0 .37z"/>
+                      </svg>
+                      Telegram Bildirim Ayarı
+                    </Label>
+                    <Input
+                      placeholder="Örn: 123456789"
+                      value={form.telegram_chat_id}
+                      onChange={(e) => update({ telegram_chat_id: e.target.value })}
+                    />
+                    <div className="bg-muted/50 border border-border rounded-lg p-3 space-y-2">
+                      <p className="text-xs font-medium text-foreground">📬 Yeni lead geldiğinde Telegram'dan anında bildirim alın:</p>
+                      <ol className="text-xs text-muted-foreground space-y-1.5 list-none">
+                        <li className="flex items-start gap-2">
+                          <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
+                          <span>Telegram'da <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium">@userinfobot</a>'a gidin ve <code className="bg-muted px-1 rounded text-foreground">/start</code> yazın. Bot size Chat ID'nizi gösterecek.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
+                          <span><a href="https://t.me/PeyzajRehberiBot" target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium">@PeyzajRehberiBot</a>'a gidin ve <code className="bg-muted px-1 rounded text-foreground">/start</code> yazın. (Bu adım zorunlu, yoksa bot mesaj gönderemez.)</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">3</span>
+                          <span>Chat ID'nizi yukarıdaki alana yapıştırın ve kaydedin. Artık her yeni lead'de bildirim alacaksınız! 🎉</span>
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
+
+                  {/* Sosyal Medya */}
+                  <div className="space-y-2">
+                    <Label>Sosyal Medya Linkleri</Label>
+                    <p className="text-xs text-muted-foreground">Sosyal medya hesaplarınız sadece Premium profillerde gösterilir.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Instagram</Label>
+                        <Input placeholder="kullaniciadi veya tam link" value={form.social_instagram} onChange={(e) => update({ social_instagram: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Facebook</Label>
+                        <Input placeholder="sayfadi veya tam link" value={form.social_facebook} onChange={(e) => update({ social_facebook: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">X (Twitter)</Label>
+                        <Input placeholder="kullaniciadi veya tam link" value={form.social_x} onChange={(e) => update({ social_x: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">YouTube</Label>
+                        <Input placeholder="@kanaladi veya tam link" value={form.social_youtube} onChange={(e) => update({ social_youtube: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">LinkedIn</Label>
+                        <Input placeholder="sirketadi veya tam link" value={form.social_linkedin} onChange={(e) => update({ social_linkedin: e.target.value })} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label>Hizmetler</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {SERVICE_LABELS.map((s) => (
+                        <Badge
+                          key={s}
+                          variant={form.services.includes(s) ? "default" : "outline"}
+                          className="cursor-pointer"
+                          onClick={() => toggleService(s)}
+                        >
+                          {form.services.includes(s) && <X className="h-3 w-3 mr-1" />}
+                          {s}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4">
+                    <Button onClick={handleSave} disabled={saving} className="gap-2">
+                      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                      Değişiklikleri Kaydet
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* ===== Premium İçerik Kartı ===== */}
+              <Card className="border-accent/30 bg-gradient-to-br from-[#fffbf0] to-white dark:from-[hsl(43_20%_12%)] dark:to-card relative overflow-hidden">
+                {!form.is_premium && (
+                  <div className="absolute inset-0 z-10 backdrop-blur-sm bg-background/60 flex flex-col items-center justify-center p-6 text-center">
+                    <div className="bg-card border border-border rounded-xl p-6 max-w-sm shadow-lg">
+                      <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Crown className="h-6 w-6 text-accent" />
+                      </div>
+                      <h3 className="font-heading text-lg font-bold mb-2">Premium Özellikler</h3>
+                      <p className="text-sm text-muted-foreground mb-6">
+                        Güven rozetleri, SSS, tamamlanan projeler ve öncesi/sonrası görselleri ile profilinizi zenginleştirmek için Premium'a geçin.
+                      </p>
+                      <Button className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-0" onClick={() => router.push("/firma/premium")}>
+                        <Crown className="h-4 w-4 mr-2" />
+                        Premium'a Geç
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
+                <CardContent className={`pt-6 space-y-6 ${!form.is_premium ? 'opacity-30 pointer-events-none' : ''}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Crown className="h-5 w-5 text-accent" />
+                    <h3 className="font-heading font-semibold text-foreground">Premium İçerik Yönetimi</h3>
+                    <span className="text-xs text-muted-foreground">(Premium üstelerde gösterilir)</span>
+                  </div>
+
+                  {/* Yanıt Süresi */}
+                  <div className="space-y-1.5">
+                    <Label>Yanıt Süresi</Label>
+                    <Input
+                      placeholder="Genellikle 2 saat içinde yanıtlar"
+                      value={form.response_time}
+                      onChange={(e) => update({ response_time: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground">Firma kartında ve detay sayfasında gösterilir.</p>
+                  </div>
+
+                  {/* Trust Rozetleri */}
+                  <div className="space-y-2">
+                    <Label>Trust Rozetleri</Label>
+                    <p className="text-xs text-muted-foreground">Emoji + metin formatında rozetler ekleyin (örn: 🏆 5+ Yıl Deneyim)</p>
+                    <div className="space-y-2">
+                      {form.trust_badges.map((b, i) => (
+                        <div key={i} className="flex gap-2">
+                          <Input
+                            placeholder="Emoji"
+                            value={b.icon}
+                            onChange={(e) => {
+                              const updated = [...form.trust_badges];
+                              updated[i] = { ...updated[i], icon: e.target.value };
+                              update({ trust_badges: updated });
+                            }}
+                            className="w-20"
+                          />
+                          <Input
+                            placeholder="Rozet metni"
+                            value={b.label}
+                            onChange={(e) => {
+                              const updated = [...form.trust_badges];
+                              updated[i] = { ...updated[i], label: e.target.value };
+                              update({ trust_badges: updated });
+                            }}
+                          />
+                          <Button variant="ghost" size="icon" onClick={() => update({ trust_badges: form.trust_badges.filter((_, j) => j !== i) })}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button variant="outline" size="sm" onClick={() => update({ trust_badges: [...form.trust_badges, { icon: "", label: "" }] })}>
+                        + Rozet Ekle
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Önce/Sonra */}
+                  <div className="space-y-2">
+                    <Label>Önce / Sonra Slider</Label>
+                    <p className="text-xs text-muted-foreground">Her iki alan dolu olduğunda slider sayfada görünür.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">"Önce" Fotoğraf URL'i</Label>
+                        <Input placeholder="https://..." value={form.before_url} onChange={(e) => update({ before_url: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">"Sonra" Fotoğraf URL'i</Label>
+                        <Input placeholder="https://..." value={form.after_url} onChange={(e) => update({ after_url: e.target.value })} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SSS */}
+                  <div className="space-y-2">
+                    <Label>Sık Sorulan Sorular (SSS)</Label>
+                    <div className="space-y-3">
+                      {form.faq_items.map((faq, i) => (
+                        <div key={i} className="border border-border rounded-lg p-3 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-muted-foreground">Soru {i + 1}</span>
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => update({ faq_items: form.faq_items.filter((_, j) => j !== i) })}>
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          <Input
+                            placeholder="Soru"
+                            value={faq.question}
+                            onChange={(e) => {
+                              const updated = [...form.faq_items];
+                              updated[i] = { ...updated[i], question: e.target.value };
+                              update({ faq_items: updated });
+                            }}
+                          />
+                          <Textarea
+                            placeholder="Cevap"
+                            rows={2}
+                            value={faq.answer}
+                            onChange={(e) => {
+                              const updated = [...form.faq_items];
+                              updated[i] = { ...updated[i], answer: e.target.value };
+                              update({ faq_items: updated });
+                            }}
+                          />
+                        </div>
+                      ))}
+                      <Button variant="outline" size="sm" onClick={() => update({ faq_items: [...form.faq_items, { question: "", answer: "" }] })}>
+                        + Soru Ekle
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <Button onClick={handleSave} disabled={saving} className="gap-2">
+                      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                      Değişiklikleri Kaydet
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </main>
+        </div>
+      </div>
+
+      {/* Confirmation dialog */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-accent" /> Değişiklikleri Onaylayın
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Bilgilerinizi güncelledikten sonra firmanız admin onayına gönderilecektir. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir. Devam etmek istiyor musunuz?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>İptal</Button>
+            <Button onClick={confirmSave} disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Evet, Güncelle
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </SidebarProvider>
+  );
+};
+
+export default FirmaProfil;
+

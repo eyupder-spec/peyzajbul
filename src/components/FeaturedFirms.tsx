@@ -1,7 +1,7 @@
 import { useApprovedFirms } from "@/hooks/useFirms";
 import FirmCard from "@/components/FirmCard";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const FeaturedFirms = () => {
   const { data: firms, isLoading } = useApprovedFirms();
@@ -42,7 +42,7 @@ const FeaturedFirms = () => {
         )}
 
         <div className="text-center mt-10">
-          <Link to="/firmalar">
+          <Link href="/firmalar">
             <Button variant="default" size="lg">
               Tüm Firmaları Gör
             </Button>

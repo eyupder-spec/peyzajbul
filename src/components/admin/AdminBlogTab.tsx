@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import { compressAndConvertToWebP } from "@/lib/imageUtils";
+import { Plus, Edit, Trash2, Eye, EyeOff, Loader2 } from "lucide-react";
 import BlogEditor from "./BlogEditor";
 import { CATEGORIES } from "@/lib/categories";
 import { CITIES } from "@/lib/cities";
@@ -69,7 +70,7 @@ const AdminBlogTab = () => {
   const resetForm = () => {
     setTitle(""); setSlug(""); setExcerpt(""); setContent("");
     setCoverUrl(""); setCategorySlug(""); setCitySlug("");
-    setAuthorName("Peyzaj Rehberi"); setEditingPost(null);
+    setAuthorName("Peyzajbul"); setEditingPost(null);
   };
 
   const openNew = () => { resetForm(); setFormOpen(true); };
@@ -97,9 +98,14 @@ const AdminBlogTab = () => {
     if (!file) return;
     setCoverUploading(true);
     try {
-      const ext = file.name.split(".").pop();
+      const ext = "webp";
       const path = `covers/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("blog-images").upload(path, file);
+
+      // Görseli WebP'ye dönüştür ve sıkıştır
+      const optimizedBlob = await compressAndConvertToWebP(file);
+      const optimizedFile = new File([optimizedBlob], `${Date.now()}.${ext}`, { type: "image/webp" });
+
+      const { error } = await supabase.storage.from("blog-images").upload(path, optimizedFile);
       if (error) throw error;
       const { data: { publicUrl } } = supabase.storage.from("blog-images").getPublicUrl(path);
       setCoverUrl(publicUrl);
@@ -180,7 +186,7 @@ const AdminBlogTab = () => {
           <thead className="bg-muted">
             <tr>
               <th className="text-left px-3 py-2 text-muted-foreground font-medium">Başlık</th>
-              <th className="text-left px-3 py-2 text-muted-foreground font-medium">Kategori</th>
+              <th className="text-left px-3 py-2 text-muted-foreground font-medium">Hizmet Alanı</th>
               <th className="text-left px-3 py-2 text-muted-foreground font-medium">Şehir</th>
               <th className="text-left px-3 py-2 text-muted-foreground font-medium">Durum</th>
               <th className="text-left px-3 py-2 text-muted-foreground font-medium">Tarih</th>
@@ -252,7 +258,7 @@ const AdminBlogTab = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <Label>Kategori</Label>
+                <Label>Hizmet Alanı</Label>
                 <Select value={categorySlug || "none"} onValueChange={(v) => setCategorySlug(v === "none" ? "" : v)}>
                   <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
                   <SelectContent>
@@ -317,3 +323,4 @@ const AdminBlogTab = () => {
 };
 
 export default AdminBlogTab;
+

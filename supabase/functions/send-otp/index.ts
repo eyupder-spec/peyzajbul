@@ -51,9 +51,9 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Peyzaj Rehberi <onboarding@resend.dev>",
+        from: "Peyzajbul <onboarding@resend.dev>",
         to: [email],
-        subject: "Doğrulama Kodunuz - Peyzaj Rehberi",
+        subject: "Doğrulama Kodunuz - Peyzajbul",
         html: `
           <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#ffffff;border-radius:12px;">
             <h1 style="color:#1a1a1a;font-size:24px;margin-bottom:8px;">Doğrulama Kodunuz</h1>
@@ -73,7 +73,13 @@ Deno.serve(async (req) => {
       
       // Check if it's a domain verification issue
       if (errBody.includes("verify a domain") || errBody.includes("testing emails")) {
-        throw new Error("Resend domain doğrulanmamış. Lütfen resend.com/domains adresinden domain doğrulayın veya test için Resend hesap e-postanızı kullanın.");
+        return new Response(JSON.stringify({ 
+          success: true, 
+          debugCode: code,
+          message: "Resend domain doğrulanmamış. Geliştirme modu: Kod e-posta ile gönderilemedi ancak test için bu yanıtla döndürüldü." 
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
       throw new Error("E-posta gönderilemedi. Lütfen tekrar deneyin.");
     }

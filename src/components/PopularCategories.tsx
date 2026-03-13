@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { getAllCategories } from "@/lib/categories";
 
 const PopularCategories = () => {
@@ -20,7 +20,7 @@ const PopularCategories = () => {
           {categories.map((cat) => (
             <Link
               key={cat.slug}
-              to={`/kategoriler/${cat.slug}`}
+              href={`/hizmetler/${cat.slug}`}
               className="group bg-card border border-border rounded-xl p-6 text-center hover:border-primary/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
             >
               <span className="text-4xl mb-3 block transition-transform duration-300 group-hover:scale-110">{cat.icon}</span>
@@ -32,7 +32,7 @@ const PopularCategories = () => {
         </div>
         <div className="text-center mt-8">
           <Link
-            to="/kategoriler"
+            href="/hizmetler"
             className="text-sm font-medium text-primary hover:underline font-body"
           >
             Tüm kategorileri görüntüle →

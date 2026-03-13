@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const NOTIFICATION_SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
@@ -77,3 +79,4 @@ export function useLeadNotifications(userId: string | null, onNewLead?: () => vo
     };
   }, [userId, toast, playSound, showBrowserNotification, onNewLead]);
 }
+

@@ -1,9 +1,8 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 Deno.serve(async (req) => {
@@ -25,29 +24,22 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify caller is admin
-    const supabaseUser = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
+    // Get the user from the token
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } =
-      await supabaseUser.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
         status: 401,
         headers: corsHeaders,
       });
     }
 
-    const adminUserId = claimsData.claims.sub;
-
+    // Verify caller is admin
     const { data: adminRole } = await supabaseAdmin
       .from("user_roles")
       .select("role")
-      .eq("user_id", adminUserId)
+      .eq("user_id", user.id)
       .eq("role", "admin")
       .maybeSingle();
 
@@ -67,7 +59,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get claim
     const { data: claim, error: claimError } = await supabaseAdmin
       .from("claim_requests")
       .select("*")
@@ -99,8 +90,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Approve: update firm, assign role, update claim
-    // 1. Update firm user_id and is_claimed
+    // 1. Update firm ownership
     const { error: firmError } = await supabaseAdmin
       .from("firms")
       .update({ user_id: claim.user_id, is_claimed: true })
@@ -108,7 +98,7 @@ Deno.serve(async (req) => {
 
     if (firmError) throw firmError;
 
-    // 2. Assign firm role (if not already)
+    // 2. Assign firm role
     const { data: existingRole } = await supabaseAdmin
       .from("user_roles")
       .select("id")
@@ -123,7 +113,7 @@ Deno.serve(async (req) => {
       if (roleError) throw roleError;
     }
 
-    // 3. Update claim status
+    // 3. Mark claim as approved
     await supabaseAdmin
       .from("claim_requests")
       .update({ status: "approved" })

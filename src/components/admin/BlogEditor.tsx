@@ -3,8 +3,9 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { compressAndConvertToWebP } from "@/lib/imageUtils";
 import {
   Bold, Italic, Heading1, Heading2, Heading3, List, ListOrdered,
   Link as LinkIcon, ImageIcon, Undo, Redo, Quote,
@@ -29,6 +30,7 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary underline" } }),
     ],
     content,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
@@ -38,6 +40,7 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
       },
     },
   });
+
 
   if (!editor) return null;
 
@@ -52,9 +55,14 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const ext = file.name.split(".").pop();
+      const ext = "webp";
       const path = `${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("blog-images").upload(path, file);
+
+      // Görseli WebP'ye dönüştür ve sıkıştır
+      const optimizedBlob = await compressAndConvertToWebP(file);
+      const optimizedFile = new File([optimizedBlob], `${Date.now()}.${ext}`, { type: "image/webp" });
+
+      const { error } = await supabase.storage.from("blog-images").upload(path, optimizedFile);
       if (error) throw error;
       const { data: { publicUrl } } = supabase.storage.from("blog-images").getPublicUrl(path);
       editor.chain().focus().setImage({ src: publicUrl }).run();
@@ -147,3 +155,4 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
 };
 
 export default BlogEditor;
+

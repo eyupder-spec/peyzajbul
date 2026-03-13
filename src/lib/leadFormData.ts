@@ -52,10 +52,12 @@ export const initialFormData: LeadFormData = {
   photos: [],
   notes: "",
   fullName: "",
-  phone: "",
+  phone: "05",
   email: "",
   kvkkAccepted: false,
 };
+
+
 
 // Service options by project type
 export const RESIDENTIAL_SERVICES = [

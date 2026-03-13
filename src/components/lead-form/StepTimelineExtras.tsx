@@ -39,80 +39,82 @@ const StepTimelineExtras = ({ data, onChange }: StepTimelineExtrasProps) => {
   };
 
   return (
-    <div>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h2 className="font-heading text-2xl font-bold text-foreground mb-2 text-center">
         Zamanlama ve Ek Bilgiler
       </h2>
-      <p className="text-muted-foreground text-center mb-6 font-body text-sm">
+      <p className="text-muted-foreground text-center mb-8 font-body text-sm">
         Projenize ne zaman başlamak istiyorsunuz?
       </p>
-      <div className="max-w-md mx-auto space-y-5">
+      <div className="max-w-md mx-auto space-y-8">
         {/* Timeline */}
-        <div>
-          <label className="block text-sm font-semibold text-foreground mb-2 font-body">Başlangıç Zamanı *</label>
-          <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-4">
+          <label className="block text-sm font-semibold text-foreground font-body">Başlangıç Zamanı *</label>
+          <div className="grid grid-cols-2 gap-3">
             {TIMELINE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => onChange({ timeline: opt.value })}
-                className={`p-2.5 rounded-md border-2 transition-all font-body text-xs text-center ${
+                className={`p-4 rounded-xl border-2 transition-all font-body text-xs text-center ${
                   data.timeline === opt.value
-                    ? "border-accent bg-accent/10 shadow-sm"
-                    : "border-border bg-card hover:border-primary/30"
+                    ? "border-accent bg-accent/5 shadow-sm scale-[1.02]"
+                    : "border-border bg-card hover:border-primary/20 hover:bg-muted/30"
                 }`}
               >
-                {opt.label}
+                <span className="font-medium">{opt.label}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Photo upload */}
-        <div>
-          <label className="block text-sm font-semibold text-foreground mb-2 font-body">
-            Fotoğraf (opsiyonel, max {MAX_PHOTOS})
+        <div className="space-y-4">
+          <label className="block text-sm font-semibold text-foreground font-body">
+            Fotoğraf Yükle (opsiyonel, en fazla {MAX_PHOTOS})
           </label>
-          {data.photos.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-2">
-              {data.photos.map((file, i) => (
-                <div key={i} className="relative w-16 h-16 rounded-md overflow-hidden border border-border">
-                  <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(i)}
-                    className="absolute top-0 right-0 bg-destructive text-destructive-foreground rounded-bl p-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          {data.photos.length < MAX_PHOTOS && (
-            <label className="flex items-center gap-2 px-4 py-2.5 rounded-md border border-dashed border-input bg-card cursor-pointer hover:border-primary/30 transition-colors">
-              <Upload className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground font-body">Fotoğraf yükle (JPG/PNG, max {MAX_SIZE_MB}MB)</span>
-              <input type="file" accept="image/jpeg,image/png" multiple onChange={handlePhotoAdd} className="hidden" />
-            </label>
-          )}
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+            {data.photos.map((file, i) => (
+              <div key={i} className="relative aspect-square rounded-xl overflow-hidden border-2 border-border group">
+                <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                <button
+                  type="button"
+                  onClick={() => removePhoto(i)}
+                  className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="h-5 w-5 text-white" />
+                </button>
+              </div>
+            ))}
+            {data.photos.length < MAX_PHOTOS && (
+              <label className="aspect-square rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all group">
+                <Upload className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors mb-1" />
+                <span className="text-[10px] text-muted-foreground group-hover:text-primary transition-colors text-center px-1">Ekle</span>
+                <input type="file" accept="image/jpeg,image/png" multiple onChange={handlePhotoAdd} className="hidden" />
+              </label>
+            )}
+          </div>
+          <p className="text-[11px] text-muted-foreground text-center">
+            Bahçenizin/alanın mevcut durumunu gösteren fotoğraflar doğru teklif almanıza yardımcı olur.
+          </p>
         </div>
 
         {/* Notes */}
-        <div>
-          <label className="block text-sm font-semibold text-foreground mb-1.5 font-body">Ek Notlar (opsiyonel)</label>
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-foreground font-body">Ek Notlar (opsiyonel)</label>
           <textarea
             value={data.notes}
             onChange={(e) => onChange({ notes: e.target.value })}
-            placeholder="Projeniz hakkında eklemek istediğiniz bilgiler..."
-            rows={3}
+            placeholder="Projeniz veya ihtiyaçlarınız hakkında eklemek istediğiniz diğer detaylar..."
+            rows={4}
             maxLength={1000}
-            className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm font-body focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+            className="w-full p-4 rounded-xl border-2 border-border bg-card text-sm font-body focus:outline-none focus:border-accent/50 focus:bg-accent/5 transition-all resize-none placeholder:text-muted-foreground/50"
           />
         </div>
       </div>
     </div>
   );
 };
+
 
 export default StepTimelineExtras;

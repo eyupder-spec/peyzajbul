@@ -12,6 +12,19 @@ import Navbar from "@/components/Navbar";
 import { Coins, Eye, ArrowLeft } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
+import {
+  SERVICE_LABELS,
+  PROJECT_TYPE_LABELS,
+  PROPERTY_TYPE_LABELS,
+  CONDITION_LABELS,
+  BUDGET_LABELS,
+  TIMELINE_LABELS,
+  AREA_LABELS,
+  IRRIGATION_TYPE_LABELS,
+  IRRIGATION_SYSTEM_LABELS,
+  WATER_SOURCE_LABELS,
+  getLeadLabel
+} from "@/lib/formatLead";
 
 type Lead = {
   id: string;
@@ -27,6 +40,15 @@ type Lead = {
   email: string;
   lead_score: number | null;
   status: string;
+  project_type?: string | null;
+  property_type?: string | null;
+  current_condition?: string | null;
+  address?: string | null;
+  notes?: string | null;
+  scope?: string[] | null;
+  irrigation_type?: string | null;
+  irrigation_system?: string | null;
+  water_source?: string | null;
 };
 
 const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
@@ -216,9 +238,9 @@ const FirmaLeadlerContent = () => {
                         <td className="px-4 py-3 text-sm text-foreground">
                           {new Date(lead.created_at).toLocaleDateString("tr-TR")}
                         </td>
-                        <td className="px-4 py-3 text-sm text-foreground">{lead.service_type}</td>
-                        <td className="px-4 py-3 text-sm text-foreground">{lead.project_size}</td>
-                        <td className="px-4 py-3 text-sm text-foreground">{lead.budget}</td>
+                        <td className="px-4 py-3 text-sm text-foreground">{getLeadLabel(SERVICE_LABELS, lead.service_type)}</td>
+                        <td className="px-4 py-3 text-sm text-foreground">{getLeadLabel(AREA_LABELS, lead.project_size)}</td>
+                        <td className="px-4 py-3 text-sm text-foreground">{getLeadLabel(BUDGET_LABELS, lead.budget)}</td>
                         <td className="px-4 py-3 text-sm text-foreground">{lead.city}</td>
                         <td className="px-4 py-3 text-sm text-foreground">{lead.district || "-"}</td>
                         <td className="px-4 py-3 text-sm text-foreground">{lead.full_name}</td>
@@ -288,7 +310,7 @@ const FirmaLeadlerContent = () => {
                 <Card key={lead.id} className="border-border">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm">{lead.service_type}</CardTitle>
+                      <CardTitle className="text-sm">{getLeadLabel(SERVICE_LABELS, lead.service_type)}</CardTitle>
                       <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
                         {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
                       </Badge>
@@ -305,7 +327,7 @@ const FirmaLeadlerContent = () => {
                   <CardContent className="space-y-2">
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div><span className="text-muted-foreground">İl:</span> {lead.city}</div>
-                      <div><span className="text-muted-foreground">Bütçe:</span> {lead.budget}</div>
+                      <div><span className="text-muted-foreground">Bütçe:</span> {getLeadLabel(BUDGET_LABELS, lead.budget)}</div>
                       <div><span className="text-muted-foreground">Ad:</span> {lead.full_name}</div>
                       <div><span className="text-muted-foreground">Tel:</span> {lead.phone}</div>
                     </div>
@@ -343,29 +365,68 @@ const FirmaLeadlerContent = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Hizmet Türü</p>
-                  <p className="font-medium text-foreground">{selectedLead.service_type}</p>
+                  <p className="text-sm text-muted-foreground">Proje Türü</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(PROJECT_TYPE_LABELS, selectedLead.project_type)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Proje Büyüklüğü</p>
-                  <p className="font-medium text-foreground">{selectedLead.project_size}</p>
+                  <p className="text-sm text-muted-foreground">Hizmet Türü</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(SERVICE_LABELS, selectedLead.service_type)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Mülk Tipi</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(PROPERTY_TYPE_LABELS, selectedLead.property_type)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Alan Büyüklüğü</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(AREA_LABELS, selectedLead.project_size)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Mevcut Durum</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(CONDITION_LABELS, selectedLead.current_condition)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Bütçe</p>
-                  <p className="font-medium text-foreground">{selectedLead.budget}</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(BUDGET_LABELS, selectedLead.budget)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Zaman Çizelgesi</p>
-                  <p className="font-medium text-foreground">{selectedLead.timeline}</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(TIMELINE_LABELS, selectedLead.timeline)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">İl</p>
-                  <p className="font-medium text-foreground">{selectedLead.city}</p>
+                  <p className="text-sm text-muted-foreground">Konum</p>
+                  <p className="font-medium text-foreground">{selectedLead.district ? `${selectedLead.city}, ${selectedLead.district}` : selectedLead.city}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">İlçe</p>
-                  <p className="font-medium text-foreground">{selectedLead.district || "-"}</p>
-                </div>
+
+                {selectedLead.service_type === "sulama-sistemi" && (
+                  <>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Sulama Türü</p>
+                      <p className="font-medium text-foreground">{getLeadLabel(IRRIGATION_TYPE_LABELS, selectedLead.irrigation_type)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Sulama Sistemi</p>
+                      <p className="font-medium text-foreground">{getLeadLabel(IRRIGATION_SYSTEM_LABELS, selectedLead.irrigation_system)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Su Kaynağı</p>
+                      <p className="font-medium text-foreground">{getLeadLabel(WATER_SOURCE_LABELS, selectedLead.water_source)}</p>
+                    </div>
+                  </>
+                )}
+
+                {selectedLead.scope && selectedLead.scope.length > 0 && (
+                  <div className="col-span-2">
+                    <p className="text-sm text-muted-foreground">Kapsam</p>
+                    <p className="font-medium text-foreground">{selectedLead.scope.map(s => s.replace(/-/g, " ")).join(", ")}</p>
+                  </div>
+                )}
+
+                {selectedLead.notes && (
+                  <div className="col-span-2">
+                    <p className="text-sm text-muted-foreground">Notlar</p>
+                    <p className="font-medium text-foreground">{selectedLead.notes}</p>
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-border pt-4">
@@ -379,6 +440,12 @@ const FirmaLeadlerContent = () => {
                     <p className="text-sm text-muted-foreground">Telefon</p>
                     <p className="font-medium text-foreground">{selectedLead.phone}</p>
                   </div>
+                  {selectedLead.address && (
+                    <div className="col-span-2">
+                      <p className="text-sm text-muted-foreground">Adres</p>
+                      <p className="font-medium text-foreground">{selectedLead.address}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -15,9 +15,9 @@ export const getScoreBadge = (score: number | null): ScoreBadge => {
 export const getScoreBreakdown = (lead: {
   budget: string;
   timeline: string;
-  project_size?: string;
-  area_size?: string;
-  project_type?: string;
+  project_size?: string | null;
+  area_size?: string | null;
+  project_type?: string | null;
   phone: string;
 }) => {
   const breakdown: { label: string; points: number }[] = [];

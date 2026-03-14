@@ -12,14 +12,16 @@ export const getScoreBadge = (score: number | null): ScoreBadge => {
   return { label: "Soğuk Lead", emoji: "❄️", className: "bg-muted text-muted-foreground" };
 };
 
-export const getScoreBreakdown = (lead: {
-  budget: string;
-  timeline: string;
-  project_size?: string | null;
-  area_size?: string | null;
-  project_type?: string | null;
-  phone: string;
-}) => {
+export interface ScorableLead {
+  budget: string | null | undefined;
+  timeline: string | null | undefined;
+  project_size?: string | null | undefined;
+  area_size?: string | null | undefined;
+  project_type?: string | null | undefined;
+  phone: string | null | undefined;
+}
+
+export const getScoreBreakdown = (lead: ScorableLead) => {
   const breakdown: { label: string; points: number }[] = [];
 
   // Project type

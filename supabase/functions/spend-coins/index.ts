@@ -93,7 +93,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "Peyzajbul <onboarding@resend.dev>",
+            from: "Peyzajbul <noreply@peyzajbul.com>",
             to: [lead.email],
             subject: "Talebiniz İlgileniliyor! - Peyzajbul",
             html: `

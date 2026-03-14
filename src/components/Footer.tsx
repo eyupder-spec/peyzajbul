@@ -28,10 +28,10 @@ const Footer = () => {
           <div>
             <h4 className="font-heading font-semibold mb-4 text-accent">Popüler Hizmetler</h4>
             <div className="space-y-2.5">
-              <Link href="/hizmet/peyzaj-mimarligi/istanbul" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İstanbul Peyzaj</Link>
-              <Link href="/hizmet/bahce-tasarimi/istanbul/kadikoy" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Kadıköy Bahçe Tasarımı</Link>
-              <Link href="/hizmet/bahce-bakimi/ankara/cankaya" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Çankaya Bahçe Bakımı</Link>
-              <Link href="/hizmet/rulo-cim/izmir" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İzmir Rulo Çim</Link>
+              <Link href="/hizmet/peyzaj-mimarligi/istanbul" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İstanbul Peyzaj Mimarlığı</Link>
+              <Link href="/hizmet/bahce-tasarimi/istanbul" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İstanbul Bahçe Tasarımı</Link>
+              <Link href="/hizmet/bahce-bakimi/ankara" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Ankara Bahçe Bakımı</Link>
+              <Link href="/hizmet/cim-serme/izmir" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İzmir Çim Serme</Link>
             </div>
           </div>
           <div>

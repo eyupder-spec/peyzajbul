@@ -431,7 +431,9 @@ const FirmaPanel = () => {
                               </td>
                               <td className="px-4 py-3">
                                 {isPurchased ? (
-                                  <Button size="sm" variant="outline" disabled>Açıldı</Button>
+                                  <Button size="sm" variant="outline" onClick={() => setSelectedLead(lead)} className="w-full">
+                                    <Eye className="h-4 w-4 mr-1" /> İncele
+                                  </Button>
                                 ) : (
                                   <div className="flex gap-2">
                                     <Button size="sm" variant="outline" onClick={() => setSelectedLead(lead)} id={lead === leads[0] ? "tour-lead-preview" : undefined}>
@@ -478,7 +480,13 @@ const FirmaPanel = () => {
                             <div><span className="text-muted-foreground">Ad:</span> {lead.full_name}</div>
                             <div><span className="text-muted-foreground">Tel:</span> {lead.phone}</div>
                           </div>
-                          {!isPurchased && (
+                          {isPurchased ? (
+                            <div className="pt-2">
+                              <Button size="sm" variant="outline" className="w-full" onClick={() => setSelectedLead(lead)}>
+                                <Eye className="h-4 w-4 mr-1" /> Detayları İncele
+                              </Button>
+                            </div>
+                          ) : (
                             <div className="flex gap-2 pt-2">
                               <Button size="sm" variant="outline" className="flex-1" onClick={() => setSelectedLead(lead)}>
                                 <Eye className="h-4 w-4 mr-1" /> Önizle
@@ -621,10 +629,17 @@ const FirmaPanel = () => {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedLead(null)}>Kapat</Button>
-            <Button onClick={() => { if (selectedLead) handlePurchase(selectedLead.id); }} disabled={purchasing}>
-              <Coins className="h-4 w-4 mr-2" />
-              Lead Aç (20 Jeton)
-            </Button>
+            {selectedLead && !purchasedLeadIds.has(selectedLead.id) && (
+              <Button onClick={() => handlePurchase(selectedLead.id)} disabled={purchasing}>
+                <Coins className="h-4 w-4 mr-2" />
+                Lead Aç (20 Jeton)
+              </Button>
+            )}
+            {selectedLead && purchasedLeadIds.has(selectedLead.id) && (
+              <Button variant="default" onClick={() => window.location.href = `tel:${selectedLead.phone}`}>
+                Hemen Ara
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

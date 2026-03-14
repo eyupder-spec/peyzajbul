@@ -1,1 +1,0 @@
-ALTER TABLE public.firms ADD COLUMN website text;

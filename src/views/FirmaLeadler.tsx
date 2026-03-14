@@ -49,6 +49,7 @@ type Lead = {
   irrigation_type?: string | null;
   irrigation_system?: string | null;
   water_source?: string | null;
+  photo_urls?: string[] | null;
 };
 
 const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
@@ -100,6 +101,7 @@ const FirmaLeadlerContent = () => {
   const [purchasing, setPurchasing] = useState(false);
   const [coinBalance, setCoinBalance] = useState(0);
   const [userId, setUserId] = useState<string>("");
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   useEffect(() => {
     const purchasedId = searchParams ? searchParams.get("purchased") : null;
@@ -433,6 +435,19 @@ const FirmaLeadlerContent = () => {
                     <p className="font-medium text-foreground">{selectedLead.notes}</p>
                   </div>
                 )}
+
+                {selectedLead.photo_urls && selectedLead.photo_urls.length > 0 && (
+                  <div className="col-span-2">
+                    <p className="text-sm text-muted-foreground mb-2">Görseller</p>
+                    <div className="flex gap-2 flex-wrap">
+                      {selectedLead.photo_urls.map((url, i) => (
+                        <div key={i} onClick={() => setSelectedPhoto(url)} className="block overflow-hidden rounded-md border border-border hover:opacity-80 transition-opacity cursor-pointer">
+                          <img src={url} alt={`Görsel ${i + 1}`} className="w-24 h-24 object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-border pt-4">
@@ -498,6 +513,16 @@ const FirmaLeadlerContent = () => {
               </Button>
             )}
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Full Screen Photo Modal */}
+      <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
+        <DialogContent className="max-w-4xl p-1 bg-transparent border-none shadow-none flex justify-center items-center [&>button]:text-white [&>button]:bg-black/50 hover:[&>button]:bg-black/70 [&>button]:rounded-full [&>button]:p-2">
+          <DialogTitle className="sr-only">Görsel İnceleme</DialogTitle>
+          {selectedPhoto && (
+            <img src={selectedPhoto} alt="Detaylı Görsel" className="max-w-full max-h-[85vh] object-contain rounded-md shadow-2xl" />
+          )}
         </DialogContent>
       </Dialog>
     </>

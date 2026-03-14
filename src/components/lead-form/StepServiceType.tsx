@@ -50,6 +50,7 @@ const StepServiceType = ({ data, onChange }: StepServiceTypeProps) => {
         {services.map((s) => (
           <button
             key={s.value}
+            type="button"
             onClick={() => onChange({ serviceType: s.value, scope: [], irrigationType: "", irrigationSystem: "", waterSource: "" })}
             className={`flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all font-body text-sm font-medium ${
               data.serviceType === s.value

@@ -25,6 +25,7 @@ const StepProjectType = ({ data, onChange }: StepProjectTypeProps) => {
         {options.map((opt) => (
           <button
             key={opt.value}
+            type="button"
             onClick={() => onChange({ projectType: opt.value, serviceType: "", scope: [], irrigationType: "", irrigationSystem: "", waterSource: "" })}
             className={`flex flex-col items-center gap-4 p-6 rounded-2xl border-2 transition-all font-body ${
               data.projectType === opt.value

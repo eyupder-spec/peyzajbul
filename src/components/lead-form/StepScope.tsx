@@ -35,6 +35,7 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
               {IRRIGATION_TYPE_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
+                  type="button"
                   onClick={() => onChange({ irrigationType: opt.value })}
                   className={`p-3 rounded-xl border-2 transition-all font-body text-sm text-center ${
                     data.irrigationType === opt.value
@@ -54,6 +55,7 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
               {IRRIGATION_SYSTEM_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
+                  type="button"
                   onClick={() => onChange({ irrigationSystem: opt.value })}
                   className={`p-3 rounded-xl border-2 transition-all font-body text-sm text-center ${
                     data.irrigationSystem === opt.value
@@ -73,6 +75,7 @@ const StepScope = ({ data, onChange }: StepScopeProps) => {
               {WATER_SOURCE_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
+                  type="button"
                   onClick={() => onChange({ waterSource: opt.value })}
                   className={`p-3 rounded-xl border-2 transition-all font-body text-sm text-center ${
                     data.waterSource === opt.value

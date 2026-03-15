@@ -26,6 +26,8 @@ import {
   MessageSquare,
   Bookmark
 } from "lucide-react";
+import { CATEGORIES } from "@/lib/categories";
+import { CITIES } from "@/lib/cities";
 
 interface BlogDetayProps {
   slug?: string;

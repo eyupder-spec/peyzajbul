@@ -17,8 +17,8 @@ const Kategoriler = () => {
             <h1 className="font-heading text-3xl md:text-4xl font-bold text-primary-foreground mb-2">
               Peyzaj Hizmetleri
             </h1>
-            <p className="text-primary-foreground/70 font-body">
-              İhtiyacınıza uygun peyzaj hizmetini seçin, en iyi firmaları bulun.
+            <p className="text-primary-foreground/70 font-body max-w-3xl mx-auto mt-4 text-balanced">
+              Bahçe tasarımı, peyzaj mimarlığı, otomatik sulama sistemleri ve sert zemin uygulamaları gibi birçok alanda uzmanlaşmış profesyonelleri keşfedin. Hayalinizdeki dış mekanı gerçeğe dönüştürecek en iyi peyzaj firmalarını kategorilere göre filtreleyerek hemen bulabilirsiniz.
             </p>
           </div>
         </div>

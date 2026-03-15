@@ -27,7 +27,7 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
   if (!category) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold mb-4">Hizmet Bulunamadı</h1>
+        <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-4">Hizmet Bulunamadı</h1>
         <Link href="/hizmetler">
           <Button variant="outline">Hizmetlere Dön</Button>
         </Link>
@@ -64,8 +64,11 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
         </div>
 
         <div className="container mx-auto px-4 py-12">
-          <article className="prose prose-lg max-w-3xl mx-auto mb-12 font-body text-muted-foreground">
-            <p>{category.seoArticle}</p>
+          <article className="prose prose-lg max-w-3xl mx-auto mb-16 font-body text-muted-foreground leading-relaxed">
+            <p className="mb-4">{category.seoArticle}</p>
+            <p>
+              Profesyonel <strong>{category.label.toLowerCase()}</strong> hizmetleri, sadece estetik bir görünüm değil, aynı zamanda mülkünüzün değerini artıran ve ekosisteme katkı sağlayan yatırım odaklı çalışmalardır. Peyzajbul olarak Türkiye genelindeki en deneyimli firmaları, uzman peyzaj mimarlarını ve uygulama ekiplerini bir araya getiriyoruz. İhtiyacınız olan çözüm için doğru uzmanla eşleşerek projenizi güvenle hayata geçirebilirsiniz.
+            </p>
           </article>
 
           <h2 className="font-heading text-2xl font-bold text-foreground mb-6 text-center">

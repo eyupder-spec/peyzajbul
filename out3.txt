@@ -1,0 +1,12 @@
+Initialising login role...
+Connecting to remote database...
+Do you want to push these migrations to the remote database?
+ • 20260311160000_premium_firm_features.sql
+ • 20260311183000_security_hardening.sql
+ • 20260313020000_stripe_subscriptions.sql
+ • 20260313030000_whatsapp_notifications.sql
+ • 20260313120000_projects.sql
+ • 20260315000000_leads_for_firms_photo_urls.sql
+
+ [Y/n] context canceled
+Terminate batch job (Y/N)? 

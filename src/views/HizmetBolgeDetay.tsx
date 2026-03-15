@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Leaf, MapPin, CheckCircle2, ChevronRight, Home, Building2 } from "lucide-react";
+import { Leaf, MapPin, CheckCircle2, ChevronRight, Home, Building2, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -129,6 +129,71 @@ const HizmetBolgeDetay = ({
                   ))}
                 </ul>
               </article>
+
+              {/* WHY CHOOSE US - NEW SEO SECTION */}
+              <div className="bg-primary/5 rounded-2xl p-8 border border-primary/10">
+                <h2 className="text-2xl font-bold mb-6">{fullLocation} Projelerinizde Doğru Paydaş Seçimi</h2>
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <h4 className="font-bold flex items-center gap-2">
+                       <Sparkles className="h-4 w-4 text-accent" /> Yerel Deneyim
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {cityName} bölgesindeki iklim ve toprak yapısını en iyi bilen firmalarla çalışarak, projenizin uzun ömürlü ve sağlıklı kalmasını sağlarsınız.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-bold flex items-center gap-2">
+                       <CheckCircle2 className="h-4 w-4 text-accent" /> Hızlı Teklif Alın
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Peyzajbul üzerinden {districtName || cityName} bölgesindeki birden fazla firmadan hızlıca teklif toplayarak maliyet avantajı elde edebilirsiniz.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-bold flex items-center gap-2">
+                       <Building2 className="h-4 w-4 text-accent" /> Şeffaf Süreç
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Müşteri yorumları ve puanları sayesinde, {category.label} hizmetinde uzmanlaşmış en güvenilir ekipleri kolayca ayırt edin.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-bold flex items-center gap-2">
+                       <MapPin className="h-4 w-4 text-accent" /> Yaygın Hizmet Ağı
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {districtName} ve çevresindeki tüm mahallelerde hizmet sunan profesyonellere tek tıkla ulaşım imkanı.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ SECTION - NEW SEO SECTION */}
+              <div className="space-y-6 pt-4">
+                <h3 className="text-2xl font-bold">{fullLocation} {category.label} Hakkında Sıkça Sorulan Sorular</h3>
+                <div className="grid gap-4">
+                  <div className="border border-border rounded-xl p-6 bg-white shadow-sm">
+                    <h4 className="font-bold mb-2">Peyzaj projesi için fiyatlar nasıl belirlenir?</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Fiyatlandırma genellikle projenin büyüklüğü (m²), kullanılacak bitki türleri, sert zemin uygulamaları ve işçilik detaylarına göre değişir. {cityName} genelindeki firmalar genellikle ücretsiz keşif sonrası net fiyat verirler.
+                    </p>
+                  </div>
+                  <div className="border border-border rounded-xl p-6 bg-white shadow-sm">
+                    <h4 className="font-bold mb-2">{category.label} uygulaması ne kadar sürer?</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Ortalama bir bahçe düzenleme veya {category.label.toLowerCase()} projesi, iş kapsamına bağlı olarak 1 hafta ile 1 ay arasında tamamlanmaktadır.
+                    </p>
+                  </div>
+                  <div className="border border-border rounded-xl p-6 bg-white shadow-sm">
+                    <h4 className="font-bold mb-2">Bölgeme en yakın firmayı nasıl bulabilirim?</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Peyzajbul sisteminde konum bazlı filtreleme yaparak {districtName || cityName} içerisinde hizmet veren onaylı profesyonelleri saniyeler içinde listeleyebilirsiniz.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
 
               <div id="firmalar-listesi" className="pt-8">
                 <h3 className="text-2xl font-bold mb-6">{districtName || cityName} Bölgesindeki Uzmanlar</h3>

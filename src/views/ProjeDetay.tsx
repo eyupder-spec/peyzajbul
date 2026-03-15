@@ -117,8 +117,8 @@ export default function ProjeDetayClient({ params }: { params: { kategori: strin
     return (
       <>
         <Navbar />
-        <div className="min-h-screen pt-20 flex items-center justify-center">
-          <p className="text-muted-foreground animate-pulse">Yükleniyor...</p>
+        <div className="min-h-screen pt-20 flex flex-col items-center justify-center gap-4">
+          <h1 className="text-xl font-bold text-muted-foreground animate-pulse">Proje Yükleniyor...</h1>
         </div>
       </>
     );

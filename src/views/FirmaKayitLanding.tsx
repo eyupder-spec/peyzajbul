@@ -234,19 +234,19 @@ const FirmaKayitLanding = () => {
         {/* STATS - LIGHT CARD */}
         <section className="py-24 px-4 bg-[#f1f6f3]">
           <div className="container mx-auto max-w-7xl">
-            <div className="relative rounded-[3rem] overflow-hidden p-12 md:p-20 shadow-xl bg-white border border-primary/5">
+            <div className="relative rounded-3xl md:rounded-[3rem] overflow-hidden p-6 sm:p-8 md:p-12 lg:p-20 shadow-xl bg-white border border-primary/5">
               <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/leaf.png')] opacity-[0.03] pointer-events-none" />
               
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 text-center">
                 {[
                   { v: "50.000+", l: "Aylık Ziyaretçi" },
                   { v: "81", l: "İl Kapsamı" },
                   { v: "4.500+", l: "Eşleşme" },
                   { v: "350+", l: "Aktif Profesyonel" }
                 ].map((stat, i) => (
-                  <div key={i} className="space-y-2">
-                    <div className="text-5xl md:text-6xl font-bold text-accent tracking-tighter drop-shadow-sm">{stat.v}</div>
-                    <div className="text-muted-foreground font-bold uppercase tracking-[0.2em] text-xs md:text-sm">{stat.l}</div>
+                  <div key={i} className="space-y-1 md:space-y-2 flex flex-col items-center justify-center">
+                    <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-accent tracking-tighter drop-shadow-sm whitespace-nowrap">{stat.v}</div>
+                    <div className="text-muted-foreground font-bold uppercase tracking-wider md:tracking-[0.2em] text-[10px] sm:text-xs md:text-sm text-balance">{stat.l}</div>
                   </div>
                 ))}
               </div>

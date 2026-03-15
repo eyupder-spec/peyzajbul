@@ -18,6 +18,7 @@ const Navbar = () => {
     { label: "Projeler", href: "/projeler" },
     { label: "Hizmetler", href: "/hizmetler" },
     { label: "Blog", href: "/blog" },
+    { label: "YZ Bahçe Tasarımı", href: "/ai-bahce-tasarimi" },
     { label: "Nasıl Çalışır", href: "/#nasil-calisir" },
     { label: "Firma Kaydı", href: "/isletme-ekle" },
   ];

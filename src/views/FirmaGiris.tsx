@@ -69,6 +69,27 @@ const FirmaGiris = () => {
   const [loading, setLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
 
+  // Check for existing session on mount
+  useState(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        // Only redirect if approved firm
+        const { data: firm } = await supabase
+          .from("firms")
+          .select("is_approved")
+          .eq("user_id", session.user.id)
+          .single();
+
+        if (firm?.is_approved) {
+          router.push("/firma/panel");
+        }
+      }
+    };
+    checkSession();
+  });
+
+
   // Login state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");

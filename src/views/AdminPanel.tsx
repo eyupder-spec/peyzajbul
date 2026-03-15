@@ -808,7 +808,7 @@ const AdminPanel = () => {
 
       {/* Delete confirmation */}
       <Dialog open={!!deletingLead} onOpenChange={() => setDeletingLead(null)}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
           <DialogHeader><DialogTitle>Lead'i silmek istediğinize emin misiniz?</DialogTitle></DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletingLead(null)}>İptal</Button>
@@ -819,7 +819,7 @@ const AdminPanel = () => {
 
       {/* Status edit */}
       <Dialog open={!!editingStatus} onOpenChange={() => setEditingStatus(null)}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
           <DialogHeader><DialogTitle>Durum Güncelle</DialogTitle></DialogHeader>
           <Select value={editingStatus?.status || ""} onValueChange={(val) => setEditingStatus((prev) => prev ? { ...prev, status: val } : null)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
@@ -838,7 +838,7 @@ const AdminPanel = () => {
 
       {/* Add Coins Dialog */}
       <Dialog open={!!addCoinFirmId} onOpenChange={() => setAddCoinFirmId(null)}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Coins className="h-5 w-5 text-primary" /> Manuel Jeton Ekle
@@ -885,7 +885,7 @@ const AdminPanel = () => {
 
       {/* Admin Gallery Dialog */}
       <Dialog open={!!adminGalleryFirmId} onOpenChange={() => setAdminGalleryFirmId(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Image className="h-5 w-5 text-primary" /> Galeri Yönetimi - {firmsData.find(f => f.id === adminGalleryFirmId)?.company_name}
@@ -929,7 +929,7 @@ const AdminPanel = () => {
 
       {/* Admin Reviews Dialog */}
       <Dialog open={!!adminReviewsFirmId} onOpenChange={() => setAdminReviewsFirmId(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Star className="h-5 w-5 text-yellow-500" /> Yorum Yönetimi - {firmsData.find(f => f.id === adminReviewsFirmId)?.company_name}

@@ -29,7 +29,7 @@ serve(async (req) => {
     if (!lead_id) throw new Error("lead_id is required");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2025-08-27.basil",
+      apiVersion: "2026-02-25.clover",
     });
 
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });

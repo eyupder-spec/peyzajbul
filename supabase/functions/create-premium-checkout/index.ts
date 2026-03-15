@@ -11,9 +11,16 @@ const corsHeaders = {
 
 // Monthly: $15, Yearly: $150
 // NOTE: These should be real Price IDs from Stripe Dashboard
+// Product Prices from Environment Variables
 const PLANS: Record<string, { priceId: string; planType: string }> = {
-  monthly: { priceId: "price_1TAI8L1hkDypIvi1Ka6gUZDF", planType: "monthly" },
-  yearly: { priceId: "price_1TAI8f1hkDypIvi1r8S8cXpu", planType: "yearly" },
+  monthly: { 
+    priceId: Deno.env.get("STRIPE_PRICE_PREMIUM_MONTHLY") || "price_1TBFKL1xCIRoZJIRaBdsykuS", 
+    planType: "monthly" 
+  },
+  yearly: { 
+    priceId: Deno.env.get("STRIPE_PRICE_PREMIUM_YEARLY") || "price_1TBFL01xCIRoZJIRhtqTrSBd", 
+    planType: "yearly" 
+  },
 };
 
 serve(async (req) => {
@@ -41,7 +48,7 @@ serve(async (req) => {
     if (!selectedPlan) throw new Error("Invalid plan selected");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2025-08-27.basil",
+      apiVersion: "2026-02-25.clover",
     });
 
     // 1. Find or create customer

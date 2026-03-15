@@ -8,11 +8,24 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Coin Package Prices from Environment Variables
 const COIN_PACKAGES: Record<string, { coins: number; priceId: string }> = {
-  starter: { coins: 50, priceId: "price_1T8iq71hkDypIvi1dybYwQGr" },
-  advantage: { coins: 220, priceId: "price_1T8iqo1hkDypIvi1esb741jp" },
-  pro: { coins: 600, priceId: "price_1T8ixK1hkDypIvi1Jg5A28EO" },
-  ultra: { coins: 1300, priceId: "price_1T8iyP1hkDypIvi1bnbXgXBT" },
+  starter: { 
+    coins: 50, 
+    priceId: Deno.env.get("STRIPE_PRICE_COIN_STARTER") || "price_1TBFMj1xCIRoZJIRQ5ZPTEpw" 
+  },
+  advantage: { 
+    coins: 220, 
+    priceId: Deno.env.get("STRIPE_PRICE_COIN_ADVANTAGE") || "price_1TBFNc1xCIRoZJIRW09ivdv3" 
+  },
+  pro: { 
+    coins: 600, 
+    priceId: Deno.env.get("STRIPE_PRICE_COIN_PRO") || "price_1TBFOZ1xCIRoZJIRfpt2gjWe" 
+  },
+  ultra: { 
+    coins: 1300, 
+    priceId: Deno.env.get("STRIPE_PRICE_COIN_ULTRA") || "price_1TBFPV1xCIRoZJIROmYLZs56" 
+  },
 };
 
 serve(async (req) => {
@@ -37,7 +50,7 @@ serve(async (req) => {
     if (!pkg) throw new Error("Invalid package");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2025-08-27.basil",
+      apiVersion: "2026-02-25.clover",
     });
 
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });

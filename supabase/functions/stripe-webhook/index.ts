@@ -6,7 +6,7 @@ import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 serve(async (req) => {
   console.log("Stripe Webhook request received");
   const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-    apiVersion: "2025-08-27.basil",
+    apiVersion: "2026-02-25.clover",
   });
 
   const signature = req.headers.get("stripe-signature");

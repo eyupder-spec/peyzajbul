@@ -58,7 +58,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
       // First try by slug
       let query = supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items")
+        .select("id, company_name, city, district, services, description, phone, email, is_premium, is_claimed, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items")
         .eq("slug", slug)
         .eq("is_approved", true)
         .eq("is_active", true)
@@ -70,7 +70,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
       if (!data && !error && firmId && /^[0-9a-f]{8}$/i.test(firmId)) {
         const idQuery = await supabase
           .from("firms")
-          .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items")
+          .select("id, company_name, city, district, services, description, phone, email, is_premium, is_claimed, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items")
           .like("id", `${firmId}%`)
           .eq("is_approved", true)
           .eq("is_active", true)
@@ -474,6 +474,22 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                 </Button>
               </a>
             </div>
+            
+            {!firm.is_claimed && (
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 space-y-4">
+                <h3 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-primary" /> Bu işletme size mi ait?
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  İşletme profilinizi yönetmek, projelerinizi eklemek ve müşterilerle doğrudan iletişim kurmak için bu kaydı sahiplenin.
+                </p>
+                <Link href={`/firma-sahiplen/${firm.id}`} className="block">
+                  <Button variant="outline" className="w-full border-primary/50 text-primary hover:bg-primary/10 transition-colors">
+                    Firma Kaydını Sahiplen
+                  </Button>
+                </Link>
+              </div>
+            )}
 
             <div className="flex flex-col gap-3">
               <Link href={`/iller/${citySlug}-peyzaj-firmalari`}>

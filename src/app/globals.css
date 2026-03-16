@@ -143,6 +143,18 @@
   @apply flex-1 h-[2px] bg-primary/10 ml-4;
 }
 
+.prose ul, .prose ol {
+  @apply my-4 !important;
+}
+
+.prose li {
+  @apply my-1 !important;
+}
+
+.prose li p {
+  @apply my-0.5 !important;
+}
+
 @keyframes shimmer-gold {
   0%, 100% {
     border-color: hsl(43 78% 46% / 0.4);

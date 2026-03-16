@@ -222,7 +222,7 @@ const BlogDetay = ({ slug: propSlug }: BlogDetayProps) => {
                   prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-10
                   prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-accent/5 prose-blockquote:p-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic
                   prose-strong:text-foreground prose-strong:font-bold
-                  prose-ul:my-6 prose-li:mb-2
+                  prose-ul:my-4 prose-li:mb-1
                   prose-table:border-collapse prose-table:w-full prose-table:my-8
                   prose-table:border prose-table:border-border
                   prose-th:border prose-th:border-border prose-th:bg-muted/50 prose-th:p-4 prose-th:text-left

@@ -1,7 +1,11 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
+import { Image } from "@tiptap/extension-image";
+import { Table } from "@tiptap/extension-table";
+import { TableRow } from "@tiptap/extension-table-row";
+import { TableCell } from "@tiptap/extension-table-cell";
+import { TableHeader } from "@tiptap/extension-table-header";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +13,7 @@ import { compressAndConvertToWebP } from "@/lib/imageUtils";
 import {
   Bold, Italic, Heading1, Heading2, Heading3, List, ListOrdered,
   Link as LinkIcon, ImageIcon, Undo, Redo, Quote,
+  Table as TableIcon, Columns, Rows, Trash2, Plus
 } from "lucide-react";
 import { useRef } from "react";
 
@@ -28,6 +33,10 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
       }),
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary underline" } }),
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content,
     immediatelyRender: false,
@@ -36,7 +45,7 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
     },
     editorProps: {
       attributes: {
-        class: "prose prose-sm max-w-none min-h-[300px] p-4 focus:outline-none text-foreground",
+        class: "prose prose-sm max-w-none min-h-[300px] p-4 focus:outline-none text-foreground border-t border-input",
       },
     },
   });
@@ -139,6 +148,39 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
         <ToolButton onClick={() => editor.chain().focus().redo().run()} title="İleri Al">
           <Redo className="h-4 w-4" />
         </ToolButton>
+
+        {/* Table Controls */}
+        <div className="w-px bg-border mx-1" />
+        <ToolButton onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} title="Tablo Ekle">
+          <TableIcon className="h-4 w-4" />
+        </ToolButton>
+        {editor.isActive("table") && (
+          <div className="flex gap-0.5 items-center">
+             <ToolButton onClick={() => editor.chain().focus().addColumnBefore().run()} title="Sola Sütun Ekle">
+              <span className="flex items-center"><Columns className="h-3 w-3" /><Plus className="h-2 w-2" /></span>
+            </ToolButton>
+            <ToolButton onClick={() => editor.chain().focus().addColumnAfter().run()} title="Sağa Sütun Ekle">
+              <span className="flex items-center"><Plus className="h-2 w-2" /><Columns className="h-3 w-3" /></span>
+            </ToolButton>
+            <ToolButton onClick={() => editor.chain().focus().deleteColumn().run()} title="Sütunu Sil">
+              <span className="flex items-center text-destructive"><Columns className="h-3 w-3" /><Trash2 className="h-2 w-2" /></span>
+            </ToolButton>
+            <div className="w-px h-4 bg-border mx-0.5" />
+            <ToolButton onClick={() => editor.chain().focus().addRowBefore().run()} title="Üste Satır Ekle">
+               <span className="flex flex-col items-center"><Plus className="h-2 w-2" /><Rows className="h-3 w-3" /></span>
+            </ToolButton>
+            <ToolButton onClick={() => editor.chain().focus().addRowAfter().run()} title="Alta Satır Ekle">
+               <span className="flex flex-col items-center"><Rows className="h-3 w-3" /><Plus className="h-2 w-2" /></span>
+            </ToolButton>
+             <ToolButton onClick={() => editor.chain().focus().deleteRow().run()} title="Satırı Sil">
+               <span className="flex flex-col items-center text-destructive"><Rows className="h-3 w-3" /><Trash2 className="h-2 w-2" /></span>
+            </ToolButton>
+            <div className="w-px h-4 bg-border mx-0.5" />
+            <ToolButton onClick={() => editor.chain().focus().deleteTable().run()} title="Tabloyu Sil">
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </ToolButton>
+          </div>
+        )}
       </div>
 
       <EditorContent editor={editor} />

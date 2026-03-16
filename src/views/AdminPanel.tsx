@@ -24,6 +24,7 @@ import AdminChangelogTab from "@/components/admin/AdminChangelogTab";
 import AdminClaimTab from "@/components/admin/AdminClaimTab";
 import AdminBulkFirmTab from "@/components/admin/AdminBulkFirmTab";
 import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
+import AdminTasksTab from "@/components/admin/AdminTasksTab";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
@@ -88,6 +89,7 @@ const SIDEBAR_ITEMS = [
   { title: "Jetonlar", key: "jetonlar", icon: Coins },
   { title: "Projeler", key: "projects", icon: FolderKanban },
   { title: "Blog", key: "blog", icon: BookOpen },
+  { title: "Görevler", key: "tasks", icon: CheckCircle },
   { title: "Changelog", key: "changelog", icon: Rocket },
 ];
 
@@ -141,7 +143,7 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog" | "tasks">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
   const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
@@ -799,6 +801,9 @@ const AdminPanel = () => {
 
             {/* Blog */}
             {tab === "blog" && <AdminBlogTab />}
+
+            {/* Tasks */}
+            {tab === "tasks" && <AdminTasksTab />}
 
             {/* Changelog */}
             {tab === "changelog" && <AdminChangelogTab />}

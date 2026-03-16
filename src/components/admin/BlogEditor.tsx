@@ -192,6 +192,50 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
         onChange={handleImageUpload}
         className="hidden"
       />
+
+      <style jsx global>{`
+        .ProseMirror table {
+          border-collapse: collapse;
+          table-layout: fixed;
+          width: 100%;
+          margin: 0;
+          overflow: hidden;
+        }
+        .ProseMirror td, .ProseMirror th {
+          min-width: 1em;
+          border: 2px solid #ced4da;
+          padding: 3px 5px;
+          vertical-align: top;
+          box-sizing: border-box;
+          position: relative;
+        }
+        .ProseMirror th {
+          font-weight: bold;
+          text-align: left;
+          background-color: #f8f9fa;
+        }
+        .ProseMirror .selectedCell:after {
+          z-index: 2;
+          content: "";
+          position: absolute;
+          left: 0; right: 0; top: 0; bottom: 0;
+          background: rgba(200, 200, 255, 0.4);
+          pointer-events: none;
+        }
+        .ProseMirror .column-resize-handle {
+          position: absolute;
+          right: -2px;
+          top: 0;
+          bottom: -2px;
+          width: 4px;
+          background-color: #adf;
+          pointer-events: none;
+        }
+        .ProseMirror.resize-cursor {
+          cursor: ew-resize;
+          cursor: col-resize;
+        }
+      `}</style>
     </div>
   );
 };

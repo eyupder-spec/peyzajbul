@@ -24,6 +24,7 @@ type Firm = {
   company_name: string;
   city: string;
   slug: string;
+  is_active: boolean;
 };
 
 type Project = {
@@ -96,8 +97,7 @@ const AdminProjectsTab = () => {
         .order("created_at", { ascending: false }),
       supabase
         .from("firms")
-        .select("id, company_name, city, slug")
-        .eq("is_approved", true)
+        .select("id, company_name, city, slug, is_active")
         .order("company_name", { ascending: true }),
     ]);
     setProjects((projectsRes.data as any[]) || []);
@@ -366,7 +366,7 @@ const AdminProjectsTab = () => {
           <div className="grid gap-4">
             <div className="space-y-1.5 flex flex-col">
               <Label>Firma *</Label>
-              <Popover open={firmComboboxOpen} onOpenChange={setFirmComboboxOpen}>
+              <Popover open={firmComboboxOpen} onOpenChange={setFirmComboboxOpen} modal={false}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -380,7 +380,7 @@ const AdminProjectsTab = () => {
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[400px] p-0" align="start">
+                <PopoverContent className="w-[400px] p-0 z-[100] pointer-events-auto" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
                   <Command>
                     <CommandInput placeholder="Firma adı ile ara..." />
                     <CommandList>
@@ -389,16 +389,24 @@ const AdminProjectsTab = () => {
                         {firms.map((firm) => (
                           <CommandItem
                             key={firm.id}
-                            value={firm.company_name}
+                            value={firm.id}
+                            keywords={[firm.company_name, firm.city, !firm.is_active ? "pasif" : ""]}
                             onSelect={() => {
                               update({ firm_id: firm.id, city: CITIES.find(c => c.name === firm.city)?.slug || "" });
                               setFirmComboboxOpen(false);
                             }}
+                            onPointerDown={(e) => e.preventDefault()}
+                            className="cursor-pointer"
                           >
                             <Check
                               className={`mr-2 h-4 w-4 ${form.firm_id === firm.id ? "opacity-100" : "opacity-0"}`}
                             />
-                            {firm.company_name} ({firm.city})
+                            <div className="flex flex-col">
+                              <span>{firm.company_name}</span>
+                              <span className="text-[10px] text-muted-foreground">
+                                {firm.city} {!firm.is_active && "• (Pasif)"}
+                              </span>
+                            </div>
                           </CommandItem>
                         ))}
                       </CommandGroup>

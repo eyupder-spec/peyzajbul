@@ -29,6 +29,18 @@ import {
 import { CATEGORIES } from "@/lib/categories";
 import { CITIES } from "@/lib/cities";
 
+interface BlogPost {
+  title: string;
+  cover_image_url: string | null;
+  cover_image_alt?: string | null;
+  author_name: string;
+  published_at: string | null;
+  category_slug: string | null;
+  city_slug: string | null;
+  content: string | null;
+  excerpt: string | null;
+}
+
 interface BlogDetayProps {
   slug?: string;
 }
@@ -48,7 +60,7 @@ const BlogDetay = ({ slug: propSlug }: BlogDetayProps) => {
         .eq("is_published", true)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      return data as unknown as BlogPost;
     },
   });
 
@@ -137,15 +149,8 @@ const BlogDetay = ({ slug: propSlug }: BlogDetayProps) => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 pt-16">
-        {/* Cover */}
-        {post.cover_image_url && (
-          <div className="w-full h-64 md:h-96 overflow-hidden relative">
-            <Image src={post.cover_image_url} alt={post.title} fill className="object-cover" priority />
-          </div>
-        )}
-
         <div className="container mx-auto px-4 py-8">
-          {/* Breadcrumb - Moved inside container for better alignment */}
+          {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
             <Link href="/" className="hover:text-primary transition-colors">Ana Sayfa</Link>
             <ChevronRight className="h-3 w-3 shrink-0" />
@@ -176,12 +181,12 @@ const BlogDetay = ({ slug: propSlug }: BlogDetayProps) => {
                   {post.title}
                 </h1>
 
-                <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground border-y border-border/50 py-4 mb-8">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground border-y border-border/50 py-4 mb-10">
+                  <div className="flex items-center gap-2 text-foreground">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                       <User className="h-4 w-4 text-primary" />
                     </div>
-                    <span className="font-medium text-foreground">{post.author_name}</span>
+                    <span className="font-semibold">{post.author_name}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
@@ -192,6 +197,19 @@ const BlogDetay = ({ slug: propSlug }: BlogDetayProps) => {
                     {readingTime} dk okuma
                   </div>
                 </div>
+
+                {/* Cover Image - Inside container for a more premium magazine feel */}
+                {post.cover_image_url && (
+                  <div className="relative aspect-video w-full overflow-hidden rounded-[2rem] shadow-2xl mb-12 ring-1 ring-border/50">
+                    <Image 
+                      src={post.cover_image_url} 
+                      alt={post.cover_image_alt || post.title} 
+                      fill 
+                      className="object-cover transition-transform duration-700 hover:scale-105" 
+                      priority 
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Enhanced Article Styling */}
@@ -206,8 +224,9 @@ const BlogDetay = ({ slug: propSlug }: BlogDetayProps) => {
                   prose-strong:text-foreground prose-strong:font-bold
                   prose-ul:my-6 prose-li:mb-2
                   prose-table:border-collapse prose-table:w-full prose-table:my-8
-                  prose-th:border prose-th:border-border prose-th:bg-muted prose-th:p-2 prose-th:text-left
-                  prose-td:border prose-td:border-border prose-td:p-2"
+                  prose-table:border prose-table:border-border
+                  prose-th:border prose-th:border-border prose-th:bg-muted/50 prose-th:p-4 prose-th:text-left
+                  prose-td:border prose-td:border-border prose-td:p-4"
                 dangerouslySetInnerHTML={{ __html: post.content || "" }}
               />
 

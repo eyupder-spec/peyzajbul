@@ -74,7 +74,9 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
       const { error } = await supabase.storage.from("blog-images").upload(path, optimizedFile);
       if (error) throw error;
       const { data: { publicUrl } } = supabase.storage.from("blog-images").getPublicUrl(path);
-      editor.chain().focus().setImage({ src: publicUrl }).run();
+      
+      const altText = window.prompt("Görsel Alt Metni (SEO için önerilir):", "");
+      editor.chain().focus().setImage({ src: publicUrl, alt: altText || "" }).run();
     } catch {
       toast({ title: "Görsel yüklenemedi", variant: "destructive" });
     }
@@ -195,31 +197,32 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
 
       <style jsx global>{`
         .ProseMirror table {
-          border-collapse: collapse;
-          table-layout: fixed;
-          width: 100%;
-          margin: 0;
-          overflow: hidden;
+          border-collapse: collapse !important;
+          table-layout: fixed !important;
+          width: 100% !important;
+          margin: 1rem 0 !important;
+          overflow: hidden !important;
+          border: 1px solid #ced4da !important;
         }
         .ProseMirror td, .ProseMirror th {
-          min-width: 1em;
-          border: 2px solid #ced4da;
-          padding: 3px 5px;
-          vertical-align: top;
-          box-sizing: border-box;
-          position: relative;
+          min-width: 1em !important;
+          border: 1px solid #ced4da !important;
+          padding: 8px !important;
+          vertical-align: top !important;
+          box-sizing: border-box !important;
+          position: relative !important;
         }
         .ProseMirror th {
-          font-weight: bold;
-          text-align: left;
-          background-color: #f8f9fa;
+          font-weight: bold !important;
+          text-align: left !important;
+          background-color: #f1f3f5 !important;
         }
         .ProseMirror .selectedCell:after {
           z-index: 2;
           content: "";
           position: absolute;
           left: 0; right: 0; top: 0; bottom: 0;
-          background: rgba(200, 200, 255, 0.4);
+          background: rgba(200, 200, 255, 0.4) !important;
           pointer-events: none;
         }
         .ProseMirror .column-resize-handle {
@@ -228,12 +231,12 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
           top: 0;
           bottom: -2px;
           width: 4px;
-          background-color: #adf;
+          background-color: #adf !important;
           pointer-events: none;
         }
         .ProseMirror.resize-cursor {
-          cursor: ew-resize;
-          cursor: col-resize;
+          cursor: ew-resize !important;
+          cursor: col-resize !important;
         }
       `}</style>
     </div>

@@ -148,49 +148,74 @@ export default function ProjeDetayClient({ params }: { params: { kategori: strin
     <>
       <Navbar />
       <main className="min-h-screen pt-16 bg-background">
-        {/* Hero — Cover Image */}
-        {project.cover_image && (
-          <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
-            <img
-              src={project.cover_image}
-              alt={project.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
-              <div className="container mx-auto max-w-5xl">
-                {cat && (
-                  <Badge className="mb-3 bg-primary/90 hover:bg-primary text-white">
-                    {cat.icon} {cat.label}
-                  </Badge>
-                )}
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 drop-shadow-lg">
-                  {project.title}
-                </h1>
-                {firm && (
-                  <p className="text-white/80 text-lg flex items-center gap-2">
-                    <Building2 className="h-4 w-4" /> {firm.company_name} · <MapPin className="h-4 w-4" /> {firm.city}
-                  </p>
+        <div className="container mx-auto max-w-5xl px-4 py-8">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
+            <Link href="/" className="hover:text-primary transition-colors">Ana Sayfa</Link>
+            <ChevronRight className="h-3 w-3 shrink-0" />
+            <Link href="/projeler" className="hover:text-primary transition-colors">Projeler</Link>
+            <ChevronRight className="h-3 w-3 shrink-0" />
+            {cat && (
+              <>
+                <Link href={`/projeler?kategori=${cat.slug}`} className="hover:text-primary transition-colors">{cat.label}</Link>
+                <ChevronRight className="h-3 w-3 shrink-0" />
+              </>
+            )}
+            <span className="text-foreground font-medium truncate">{project.title}</span>
+          </div>
+
+          <div className="mb-10">
+            {/* Category Badge */}
+            {cat && (
+              <Badge variant="secondary" className="mb-6 bg-primary/5 text-primary border-primary/10 hover:bg-primary/10 transition-colors py-1 px-3">
+                {cat.icon} {cat.label}
+              </Badge>
+            )}
+
+            <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
+              {project.title}
+            </h1>
+
+            {firm && (
+              <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground border-y border-border/50 py-4 mb-10">
+                <div className="flex items-center gap-2 text-foreground">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Building2 className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="font-semibold">{firm.company_name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  {firm.city}{firm.district ? ` / ${firm.district}` : ""}
+                </div>
+                {images.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      {images.slice(0, 3).map((img, i) => (
+                        <div key={i} className="w-6 h-6 rounded-full border-2 border-background overflow-hidden">
+                          <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                    <span>{images.length} Görsel</span>
+                  </div>
                 )}
               </div>
-            </div>
+            )}
+
+            {/* Cover Image - Inside container for a premium feel */}
+            {project.cover_image && (
+              <div className="relative aspect-video w-full overflow-hidden rounded-[2rem] shadow-2xl mb-12 ring-1 ring-border/50 group">
+                <img 
+                  src={project.cover_image} 
+                  alt={project.title} 
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                />
+              </div>
+            )}
           </div>
-        )}
 
-        <div className="container mx-auto max-w-5xl px-4 py-8">
-          {/* Title if no cover */}
-          {!project.cover_image && (
-            <div className="mb-8">
-              {cat && (
-                <Badge className="mb-3 bg-primary/90 hover:bg-primary text-white">
-                  {cat.icon} {cat.label}
-                </Badge>
-              )}
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground">{project.title}</h1>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-16">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Description */}
@@ -325,6 +350,8 @@ export default function ProjeDetayClient({ params }: { params: { kategori: strin
         </div>
       </main>
 
+      <Footer />
+
       {/* Lightbox */}
       {lightboxIdx !== null && images.length > 0 && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={() => setLightboxIdx(null)}>
@@ -363,7 +390,6 @@ export default function ProjeDetayClient({ params }: { params: { kategori: strin
           )}
         </div>
       )}
-      <Footer />
     </>
   );
 }

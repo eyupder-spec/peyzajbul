@@ -10,6 +10,7 @@ import { useApprovedFirms } from "@/hooks/useFirms";
 import RelatedBlogPosts from "@/components/RelatedBlogPosts";
 import { Button } from "@/components/ui/button";
 import { seoCities, seoDistricts } from "@/lib/seo-data";
+import { Sparkles } from "lucide-react";
 
 interface HizmetDetayProps {
   slug: string;
@@ -71,8 +72,8 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
             </p>
           </article>
 
-          <h2 className="font-heading text-2xl font-bold text-foreground mb-6 text-center">
-            {category.label} Hizmeti Veren Firmalar
+          <h2 className="heading-premium-h3 text-2xl font-bold text-foreground mb-6 text-center justify-center">
+            <Sparkles className="h-5 w-5 text-primary" /> {category.label} Hizmeti Veren Firmalar
           </h2>
 
           {isLoading ? (
@@ -105,8 +106,8 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
 
           {/* SEO INTERNAL LINKS: HİZMET BÖLGELERİ */}
           <div className="mt-20 pt-16 border-t border-border">
-            <h2 className="font-heading text-2xl font-bold text-foreground mb-8 text-center">
-              {category.label} Hizmet Bölgeleri
+            <h2 className="heading-premium-h3 text-2xl font-bold text-foreground mb-8 text-center justify-center">
+              <Sparkles className="h-5 w-5 text-primary" /> {category.label} Hizmet Bölgeleri
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {seoCities.map((city) => (

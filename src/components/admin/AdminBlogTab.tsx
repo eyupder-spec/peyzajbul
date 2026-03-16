@@ -21,6 +21,7 @@ type BlogPost = {
   excerpt: string | null;
   content: string | null;
   cover_image_url: string | null;
+  cover_image_alt?: string | null;
   category_slug: string | null;
   city_slug: string | null;
   author_name: string;
@@ -50,6 +51,7 @@ const AdminBlogTab = () => {
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
+  const [coverAlt, setCoverAlt] = useState("");
   const [categorySlug, setCategorySlug] = useState("");
   const [citySlug, setCitySlug] = useState("");
   const [authorName, setAuthorName] = useState("Peyzaj Rehberi");
@@ -69,7 +71,7 @@ const AdminBlogTab = () => {
 
   const resetForm = () => {
     setTitle(""); setSlug(""); setExcerpt(""); setContent("");
-    setCoverUrl(""); setCategorySlug(""); setCitySlug("");
+    setCoverUrl(""); setCoverAlt(""); setCategorySlug(""); setCitySlug("");
     setAuthorName("Peyzajbul"); setEditingPost(null);
   };
 
@@ -82,6 +84,7 @@ const AdminBlogTab = () => {
     setExcerpt(post.excerpt || "");
     setContent(post.content || "");
     setCoverUrl(post.cover_image_url || "");
+    setCoverAlt(post.cover_image_alt || "");
     setCategorySlug(post.category_slug || "");
     setCitySlug(post.city_slug || "");
     setAuthorName(post.author_name);
@@ -129,6 +132,7 @@ const AdminBlogTab = () => {
         excerpt: excerpt || null,
         content: content || null,
         cover_image_url: coverUrl || null,
+        cover_image_alt: coverAlt || null,
         category_slug: categorySlug || null,
         city_slug: citySlug || null,
         author_name: authorName,
@@ -289,15 +293,27 @@ const AdminBlogTab = () => {
 
             <div className="space-y-1.5">
               <Label>Kapak Görseli</Label>
-              <div className="flex items-center gap-3">
-                <label className="cursor-pointer">
-                  <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
-                  <Button asChild variant="outline" disabled={coverUploading}>
-                    <span>{coverUploading ? "Yükleniyor..." : "Görsel Yükle"}</span>
-                  </Button>
-                </label>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <label className="cursor-pointer">
+                    <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
+                    <Button asChild variant="outline" disabled={coverUploading}>
+                      <span>{coverUploading ? "Yükleniyor..." : "Görsel Yükle"}</span>
+                    </Button>
+                  </label>
+                  {coverUrl && (
+                    <img src={coverUrl} alt="Kapak" className="h-16 rounded border border-border object-cover" />
+                  )}
+                </div>
                 {coverUrl && (
-                  <img src={coverUrl} alt="Kapak" className="h-16 rounded border border-border object-cover" />
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Görsel Alt Metni (SEO için önerilir)</Label>
+                    <Input
+                      value={coverAlt}
+                      onChange={(e) => setCoverAlt(e.target.value)}
+                      placeholder="Örn: Modern bahçe tasarımı örneği"
+                    />
+                  </div>
                 )}
               </div>
             </div>

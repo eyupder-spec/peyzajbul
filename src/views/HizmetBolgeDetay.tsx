@@ -110,12 +110,12 @@ const HizmetBolgeDetay = ({
             {/* SOL KOLON (Makale & Projeler) */}
             <div className="lg:col-span-2 space-y-12">
               <article className="prose prose-gray max-w-none prose-headings:text-foreground prose-p:text-muted-foreground">
-                <h2>{fullLocation} Bölgesinde {category.label} Çözümleri</h2>
+                <h2 className="heading-premium-h2">{fullLocation} Bölgesinde {category.label} Çözümleri</h2>
                 <p>
                   {category.seoArticle || ""} <strong>{districtName}</strong> bölgesinin iklimsel koşulları, toprak yapısı ve mimari dokusu göz önünde bulundurularak {category.label.toLowerCase()} uygulamaları profesyonel peyzaj mimarları tarafından özenle planlanmalıdır. Özellikle <strong>{cityName}</strong> gibi büyükşehirlerde dış mekanların doğru değerlendirilmesi yaşam kalitesini doğrudan artırır.
                 </p>
                 
-                <h3>Ayrıcalıklı Hizmet Anlayışı</h3>
+                <h3 className="heading-premium-h3"><Sparkles className="h-5 w-5 text-primary" /> Ayrıcalıklı Hizmet Anlayışı</h3>
                 <p>
                   Sürecin ilk aşamasında alan keşfi ve toprak analizi yapılır. {category.label} projelerinde doğru karar verebilmek için mekanın güneş alma süresi, rüzgar yönü ve mevcut altyapı detaylıca incelenir. {districtName} çevresindeki konutlarda ve ticari alanlarda uygulanan modern peyzaj trendleri mekana hem estetik bir değer hem de ekonomik bir artı katar.
                 </p>
@@ -132,7 +132,7 @@ const HizmetBolgeDetay = ({
 
               {/* WHY CHOOSE US - NEW SEO SECTION */}
               <div className="bg-primary/5 rounded-2xl p-8 border border-primary/10">
-                <h2 className="text-2xl font-bold mb-6">{fullLocation} Projelerinizde Doğru Paydaş Seçimi</h2>
+                <h2 className="heading-premium-h2 border-none pl-0 bg-none text-2xl">{fullLocation} Projelerinizde Doğru Paydaş Seçimi</h2>
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <h4 className="font-bold flex items-center gap-2">
@@ -171,7 +171,7 @@ const HizmetBolgeDetay = ({
 
               {/* FAQ SECTION - NEW SEO SECTION */}
               <div className="space-y-6 pt-4">
-                <h3 className="text-2xl font-bold">{fullLocation} {category.label} Hakkında Sıkça Sorulan Sorular</h3>
+                <h3 className="heading-premium-h3 text-2xl">{fullLocation} {category.label} Hakkında Sıkça Sorulan Sorular</h3>
                 <div className="grid gap-4">
                   <div className="border border-border rounded-xl p-6 bg-white shadow-sm">
                     <h4 className="font-bold mb-2">Peyzaj projesi için fiyatlar nasıl belirlenir?</h4>
@@ -196,7 +196,7 @@ const HizmetBolgeDetay = ({
 
 
               <div id="firmalar-listesi" className="pt-8">
-                <h3 className="text-2xl font-bold mb-6">{districtName || cityName} Bölgesindeki Uzmanlar</h3>
+                <h3 className="heading-premium-h3 text-2xl">{districtName || cityName} Bölgesindeki Uzmanlar</h3>
                 {isLoading ? (
                   <p>Yükleniyor...</p>
                 ) : filteredFirms.length > 0 ? (

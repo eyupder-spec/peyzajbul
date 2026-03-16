@@ -103,6 +103,44 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
   }
+
+  h2 {
+    @apply text-3xl md:text-4xl font-bold tracking-tight;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl font-bold tracking-tight;
+  }
+}
+
+/* Custom Heading Styles for Service Pages */
+.heading-premium-h2 {
+  @apply relative pl-4 border-l-4 border-primary/30 py-1 mb-6 text-foreground font-bold leading-tight;
+  background: linear-gradient(to right, hsl(var(--primary) / 0.03), transparent);
+}
+
+.heading-premium-h3 {
+  @apply relative flex items-center gap-2 mb-4 text-foreground font-bold;
+}
+
+.heading-premium-h3::after {
+  content: "";
+  @apply flex-1 h-px bg-border ml-4;
+}
+
+/* Tailwind Prose Overrides */
+.prose h2 {
+  @apply relative pl-5 border-l-4 border-primary/40 py-1.5 mb-8 text-foreground font-bold tracking-tight mt-12 first:mt-0;
+  background: linear-gradient(to right, hsl(var(--primary) / 0.05), transparent);
+}
+
+.prose h3 {
+  @apply flex items-center gap-2 mb-6 text-foreground font-bold tracking-tight mt-10;
+}
+
+.prose h3::after {
+  content: "";
+  @apply flex-1 h-[2px] bg-primary/10 ml-4;
 }
 
 @keyframes shimmer-gold {

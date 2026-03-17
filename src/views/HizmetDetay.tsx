@@ -52,13 +52,23 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
       })}</script>
       <Navbar />
       <main className="flex-1 pt-16">
-        <div className="bg-primary py-12">
-          <div className="container mx-auto px-4 text-center">
-            <span className="text-5xl mb-4 block">{category.icon}</span>
-            <h1 className="font-heading text-3xl md:text-4xl font-bold text-primary-foreground mb-2">
+        <div className="relative bg-primary py-24 overflow-hidden">
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center z-0"
+            style={{ 
+              backgroundImage: `url(${category.imageUrl})`,
+            }}
+          />
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-black/60 z-10" />
+
+          <div className="container relative z-20 mx-auto px-4 text-center">
+            <span className="text-5xl mb-4 block drop-shadow-md">{category.icon}</span>
+            <h1 className="font-heading text-3xl md:text-5xl font-bold text-white mb-4 drop-shadow-md">
               {category.label}
             </h1>
-            <p className="text-primary-foreground/70 font-body max-w-2xl mx-auto">
+            <p className="text-white/90 font-body max-w-2xl mx-auto text-lg drop-shadow">
               {category.shortDescription}
             </p>
           </div>

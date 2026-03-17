@@ -176,7 +176,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
             {firm.description && (
               <div className="bg-card rounded-lg border border-border p-6">
                 <h2 className="font-heading text-xl font-semibold text-foreground mb-3">Hakkında</h2>
-                <p className="text-muted-foreground leading-relaxed">{firm.description}</p>
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{firm.description}</p>
               </div>
             )}
 

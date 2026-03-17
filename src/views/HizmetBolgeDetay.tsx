@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import LeadFormModal from "@/components/lead-form/LeadFormModal";
+import LeadFormWidget from "@/components/lead-form/LeadFormWidget";
 import { useApprovedFirms } from "@/hooks/useFirms";
 import { Category } from "@/lib/categories";
 
@@ -60,45 +61,52 @@ const HizmetBolgeDetay = ({
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 pt-24 pb-16">
-        {/* BREADCRUMB */}
-        <div className="container mx-auto px-4 mb-8">
-          <nav className="flex items-center text-sm text-muted-foreground whitespace-nowrap overflow-x-auto pb-2">
-            <Link href="/" className="hover:text-primary flex items-center">
-              <Home className="h-4 w-4" />
-            </Link>
-            <ChevronRight className="h-4 w-4 mx-1 flex-shrink-0" />
-            <Link href="/hizmetler" className="hover:text-primary">Hizmetler</Link>
-            <ChevronRight className="h-4 w-4 mx-1 flex-shrink-0" />
-            <Link href={`/hizmetler/${category.slug}`} className="hover:text-primary">{category.label}</Link>
-            <ChevronRight className="h-4 w-4 mx-1 flex-shrink-0" />
-            <span className="text-foreground font-medium">{districtName || cityName}</span>
-          </nav>
-        </div>
+      <main className="flex-1 pb-16">
+        {/* BREADCRUMB & HERO STACKED WITH BACKGROUND */}
+        <section className="relative w-full overflow-hidden bg-black pb-12 pt-28">
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center z-0 opacity-40"
+            style={{ backgroundImage: `url(${category.imageUrl})` }}
+          />
+          {/* Gradient Overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-background z-10" />
 
-        {/* HERO SECTION */}
-        <section className="container mx-auto px-4 mb-12">
-          <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary mb-6">
-              <MapPin className="h-4 w-4" />
-              <span className="text-sm font-medium">{fullLocation} Bölgesi</span>
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-              {districtName || cityName} <span className="text-primary">{category.label}</span> Hizmeti
-            </h1>
-            
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-              {districtName} bölgesinde profesyonel {category.label.toLowerCase()} hizmeti veren en iyi peyzaj firmalarını sizin için listeledik. Yaşam alanlarınızı güzelleştirmek için uzman ekiplerden hemen ücretsiz teklif alın.
-            </p>
+          <div className="container relative z-20 mx-auto px-4">
+            <nav className="flex items-center text-sm text-white/70 whitespace-nowrap overflow-x-auto pb-6 mb-4">
+              <Link href="/" className="hover:text-white flex items-center">
+                <Home className="h-4 w-4" />
+              </Link>
+              <ChevronRight className="h-4 w-4 mx-1 flex-shrink-0" />
+              <Link href="/hizmetler" className="hover:text-white">Hizmetler</Link>
+              <ChevronRight className="h-4 w-4 mx-1 flex-shrink-0" />
+              <Link href={`/hizmetler/${category.slug}`} className="hover:text-white">{category.label}</Link>
+              <ChevronRight className="h-4 w-4 mx-1 flex-shrink-0" />
+              <span className="text-white font-medium">{districtName || cityName}</span>
+            </nav>
 
-            <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="text-base h-12 px-8" onClick={() => setFormOpen(true)}>
-                Ücretsiz Teklif Al
-              </Button>
-              <Button size="lg" variant="outline" className="text-base h-12 px-8" onClick={scrollToFirms}>
-                Firmaları İncele
-              </Button>
+            <div className="max-w-4xl pt-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white mb-6 backdrop-blur-md">
+                <MapPin className="h-4 w-4" />
+                <span className="text-sm font-medium">{fullLocation} Bölgesi</span>
+              </div>
+              
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+                {districtName || cityName} <span className="text-primary-foreground">{category.label}</span> Hizmeti
+              </h1>
+              
+              <p className="text-lg text-white/90 leading-relaxed mb-8 drop-shadow max-w-2xl">
+                {districtName} bölgesinde profesyonel {category.label.toLowerCase()} hizmeti veren en iyi peyzaj firmalarını sizin için listeledik. Yaşam alanlarınızı güzelleştirmek için uzman ekiplerden hemen ücretsiz teklif alın.
+              </p>
+
+              <div className="flex flex-wrap gap-4">
+                <Button size="lg" className="text-base h-12 px-8 shadow-lg" onClick={() => setFormOpen(true)}>
+                  Ücretsiz Teklif Al
+                </Button>
+                <Button size="lg" variant="secondary" className="text-base h-12 px-8 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm" onClick={scrollToFirms}>
+                  Firmaları İncele
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -244,30 +252,41 @@ const HizmetBolgeDetay = ({
                 
                 <div className="space-y-4">
                   {sidebarFirms.map((firm) => (
-                    <Card key={firm.id} className="group hover:border-primary/50 transition-colors">
+                    <Card key={firm.id} className="group hover:border-primary/50 transition-colors shadow-sm">
                       <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                        <div className="flex justify-between items-start mb-1">
+                          <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
                             {firm.company_name}
                           </h4>
                           {firm.is_premium && (
-                            <Badge variant="default" className="bg-amber-500 hover:bg-amber-600 text-[10px] px-1.5 py-0 h-4">PRO</Badge>
+                            <Badge variant="default" className="bg-amber-500 hover:bg-amber-600 text-[10px] px-1.5 py-0 h-4 shrink-0 ml-2">Önerilen</Badge>
                           )}
                         </div>
-                        <Button variant="outline" size="sm" className="w-full text-xs" asChild>
+                        
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                          <span className="flex items-center truncate">
+                            <MapPin className="w-3.5 h-3.5 mr-1 shrink-0" />
+                            <span className="truncate">{firm.district ? `${firm.district}, ` : ''}{firm.city}</span>
+                          </span>
+                        </div>
+                        
+                        {firm.description && (
+                          <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
+                            {firm.description}
+                          </p>
+                        )}
+                        
+                        <Button variant="outline" size="sm" className="w-full text-xs h-8" asChild>
                           <Link href={`/firma/${firm.slug}`}>Profili İncele</Link>
                         </Button>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
-
-                <div className="mt-8 bg-primary/5 rounded-xl p-6 border border-primary/10 text-center">
-                  <h4 className="font-bold mb-2">Hızlı Teklif Alın</h4>
-                  <p className="text-sm text-muted-foreground mb-4">Size en yakın profesyonellerden fiyat teklifi toplayalım.</p>
-                  <Button className="w-full" onClick={() => setFormOpen(true)}>
-                    Teklif Formunu Aç
-                  </Button>
+                
+                <div className="mt-8">
+                  <h4 className="font-bold mb-4 text-center">Hızlı Teklif Alın</h4>
+                  <LeadFormWidget className="shadow-lg" />
                 </div>
               </div>
             </div>

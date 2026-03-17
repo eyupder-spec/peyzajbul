@@ -417,8 +417,8 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                   </button>
                 )}
                 {showEmail ? (
-                  <a href={`mailto:${firm.email}`} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                    <Mail className="h-4 w-4 text-primary" /> {firm.email}
+                  <a href={`mailto:${firm.email?.replace(/^https?:\/\//, "")}`} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                    <Mail className="h-4 w-4 text-primary" /> {firm.email?.replace(/^https?:\/\//, "")}
                   </a>
                 ) : (
                   <button onClick={() => setShowEmail(true)} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors w-full text-left">
@@ -426,7 +426,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                   </button>
                 )}
                 {firm.is_premium && firm.website && (
-                  <a href={firm.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <a href={firm.website.startsWith("http") ? firm.website : `https://${firm.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
                     <Globe className="h-4 w-4 text-primary" /> {firm.website.replace(/^https?:\/\//, "")}
                   </a>
                 )}

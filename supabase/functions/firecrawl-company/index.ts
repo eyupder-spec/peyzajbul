@@ -155,6 +155,10 @@ Deno.serve(async (req) => {
       if ((!extracted.email || extracted.email === 'Not provided' || extracted.email === '') && extracted.emails?.length > 0) {
         extracted.email = extracted.emails[0];
       }
+      // Clean up extracted email if it has http prefix
+      if (extracted.email && typeof extracted.email === 'string') {
+        extracted.email = extracted.email.replace(/^https?:\/\//, "");
+      }
       // Clean up "Not provided" values to empty string
       for (const key of ['phone', 'email', 'address', 'city', 'district']) {
         if (extracted[key] === 'Not provided' || extracted[key] === null) {

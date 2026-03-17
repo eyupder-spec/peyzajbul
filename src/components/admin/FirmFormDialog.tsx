@@ -136,13 +136,14 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
       toast.error("Firma adı, telefon, e-posta ve il zorunludur.");
       return;
     }
+    const cleanEmail = form.email.trim().replace(/^https?:\/\//, "");
     setSaving(true);
     try {
       if (isEdit && initialData?.id) {
         const { error } = await supabase.from("firms").update({
           company_name: form.company_name,
           phone: form.phone,
-          email: form.email,
+          email: cleanEmail,
           city: form.city,
           district: form.district || null,
           address: form.address || null,
@@ -173,7 +174,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           user_id: user.id,
           company_name: form.company_name,
           phone: form.phone,
-          email: form.email,
+          email: cleanEmail,
           city: form.city,
           district: form.district || null,
           address: form.address || null,
@@ -270,7 +271,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
             </div>
             <div className="space-y-1.5">
               <Label>E-posta *</Label>
-              <Input type="email" value={form.email} onChange={(e) => update({ email: e.target.value })} disabled={isEdit} />
+              <Input type="email" value={form.email} onChange={(e) => update({ email: e.target.value })} />
             </div>
           </div>
 

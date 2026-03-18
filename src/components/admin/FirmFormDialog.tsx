@@ -119,6 +119,8 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           address: c.address || form.address,
           services: c.services?.length ? c.services : form.services,
           city: c.city || form.city,
+          district: c.district || form.district,
+          website: crawlUrl.trim(),
         });
         toast.success("Firma bilgileri web sitesinden çekildi!");
       } else {

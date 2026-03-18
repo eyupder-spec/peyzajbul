@@ -65,18 +65,18 @@ Deno.serve(async (req) => {
 
     console.log('Scraping company info from:', formattedUrl);
 
-    const mainPrompt = `Bu bir Türk peyzaj/bahçe/çevre düzenleme firmasının web sitesidir. Aşağıdaki bilgileri dikkatli bir şekilde çıkar:
+    const mainPrompt = `Bu bir Türk peyzaj/bahçe/çevre düzenleme firmasının web sitesidir. Aşağıdaki bilgileri çok dikkatli bir şekilde, Türkçe karakterlere uygun olarak çıkar:
 
-1. TELEFON: Sayfanın header, footer, sidebar, iletişim bölümü, "Bizi Arayın" butonları, tel: linkleri, WhatsApp linkleri dahil HER YERİNE bak. Telefon numarasını +90 veya 0 ile başlayan formatta ver.
-2. E-POSTA: mailto: linkleri, footer, iletişim bölümü, header dahil her yere bak. 
-3. ADRES: Tam fiziksel adres.
-4. İL (city): Firmanın bulunduğu il. Adres, footer, "Hakkımızda" bölümünden çıkar. Türkçe il adı olmalı (İstanbul, Ankara, İzmir vb.)
-5. İLÇE (district): Firmanın bulunduğu ilçe.
-6. FİRMA ADI: Resmi firma/marka adı.
-7. AÇIKLAMA: Firma hakkında kısa açıklama veya slogan.
-8. HİZMETLER: Sunulan hizmetlerin listesi.
+1. FİRMA ADI: Resmi firma veya marka adı (Örn: "Peyzaj Bul", "XYZ Bahçe Düzenleme").
+2. TELEFON: Sayfanın header, footer, iletişim bölümü, "Bizi Arayın" butonları, tel: linkleri, WhatsApp numaraları dahil her yere bak. Numarayı +90 formatında veya 05xx şeklinde ver.
+3. E-POSTA: mailto: linkleri, footer, iletişim sayfası dahil her yere bak. 
+4. ADRES: Firmanın tam fiziksel adresi (Mahalle, Sokak, No vb.). 
+5. İL (city): Firmanın bulunduğu il. SADECE il adı olmalı (Örn: "İstanbul", "Ankara", "İzmir", "Bursa").
+6. İLÇE (district): Firmanın bulunduğu ilçe (Örn: "Kadıköy", "Çankaya", "Konak").
+7. AÇIKLAMA (description): Firma hakkında kısa bir özet, tarihçe veya sunulan temel hizmetlerden oluşan açıklama metni.
+8. HİZMETLER: Sunulan hizmetlerin virgülle ayrılmış listesi.
 
-ÖNEMLİ: "Not provided" veya boş string DÖNDÜRME. Bilgiyi bulamıyorsan null dön. Telefon ve e-posta bilgisi sayfanın herhangi bir yerinde olabilir - özellikle footer, header ve sidebar'ı kontrol et.`;
+ÖNEMLİ: Eğer bir bilgiyi bulamıyorsan null dön. "Not provided" gibi ifadeler kullanma. Özellikle sayfanın en altındaki (footer) ve en üstündeki (header) metinlere odaklan. İletişim sayfasındaki adres bloğunu dikkatle oku.`;
 
     // Scrape main page
     const mainData = await scrapeUrl(apiKey, formattedUrl, mainPrompt);

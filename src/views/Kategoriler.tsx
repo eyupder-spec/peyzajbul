@@ -4,6 +4,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getAllCategories } from "@/lib/categories";
+import LeadFormBanner from "@/components/lead-form/LeadFormBanner";
 
 const Kategoriler = () => {
   const categories = getAllCategories();
@@ -24,6 +25,8 @@ const Kategoriler = () => {
         </div>
 
         <div className="container mx-auto px-4 py-12">
+          <LeadFormBanner />
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {categories.map((cat) => (
               <Link

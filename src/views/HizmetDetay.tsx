@@ -11,6 +11,7 @@ import RelatedBlogPosts from "@/components/RelatedBlogPosts";
 import { Button } from "@/components/ui/button";
 import { seoCities, seoDistricts } from "@/lib/seo-data";
 import { Sparkles } from "lucide-react";
+import LeadFormBanner from "@/components/lead-form/LeadFormBanner";
 
 interface HizmetDetayProps {
   slug: string;
@@ -81,6 +82,8 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
               Profesyonel <strong>{category.label.toLowerCase()}</strong> hizmetleri, sadece estetik bir görünüm değil, aynı zamanda mülkünüzün değerini artıran ve ekosisteme katkı sağlayan yatırım odaklı çalışmalardır. Peyzajbul olarak Türkiye genelindeki en deneyimli firmaları, uzman peyzaj mimarlarını ve uygulama ekiplerini bir araya getiriyoruz. İhtiyacınız olan çözüm için doğru uzmanla eşleşerek projenizi güvenle hayata geçirebilirsiniz.
             </p>
           </article>
+
+          <LeadFormBanner />
 
           <h2 className="heading-premium-h3 text-2xl font-bold text-foreground mb-6 text-center justify-center">
             <Sparkles className="h-5 w-5 text-primary" /> {category.label} Hizmeti Veren Firmalar

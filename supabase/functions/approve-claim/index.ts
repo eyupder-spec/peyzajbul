@@ -90,10 +90,21 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 1. Update firm ownership
+    // 1. Update firm ownership and email
+    const { data: claimantData, error: claimantError } = await supabaseAdmin.auth.admin.getUserById(claim.user_id);
+    
+    if (claimantError) {
+      console.error("Failed to fetch claimant user details:", claimantError);
+    }
+    
+    const updatePayload: any = { user_id: claim.user_id, is_claimed: true };
+    if (claimantData?.user?.email) {
+      updatePayload.email = claimantData.user.email;
+    }
+
     const { error: firmError } = await supabaseAdmin
       .from("firms")
-      .update({ user_id: claim.user_id, is_claimed: true })
+      .update(updatePayload)
       .eq("id", claim.firm_id);
 
     if (firmError) throw firmError;

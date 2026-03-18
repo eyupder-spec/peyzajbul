@@ -29,7 +29,6 @@ export async function middleware(request: NextRequest) {
   let effectivePath = pathname
   if (pathname.startsWith(secretPath)) {
     effectivePath = pathname.replace(secretPath, '/admin')
-    // Eğer sadece gizli yolun kendisi gelirse (/bilemem91), /admin/panel'e yönlendir
     if (effectivePath === '/admin' || effectivePath === '/admin/') {
       effectivePath = '/admin/panel'
     }

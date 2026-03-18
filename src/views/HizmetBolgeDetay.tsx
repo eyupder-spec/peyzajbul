@@ -245,6 +245,11 @@ const HizmetBolgeDetay = ({
             {/* SAĞ KOLON (Sidebar) */}
             <div className="space-y-6">
               <div className="sticky top-24">
+                <div className="mb-10">
+                  <h4 className="font-bold mb-4 text-center">Hızlı Teklif Alın</h4>
+                  <LeadFormWidget className="shadow-lg" />
+                </div>
+
                 <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-primary" />
                   Öne Çıkan Firmalar
@@ -282,11 +287,6 @@ const HizmetBolgeDetay = ({
                       </CardContent>
                     </Card>
                   ))}
-                </div>
-                
-                <div className="mt-8">
-                  <h4 className="font-bold mb-4 text-center">Hızlı Teklif Alın</h4>
-                  <LeadFormWidget className="shadow-lg" />
                 </div>
               </div>
             </div>

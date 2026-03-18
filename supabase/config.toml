@@ -26,3 +26,5 @@ verify_jwt = false
 
 [functions.create-lead-checkout]
 verify_jwt = false
+[functions.firecrawl-company]
+verify_jwt = false

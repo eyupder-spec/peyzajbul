@@ -45,7 +45,7 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
     },
     editorProps: {
       attributes: {
-        class: "prose prose-sm max-w-none min-h-[300px] p-4 focus:outline-none text-foreground border-t border-input",
+        class: "prose prose-sm max-w-none min-h-[300px] p-4 focus:outline-none text-foreground",
       },
     },
   });
@@ -107,9 +107,9 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
   );
 
   return (
-    <div className="border border-input rounded-md overflow-hidden bg-background">
+    <div className="flex flex-col border border-input rounded-md overflow-hidden bg-background h-[500px]">
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-0.5 p-2 border-b border-input bg-muted/30">
+      <div className="flex flex-wrap gap-0.5 p-2 bg-muted/30 z-10 sticky top-0 border-b border-input">
         <ToolButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title="Kalın">
           <Bold className="h-4 w-4" />
         </ToolButton>
@@ -185,7 +185,11 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
         )}
       </div>
 
-      <EditorContent editor={editor} />
+      <div className="flex-1 overflow-y-auto overflow-x-hidden cursor-text bg-background" onClick={(e) => {
+        if (e.target === e.currentTarget) editor.chain().focus().run();
+      }}>
+        <EditorContent editor={editor} />
+      </div>
 
       <input
         ref={fileInputRef}

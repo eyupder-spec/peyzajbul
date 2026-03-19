@@ -43,6 +43,17 @@ serve(async (req) => {
 
     if (existing) throw new Error("Bu lead zaten satın alınmış");
 
+    // Check 3-sale limit
+    const { count: purchaseCount } = await supabaseAdmin
+      .from("lead_purchases")
+      .select("*", { count: "exact", head: true })
+      .eq("lead_id", lead_id)
+      .eq("status", "paid");
+
+    if (purchaseCount !== null && purchaseCount >= 3) {
+      throw new Error("Bu müşteri adayı satış limitine ulaştı (Maksimum 3 firma satın alabilir).");
+    }
+
     // Get firm and check balance
     const { data: firm } = await supabaseAdmin
       .from("firms")

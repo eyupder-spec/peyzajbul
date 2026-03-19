@@ -34,10 +34,14 @@ Deno.serve(async (req) => {
       .eq("email", email)
       .eq("used", false);
 
+    // Calculate expiration (5 minutes from now)
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+
     // Save new code
     const { error: insertError } = await supabase.from("otp_codes").insert({
       email,
       code,
+      expires_at: expiresAt,
     });
 
     if (insertError) throw insertError;
@@ -88,8 +92,11 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err: any) {
-    console.error("send-otp error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    const errorMsg = err instanceof Error ? err.message : (err?.message || String(err));
+    console.error("send-otp error:", errorMsg, err);
+    
+    // Return 500 normally but stringify safely
+    return new Response(JSON.stringify({ error: errorMsg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

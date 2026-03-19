@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { email, code, fullName, phone } = await req.json();
+    const { email, code, fullName, phone, leadId } = await req.json();
     if (!email || !code) {
       return new Response(JSON.stringify({ error: "Email ve kod gerekli" }), {
         status: 400,
@@ -93,6 +93,21 @@ Deno.serve(async (req) => {
       });
       if (createError) throw createError;
       userId = newUser.user.id;
+    }
+
+    // Update unverified lead to active and assign user
+    if (leadId) {
+      const { error: leadUpdateError } = await supabase
+        .from("leads")
+        .update({
+          status: "active",
+          user_id: userId,
+        })
+        .eq("id", leadId);
+        
+      if (leadUpdateError) {
+        console.error("Failed to update unverified lead:", leadUpdateError);
+      }
     }
 
     // Oturum aç (mevcut kullanıcı için OTP-tabanlı, yeni kullanıcı için şifreyle)

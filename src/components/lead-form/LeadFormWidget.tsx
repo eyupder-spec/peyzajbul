@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LeadFormData, initialFormData, SCOPE_OPTIONS } from "@/lib/leadFormData";
+import { LeadFormData, initialFormData, SCOPE_OPTIONS, SERVICE_TYPE_TO_LABEL } from "@/lib/leadFormData";
 import StepProjectType from "./StepProjectType";
 import StepServiceType from "./StepServiceType";
 import StepScope from "./StepScope";
@@ -30,6 +30,7 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
   const [otpCode, setOtpCode] = useState("");
   const [otpSending, setOtpSending] = useState(false);
   const [otpError, setOtpError] = useState("");
+  const [unverifiedLeadId, setUnverifiedLeadId] = useState<string | null>(null);
   const router = useRouter();
 
   const updateData = (partial: Partial<LeadFormData>) => {
@@ -110,6 +111,7 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
           code: otpCode,
           fullName: data.fullName,
           phone: data.phone,
+          leadId: unverifiedLeadId,
         },
       });
 
@@ -161,32 +163,41 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
 
       const photoUrls = await uploadPhotos(userId);
 
-      const { error: leadError } = await supabase.from("leads").insert({
-        project_type: data.projectType || null,
-        service_type: data.serviceType,
-        project_size: data.areaSize || null,
-        area_size: data.areaSize || null,
-        scope: data.scope.length > 0 ? data.scope : null,
-        irrigation_type: data.irrigationType || null,
-        irrigation_system: data.irrigationSystem || null,
-        water_source: data.waterSource || null,
-        property_type: data.propertyType || null,
-        current_condition: data.currentCondition || null,
-        budget: data.budget,
-        timeline: data.timeline,
-        city: data.city,
-        district: data.district || null,
-        address: data.address || null,
-        notes: data.notes || null,
-        photo_urls: photoUrls.length > 0 ? photoUrls : null,
-        full_name: data.fullName,
-        phone: data.phone,
-        email: data.email,
-        user_id: userId,
-        status: "active",
-      } as any);
+      if (unverifiedLeadId) {
+        // Lead was already created as unverified and claimed in verify-otp. Just update photos if needed.
+        if (photoUrls.length > 0) {
+          const { error: updateError } = await supabase.from("leads").update({ photo_urls: photoUrls }).eq("id", unverifiedLeadId);
+          if (updateError) console.error("Could not update photos:", updateError);
+        }
+      } else {
+        // Fallback: create lead if unverifiedLeadId was not set
+        const { error: leadError } = await supabase.from("leads").insert({
+          project_type: data.projectType || null,
+          service_type: SERVICE_TYPE_TO_LABEL[data.serviceType] ?? data.serviceType,
+          project_size: data.areaSize || null,
+          area_size: data.areaSize || null,
+          scope: data.scope.length > 0 ? data.scope : null,
+          irrigation_type: data.irrigationType || null,
+          irrigation_system: data.irrigationSystem || null,
+          water_source: data.waterSource || null,
+          property_type: data.propertyType || null,
+          current_condition: data.currentCondition || null,
+          budget: data.budget,
+          timeline: data.timeline,
+          city: data.city,
+          district: data.district || null,
+          address: data.address || null,
+          notes: data.notes || null,
+          photo_urls: photoUrls.length > 0 ? photoUrls : null,
+          full_name: data.fullName,
+          phone: data.phone,
+          email: data.email,
+          user_id: userId,
+          status: "active",
+        } as any);
 
-      if (leadError) throw leadError;
+        if (leadError) throw leadError;
+      }
 
       toast.success("Talebiniz başarıyla oluşturuldu! Firmalar sizinle iletişime geçecek.");
 
@@ -234,10 +245,58 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
   const handleNext = async () => {
     if (step === 7) {
       try {
-        await sendOtp();
+        setOtpSending(true);
+        const generatedLeadId = crypto.randomUUID();
+        
+        // Try creating unverified lead first (without .select().single() to avoid RLS SELECT issues)
+        const { error: leadError } = await supabase.from("leads").insert({
+          id: generatedLeadId,
+          project_type: data.projectType || null,
+          service_type: SERVICE_TYPE_TO_LABEL[data.serviceType] ?? data.serviceType,
+          project_size: data.areaSize || null,
+          area_size: data.areaSize || null,
+          scope: data.scope.length > 0 ? data.scope : null,
+          irrigation_type: data.irrigationType || null,
+          irrigation_system: data.irrigationSystem || null,
+          water_source: data.waterSource || null,
+          property_type: data.propertyType || null,
+          current_condition: data.currentCondition || null,
+          budget: data.budget,
+          timeline: data.timeline,
+          city: data.city,
+          district: data.district || null,
+          address: data.address || null,
+          notes: data.notes || null,
+          full_name: data.fullName,
+          phone: data.phone,
+          email: data.email,
+          status: "unverified",
+        } as any);
+        
+        if (leadError) {
+          console.error("Unverified lead insert error:", leadError.message || leadError);
+        } else {
+          setUnverifiedLeadId(generatedLeadId);
+        }
+
+        const { data: res, error } = await supabase.functions.invoke("send-otp", {
+          body: { email: data.email },
+        });
+        if (error) throw error;
+        
+        if (res?.debugCode) {
+          setOtpCode(res.debugCode);
+          toast.info("Geliştirme Modu: Domain onayı olmadığı için kod otomatik dolduruldu: " + res.debugCode);
+        } else {
+          toast.success("Doğrulama kodu e-posta adresinize gönderildi!");
+        }
+        if (res?.error && !res?.debugCode) throw new Error(res.error);
+        
         setStep(8);
-      } catch {
-        // Error already shown via toast
+      } catch (err: any) {
+        toast.error(err.message || "Kod gönderilemedi. Lütfen tekrar deneyin.");
+      } finally {
+        setOtpSending(false);
       }
     } else if (step === TOTAL_STEPS) {
       handleSubmit();
@@ -289,9 +348,9 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
             {step === TOTAL_STEPS
-              ? (loading ? "Gönderiliyor..." : "Talebi Gönder")
+              ? (loading ? "Doğrulanıyor..." : "Doğrula ve Gönder")
               : step === 7
-                ? (otpSending ? "Kod Gönderiliyor..." : "Kod Gönder")
+                ? (otpSending ? "Lütfen Bekleyin..." : "Ücretsiz Teklif Al")
                 : "Devam Et"}
             {step < 7 && <ArrowRight className="ml-2 h-4 w-4" />}
           </Button>

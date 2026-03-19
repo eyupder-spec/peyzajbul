@@ -78,6 +78,24 @@ export const COMMERCIAL_SERVICES = [
   { value: "periyodik-bakim", label: "Periyodik Bakım Anlaşması", icon: "📋" },
 ];
 
+// Maps lead-form service slug → the label string stored in firms.services[]
+export const SERVICE_TYPE_TO_LABEL: Record<string, string> = {
+  // Residential
+  "bahce-tasarimi": "Bahçe Tasarımı",
+  "bahce-bakimi": "Bahçe Bakımı & Bahçıvanlık",
+  "sulama-sistemi": "Sulama Sistemleri",
+  "sert-zemin": "Sert Zemin (Hardscape)",
+  "bitki-agac": "Ağaçlandırma & Fidan",
+  "havuz-cevresi": "Havuz Yapımı & Çevresi",
+  // Commercial
+  "proje-tasarim-uygulama": "Peyzaj Mimarlığı",
+  "sadece-uygulama": "Peyzaj Mimarlığı",
+  "yesil-cati-teras": "Çatı Bahçesi & Teras",
+  "otopark-yol": "Sert Zemin (Hardscape)",
+  "havuz-cevresi-ticari": "Havuz Yapımı & Çevresi",
+  "periyodik-bakim": "Bahçe Bakımı & Bahçıvanlık",
+};
+
 // Scope options by service type
 export const SCOPE_OPTIONS: Record<string, { label: string; value: string }[]> = {
   "bahce-tasarimi": [

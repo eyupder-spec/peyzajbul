@@ -236,10 +236,42 @@ const FirmaPanel = () => {
   }
 
   const statCards = [
-    { title: "Gelen Leadler", value: stats.totalLeads, icon: Users, color: "text-primary" },
-    { title: "Satın Alınan", value: stats.purchased, icon: ShoppingCart, color: "text-accent" },
-    { title: "Jeton Bakiyesi", value: stats.coinBalance, icon: Coins, color: "text-primary" },
-    { title: "Dönüşüm Oranı", value: stats.totalLeads > 0 ? `${Math.round((stats.purchased / stats.totalLeads) * 100)}%` : "0%", icon: TrendingUp, color: "text-primary" },
+    {
+      title: "Gelen Leadler",
+      value: stats.totalLeads,
+      icon: Users,
+      iconBg: "bg-blue-500/10",
+      iconColor: "text-blue-500",
+      gradient: "from-blue-500/5 to-transparent",
+      link: null,
+    },
+    {
+      title: "Satın Alınan",
+      value: stats.purchased,
+      icon: ShoppingCart,
+      iconBg: "bg-emerald-500/10",
+      iconColor: "text-emerald-500",
+      gradient: "from-emerald-500/5 to-transparent",
+      link: "/firma/leadler",
+    },
+    {
+      title: "Jeton Bakiyesi",
+      value: `${stats.coinBalance} ⬡`,
+      icon: Coins,
+      iconBg: "bg-amber-500/10",
+      iconColor: "text-amber-500",
+      gradient: "from-amber-500/5 to-transparent",
+      link: "/firma/jeton",
+    },
+    {
+      title: "Dönüşüm Oranı",
+      value: stats.totalLeads > 0 ? `${Math.round((stats.purchased / stats.totalLeads) * 100)}%` : "—",
+      icon: TrendingUp,
+      iconBg: "bg-violet-500/10",
+      iconColor: "text-violet-500",
+      gradient: "from-violet-500/5 to-transparent",
+      link: null,
+    },
   ];
 
   return (
@@ -256,7 +288,7 @@ const FirmaPanel = () => {
             </div>
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm" onClick={() => router.push("/firma/jeton")} className="gap-2" id="tour-balance">
-                <Coins className="h-4 w-4" />
+                <Coins className="h-4 w-4 text-amber-500" />
                 <span className="font-semibold">{stats.coinBalance} Jeton</span>
               </Button>
               <Button variant="ghost" size="sm" onClick={() => (window as any).startFirmaTour?.()} className="gap-2 text-muted-foreground">
@@ -272,15 +304,19 @@ const FirmaPanel = () => {
             {/* Stat Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="tour-stats">
               {statCards.map((stat) => (
-                <Card key={stat.title} className="border-border">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-xs font-medium text-muted-foreground">{stat.title}</CardTitle>
-                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-xl font-bold text-foreground">{stat.value}</p>
-                  </CardContent>
-                </Card>
+                <div
+                  key={stat.title}
+                  onClick={stat.link ? () => router.push(stat.link!) : undefined}
+                  className={`relative overflow-hidden rounded-xl border border-border bg-gradient-to-br ${stat.gradient} bg-card p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${stat.link ? "cursor-pointer" : ""}`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <p className="text-xs font-medium text-muted-foreground">{stat.title}</p>
+                    <div className={`w-8 h-8 rounded-lg ${stat.iconBg} flex items-center justify-center`}>
+                      <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground tracking-tight">{stat.value}</p>
+                </div>
               ))}
             </div>
 

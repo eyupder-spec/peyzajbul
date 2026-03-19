@@ -24,10 +24,11 @@ Deno.serve(async (req) => {
     const scoreEmoji = (lead_score ?? 0) >= 70 ? '🔥' : (lead_score ?? 0) >= 50 ? '⚡' : '📋';
     const districtText = district ? ` / ${district}` : '';
 
-    const message = `${scoreEmoji} *Yeni Lead Bildirimi!*
+    const message = `${scoreEmoji} *Yeni Müşteri Adayı!*
 \n🏢 *${firm_name}* için yeni bir talep geldi:
-\n📌 *Hizmet:* ${service_type}\n📍 *Konum:* ${city}${districtText}\n💰 *Bütçe:* ${budget}\n📐 *Alan:* ${areaValue} m²\n⏰ *Zaman:* ${timeline}\n📊 *Lead Skoru:* ${lead_score ?? 0}/100
-\n👉 Detayları görmek ve iletişim bilgilerini açmak için panele giriş yapın.`;
+\n📌 *Hizmet:* ${service_type}\n📍 *Konum:* ${city}${districtText}\n💰 *Bütçe:* ${budget}\n📐 *Alan:* ${areaValue} m²\n⏰ *Zaman:* ${timeline}\n📊 *Aday Skoru:* ${lead_score ?? 0}/100
+\n👉 Detayları görmek ve iletişim bilgilerini açmak için panele giriş yapın:
+🔗 https://www.peyzajbul.com/firma/giris`;
 
     const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     const response = await fetch(telegramUrl, {

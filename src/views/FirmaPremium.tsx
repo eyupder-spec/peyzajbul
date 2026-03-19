@@ -53,7 +53,7 @@ const FirmaPremium = () => {
 
   const handleSubscribe = async () => {
     if (!firm) return;
-    
+
     setActivating(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-premium-checkout", {
@@ -84,12 +84,12 @@ const FirmaPremium = () => {
     <>
       <Navbar />
       <div className="min-h-screen bg-background pb-16">
-        
+
         {/* HERO SECTION */}
         <div className="relative overflow-hidden bg-card border-b border-border pt-20">
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-background to-accent/5" />
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
-          
+
           <div className="container relative mx-auto px-4 py-16 md:py-24 max-w-5xl text-center">
             <Badge variant="outline" className="mb-6 px-4 py-1.5 border-yellow-500/50 text-yellow-600 dark:text-yellow-400 bg-yellow-500/10">
               <Crown className="w-4 h-4 mr-2" /> Profesyoneller İçin
@@ -139,7 +139,7 @@ const FirmaPremium = () => {
                       <span className="text-6xl font-black text-foreground tracking-tight">{isYearly ? "150" : "15"}</span>
                       <span className="text-lg font-medium text-muted-foreground">/{isYearly ? "yıl" : "ay"}</span>
                     </div>
-                    
+
                     <ul className="w-full space-y-3 mb-8 text-left">
                       <li className="flex items-center gap-2 text-sm text-muted-foreground">
                         <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
@@ -171,7 +171,7 @@ const FirmaPremium = () => {
                     >
                       {activating ? "Hazırlanıyor..." : "Aboneliği Başlat"}
                     </Button>
-                    
+
                     <p className="mt-4 text-[10px] text-muted-foreground text-center">
                       Güvenli ödeme altyapısı Stripe ile korunmaktadır. İstediğiniz zaman iptal edebilirsiniz.
                     </p>

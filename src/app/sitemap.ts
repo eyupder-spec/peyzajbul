@@ -4,18 +4,22 @@ import { getAllCategories, Category } from '@/lib/categories';
 import { seoCities, seoDistricts } from '@/lib/seo-data';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://peyzajbul.com';
+  const baseUrl = 'https://www.peyzajbul.com';
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Fetch all approved firms
+  // Fetch all approved firms (excluding test/deneme firms)
   const { data: firms } = await supabase
     .from('firms')
-    .select('slug, updated_at')
+    .select('slug, updated_at, company_name')
     .eq('is_approved', true)
-    .eq('is_active', true);
+    .eq('is_active', true)
+    .not('company_name', 'ilike', '%deneme%')
+    .not('company_name', 'ilike', '%test%')
+    .not('slug', 'ilike', '%deneme%')
+    .not('slug', 'ilike', '%test%');
 
   // Fetch all published blog posts
   const { data: posts } = await supabase
@@ -23,10 +27,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select('slug, published_at')
     .eq('is_published', true);
 
-  // Fetch all published projects
+  // Fetch all published projects (excluding test/deneme projects)
   const { data: projects } = await (supabase.from as any)('projects')
     .select('slug, category, city, updated_at, firms!inner(slug)')
-    .eq('status', 'published');
+    .eq('status', 'published')
+    .not('title', 'ilike', '%deneme%')
+    .not('title', 'ilike', '%test%');
 
   const firmUrls = (firms || []).map((firm) => ({
     url: `${baseUrl}/firma/${firm.slug}`,

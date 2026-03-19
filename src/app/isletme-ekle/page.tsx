@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Peyzaj Firması Kayıt | İşinizi ve Müşteri Kitlenizi Büyütün",
   description: "Peyzaj firmanızı Peyzajbul'a kaydederek daha fazla müşteriye ulaşın. 81 ilde binlerce bahçe sahibinin sizi bulmasını sağlayın. Ücretsiz kayıt olun.",
   alternates: {
-    canonical: "https://peyzajbul.com/isletme-ekle",
+    canonical: "https://www.peyzajbul.com/isletme-ekle",
   },
 };
 

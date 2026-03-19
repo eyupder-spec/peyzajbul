@@ -15,6 +15,12 @@ function isProtectedRoute(pathname: string, secretPath: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
+  const botPatterns = /bot|crawl|spider|scraper|wget|curl/i;
+  const ua = request.headers.get('user-agent') || '';
+  if (botPatterns.test(ua)) {
+    return new Response(null, { status: 403 });
+  }
+
   const pathname = request.nextUrl.pathname
 
   const secretPath = process.env.NEXT_PUBLIC_ADMIN_SECRET_PATH || '/admin-dash'

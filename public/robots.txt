@@ -41,4 +41,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://peyzajbul.com/sitemap.xml
+Sitemap: https://www.peyzajbul.com/sitemap.xml

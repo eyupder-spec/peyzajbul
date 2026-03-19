@@ -12,15 +12,15 @@ import FirmCard from "@/components/FirmCard";
 import Image from "next/image";
 import { useState } from "react";
 import LeadFormModal from "@/components/lead-form/LeadFormModal";
-import { 
-  ArrowLeft, 
-  Calendar, 
-  User, 
-  Clock, 
-  Share2, 
-  Facebook, 
-  Twitter as TwitterIcon, 
-  Linkedin, 
+import {
+  ArrowLeft,
+  Calendar,
+  User,
+  Clock,
+  Share2,
+  Facebook,
+  Twitter as TwitterIcon,
+  Linkedin,
   ChevronRight,
   Sparkles,
   MessageSquare,
@@ -201,19 +201,19 @@ const BlogDetay = ({ slug: propSlug }: BlogDetayProps) => {
                 {/* Cover Image - Inside container for a more premium magazine feel */}
                 {post.cover_image_url && (
                   <div className="relative aspect-video w-full overflow-hidden rounded-[2rem] shadow-2xl mb-12 ring-1 ring-border/50">
-                    <Image 
-                      src={post.cover_image_url} 
-                      alt={post.cover_image_alt || post.title} 
-                      fill 
-                      className="object-cover transition-transform duration-700 hover:scale-105" 
-                      priority 
+                    <Image
+                      src={post.cover_image_url}
+                      alt={post.cover_image_alt || post.title}
+                      fill
+                      className="object-cover transition-transform duration-700 hover:scale-105"
+                      priority
                     />
                   </div>
                 )}
               </div>
 
               {/* Enhanced Article Styling */}
-              <article 
+              <article
                 className="prose prose-base md:prose-lg max-w-none text-foreground/90 
                   prose-headings:font-heading prose-headings:text-foreground prose-headings:font-bold
                   prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6
@@ -267,7 +267,7 @@ const BlogDetay = ({ slug: propSlug }: BlogDetayProps) => {
                     <p className="text-primary-foreground/80 text-sm mb-6 leading-relaxed">
                       Projeniz için profesyonel peyzaj firmalarından hızlıca fiyat teklifi toplamak ister misiniz?
                     </p>
-                    <Button 
+                    <Button
                       className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-6 rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                       onClick={() => setIsLeadFormOpen(true)}
                     >
@@ -375,7 +375,7 @@ const BlogDetay = ({ slug: propSlug }: BlogDetayProps) => {
           "name": "Peyzajbul",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://peyzajbul.com/logo.png"
+            "url": "https://www.peyzajbul.com/logo.png"
           }
         },
         "description": post.excerpt || post.title

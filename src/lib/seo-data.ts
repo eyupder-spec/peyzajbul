@@ -1,14 +1,9 @@
-////////////////////////////////////////////////////
-// ŞEHİRLER
-////////////////////////////////////////////////////
+import { CITIES } from "./cities";
 
-export const seoCities = [
-  { slug: "istanbul", name: "İstanbul" },
-  { slug: "ankara", name: "Ankara" },
-  { slug: "izmir", name: "İzmir" },
-  { slug: "antalya", name: "Antalya" },
-  { slug: "bursa", name: "Bursa" }
-];
+export const seoCities = CITIES.map(city => ({
+  slug: city.slug,
+  name: city.name
+}));
 
 ////////////////////////////////////////////////////
 // İLÇELER

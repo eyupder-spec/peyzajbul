@@ -40,7 +40,7 @@ export async function generateMetadata(
       ? project.description.slice(0, 155)
       : `${firmName} tarafından ${cityName} ilinde gerçekleştirilen ${catLabel} projesi.`;
 
-    const baseUrl = "https://peyzajbul.com";
+    const baseUrl = "https://www.peyzajbul.com";
     const canonical = `${baseUrl}/${kategori}/${il}/${firma}/${proje}`;
 
     return {

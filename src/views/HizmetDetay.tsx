@@ -49,15 +49,15 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
           "@type": "Organization",
           "name": "Peyzajbul"
         },
-        "url": `https://peyzajbul.com/hizmetler/${category.slug}`
+        "url": `https://www.peyzajbul.com/hizmetler/${category.slug}`
       })}</script>
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="relative bg-primary py-24 overflow-hidden">
           {/* Background Image */}
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center z-0"
-            style={{ 
+            style={{
               backgroundImage: `url(${category.imageUrl})`,
             }}
           />
@@ -125,7 +125,7 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {seoCities.map((city) => (
                 <div key={city.slug} className="space-y-3">
-                  <Link 
+                  <Link
                     href={`/hizmet/${category.slug}/${city.slug}`}
                     className="inline-block text-lg font-semibold text-primary hover:underline"
                   >
@@ -134,7 +134,7 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
                   <ul className="grid grid-cols-2 gap-2">
                     {(seoDistricts[city.slug] || []).map((district) => (
                       <li key={district.slug}>
-                        <Link 
+                        <Link
                           href={`/hizmet/${category.slug}/${city.slug}/${district.slug}`}
                           className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 before:content-[''] before:w-1.5 before:h-1.5 before:bg-primary/50 before:rounded-full"
                         >

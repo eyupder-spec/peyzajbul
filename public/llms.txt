@@ -4,41 +4,41 @@
 
 ## Ana Sayfalar
 
-- [Ana Sayfa](https://peyzajbul.com/): Öne çıkan firmalar, hizmetler ve nasıl çalışır bölümü
-- [Tüm Firmalar](https://peyzajbul.com/firmalar): Onaylı peyzaj firmalarının tam listesi
-- [İller](https://peyzajbul.com/iller): 81 il bazında peyzaj firmaları
-- [Kategoriler](https://peyzajbul.com/hizmetler): 20 hizmet kategorisi
+- [Ana Sayfa](https://www.peyzajbul.com/): Öne çıkan firmalar, hizmetler ve nasıl çalışır bölümü
+- [Tüm Firmalar](https://www.peyzajbul.com/firmalar): Onaylı peyzaj firmalarının tam listesi
+- [İller](https://www.peyzajbul.com/iller): 81 il bazında peyzaj firmaları
+- [Kategoriler](https://www.peyzajbul.com/hizmetler): 20 hizmet kategorisi
 
 ## Hizmet Kategorileri
 
-- [Peyzaj Mimarlığı](https://peyzajbul.com/hizmetler/peyzaj-mimarligi)
-- [Bahçe Tasarımı](https://peyzajbul.com/hizmetler/bahce-tasarimi)
-- [Bahçe Bakımı & Bahçıvanlık](https://peyzajbul.com/hizmetler/bahce-bakimi)
-- [Çim Serme & Çim Bakımı](https://peyzajbul.com/hizmetler/cim-serme)
-- [Ağaçlandırma & Fidan](https://peyzajbul.com/hizmetler/agaclandirma)
-- [Ağaç Budama & Kesim](https://peyzajbul.com/hizmetler/agac-budama)
-- [Sulama Sistemleri](https://peyzajbul.com/hizmetler/sulama-sistemleri)
-- [Sert Zemin (Hardscape)](https://peyzajbul.com/hizmetler/sert-zemin)
-- [Peyzaj Aydınlatma](https://peyzajbul.com/hizmetler/peyzaj-aydinlatma)
-- [Havuz Yapımı & Çevresi](https://peyzajbul.com/hizmetler/havuz-yapimi)
-- [Süs Havuzu & Şelale](https://peyzajbul.com/hizmetler/sus-havuzu)
-- [Çatı Bahçesi & Teras](https://peyzajbul.com/hizmetler/cati-bahcesi)
-- [Dikey Bahçe](https://peyzajbul.com/hizmetler/dikey-bahce)
-- [Kentsel Peyzaj](https://peyzajbul.com/hizmetler/kentsel-peyzaj)
-- [Park & Oyun Alanı](https://peyzajbul.com/hizmetler/park-oyun-alani)
-- [Çit & Pergola](https://peyzajbul.com/hizmetler/cit-pergola)
-- [Peyzaj Malzemeleri Satışı](https://peyzajbul.com/hizmetler/peyzaj-malzemeleri)
-- [Doğal Taş & Kaplama](https://peyzajbul.com/hizmetler/dogal-tas)
-- [Bitki Satışı & Fidanlık](https://peyzajbul.com/hizmetler/bitki-satisi)
-- [Toprak & Gübre Hizmetleri](https://peyzajbul.com/hizmetler/toprak-gubre)
+- [Peyzaj Mimarlığı](https://www.peyzajbul.com/hizmetler/peyzaj-mimarligi)
+- [Bahçe Tasarımı](https://www.peyzajbul.com/hizmetler/bahce-tasarimi)
+- [Bahçe Bakımı & Bahçıvanlık](https://www.peyzajbul.com/hizmetler/bahce-bakimi)
+- [Çim Serme & Çim Bakımı](https://www.peyzajbul.com/hizmetler/cim-serme)
+- [Ağaçlandırma & Fidan](https://www.peyzajbul.com/hizmetler/agaclandirma)
+- [Ağaç Budama & Kesim](https://www.peyzajbul.com/hizmetler/agac-budama)
+- [Sulama Sistemleri](https://www.peyzajbul.com/hizmetler/sulama-sistemleri)
+- [Sert Zemin (Hardscape)](https://www.peyzajbul.com/hizmetler/sert-zemin)
+- [Peyzaj Aydınlatma](https://www.peyzajbul.com/hizmetler/peyzaj-aydinlatma)
+- [Havuz Yapımı & Çevresi](https://www.peyzajbul.com/hizmetler/havuz-yapimi)
+- [Süs Havuzu & Şelale](https://www.peyzajbul.com/hizmetler/sus-havuzu)
+- [Çatı Bahçesi & Teras](https://www.peyzajbul.com/hizmetler/cati-bahcesi)
+- [Dikey Bahçe](https://www.peyzajbul.com/hizmetler/dikey-bahce)
+- [Kentsel Peyzaj](https://www.peyzajbul.com/hizmetler/kentsel-peyzaj)
+- [Park & Oyun Alanı](https://www.peyzajbul.com/hizmetler/park-oyun-alani)
+- [Çit & Pergola](https://www.peyzajbul.com/hizmetler/cit-pergola)
+- [Peyzaj Malzemeleri Satışı](https://www.peyzajbul.com/hizmetler/peyzaj-malzemeleri)
+- [Doğal Taş & Kaplama](https://www.peyzajbul.com/hizmetler/dogal-tas)
+- [Bitki Satışı & Fidanlık](https://www.peyzajbul.com/hizmetler/bitki-satisi)
+- [Toprak & Gübre Hizmetleri](https://www.peyzajbul.com/hizmetler/toprak-gubre)
 
 ## Popüler İller
 
-- [İstanbul Peyzaj Firmaları](https://peyzajbul.com/iller/istanbul-peyzaj-firmalari)
-- [Ankara Peyzaj Firmaları](https://peyzajbul.com/iller/ankara-peyzaj-firmalari)
-- [İzmir Peyzaj Firmaları](https://peyzajbul.com/iller/izmir-peyzaj-firmalari)
-- [Antalya Peyzaj Firmaları](https://peyzajbul.com/iller/antalya-peyzaj-firmalari)
-- [Bursa Peyzaj Firmaları](https://peyzajbul.com/iller/bursa-peyzaj-firmalari)
+- [İstanbul Peyzaj Firmaları](https://www.peyzajbul.com/iller/istanbul-peyzaj-firmalari)
+- [Ankara Peyzaj Firmaları](https://www.peyzajbul.com/iller/ankara-peyzaj-firmalari)
+- [İzmir Peyzaj Firmaları](https://www.peyzajbul.com/iller/izmir-peyzaj-firmalari)
+- [Antalya Peyzaj Firmaları](https://www.peyzajbul.com/iller/antalya-peyzaj-firmalari)
+- [Bursa Peyzaj Firmaları](https://www.peyzajbul.com/iller/bursa-peyzaj-firmalari)
 
 ## Platform Özellikleri
 

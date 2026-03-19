@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: seo.title,
     description: seo.description,
     alternates: {
-      canonical: `https://peyzajbul.com/iller/${slug}`,
+      canonical: `https://www.peyzajbul.com/iller/${slug}`,
     },
   };
 }

@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: category.seoTitle,
     description: category.seoDescription,
     alternates: {
-      canonical: `https://peyzajbul.com/hizmetler/${category.slug}`,
+      canonical: `https://www.peyzajbul.com/hizmetler/${category.slug}`,
     },
   };
 }

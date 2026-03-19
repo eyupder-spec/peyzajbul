@@ -37,7 +37,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const category = getCategoryBySlug(resolvedParams.hizmet);
-  
+
   if (!category) return { title: 'Sayfa Bulunamadı' };
 
   // İlçesiz sadece il başlığı üretelim
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'tr_TR',
     },
     alternates: {
-      canonical: `https://peyzajbul.com/hizmet/${resolvedParams.hizmet}/${resolvedParams.il}`,
+      canonical: `https://www.peyzajbul.com/hizmet/${resolvedParams.hizmet}/${resolvedParams.il}`,
     }
   };
 }
@@ -81,7 +81,7 @@ export default async function ServiceCityPage({ params }: PageProps) {
     "provider": {
       "@type": "Organization",
       "name": "Peyzajbul Türkiye",
-      "url": "https://peyzajbul.com"
+      "url": "https://www.peyzajbul.com"
     },
     "areaServed": {
       "@type": "City",
@@ -96,7 +96,7 @@ export default async function ServiceCityPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
-      <HizmetBolgeDetay 
+      <HizmetBolgeDetay
         category={category}
         il={il}
         cityName={cityName}

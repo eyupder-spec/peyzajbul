@@ -69,8 +69,8 @@ Deno.serve(async (req) => {
 
       // Kullanıcı metadata'sını güncelle (isim/telefon değişmişse)
       await supabase.auth.admin.updateUserById(userId, {
-        user_metadata: { 
-          full_name: fullName || existingUser.user_metadata?.full_name, 
+        user_metadata: {
+          full_name: fullName || existingUser.user_metadata?.full_name,
           phone: phone || existingUser.user_metadata?.phone,
         },
       });
@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
           user_id: userId,
         })
         .eq("id", leadId);
-        
+
       if (leadUpdateError) {
         console.error("Failed to update unverified lead:", leadUpdateError);
       }
@@ -154,7 +154,7 @@ Deno.serve(async (req) => {
             html: `
               <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#ffffff;border-radius:12px;">
                 <h1 style="color:#1a1a1a;font-size:24px;margin-bottom:8px;">Hesabınız Oluşturuldu!</h1>
-                <p style="color:#666;font-size:14px;margin-bottom:24px;">Peyzajbul'da sizin için bir hesap oluşturduk. Aşağıdaki bilgilerle <a href="https://peyzajbul.com/hesabim" style="color:#10b981;font-weight:bold;">hesabım</a> sayfasından giriş yapabilirsiniz:</p>
+                <p style="color:#666;font-size:14px;margin-bottom:24px;">Peyzajbul'da sizin için bir hesap oluşturduk. Aşağıdaki bilgilerle <a href="https://www.peyzajbul.com/hesabim" style="color:#10b981;font-weight:bold;">hesabım</a> sayfasından giriş yapabilirsiniz:</p>
                 <div style="background:#f5f5f5;border-radius:8px;padding:20px;margin-bottom:24px;">
                   <p style="margin:0 0 8px;color:#333;font-size:14px;"><strong>E-posta:</strong> ${email}</p>
                   <p style="margin:0;color:#333;font-size:14px;"><strong>Şifre:</strong> ${password}</p>

@@ -5,6 +5,14 @@ export const seoCities = CITIES.map(city => ({
   name: city.name
 }));
 
+export const featuredCities = [
+  { slug: "istanbul", name: "İstanbul" },
+  { slug: "ankara", name: "Ankara" },
+  { slug: "izmir", name: "İzmir" },
+  { slug: "antalya", name: "Antalya" },
+  { slug: "bursa", name: "Bursa" }
+];
+
 ////////////////////////////////////////////////////
 // İLÇELER
 ////////////////////////////////////////////////////

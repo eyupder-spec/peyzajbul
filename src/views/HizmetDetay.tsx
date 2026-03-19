@@ -9,7 +9,7 @@ import { getCategoryBySlug } from "@/lib/categories";
 import { useApprovedFirms } from "@/hooks/useFirms";
 import RelatedBlogPosts from "@/components/RelatedBlogPosts";
 import { Button } from "@/components/ui/button";
-import { seoCities, seoDistricts } from "@/lib/seo-data";
+import { featuredCities, seoDistricts } from "@/lib/seo-data";
 import { Sparkles } from "lucide-react";
 import LeadFormBanner from "@/components/lead-form/LeadFormBanner";
 
@@ -123,7 +123,7 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
               <Sparkles className="h-5 w-5 text-primary" /> {category.label} Hizmet Bölgeleri
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {seoCities.map((city) => (
+              {featuredCities.map((city) => (
                 <div key={city.slug} className="space-y-3">
                   <Link
                     href={`/hizmet/${category.slug}/${city.slug}`}

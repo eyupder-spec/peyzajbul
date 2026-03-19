@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { seoCities, seoDistricts } from "@/lib/seo-data";
+import { featuredCities, seoDistricts } from "@/lib/seo-data";
 import { getAllCategories } from "@/lib/categories";
 
 const SeoLocationLinks = () => {
@@ -23,7 +23,7 @@ const SeoLocationLinks = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {seoCities.map((city) => (
+          {featuredCities.map((city) => (
             <div key={city.slug} className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
               <h3 className="font-heading text-xl font-bold text-primary mb-4 border-b pb-2 border-border/50">
                 {city.name} Peyzaj

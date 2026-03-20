@@ -23,10 +23,32 @@ export function useLeadNotifications(firmId: string | null, onNewLead?: () => vo
     }
   }, []);
 
-  // Preload audio
+  // Preload audio and handle autoplay restrictions
   useEffect(() => {
-    audioRef.current = new Audio(NOTIFICATION_SOUND_URL);
-    audioRef.current.volume = 1.0; // Sesi maksimuma alalım
+    const audio = new Audio(NOTIFICATION_SOUND_URL);
+    audio.volume = 1.0;
+    audioRef.current = audio;
+
+    const handleFirstUserInteraction = () => {
+      // Tarayıcıya kullanıcının sayfayla etkileşime girdiğini kanıtlamak için 
+      // sesi 1 saliseliğine çalıp tekrar durduruyoruz (sessizce).
+      audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+      }).catch(e => console.warn("Sessiz oynatma henüz onaylanmadı:", e));
+      
+      // İlk tıklamada bunu yaptıktan sonra event listener'ı siliyoruz.
+      document.removeEventListener("click", handleFirstUserInteraction);
+      document.removeEventListener("touchstart", handleFirstUserInteraction);
+    };
+
+    document.addEventListener("click", handleFirstUserInteraction);
+    document.addEventListener("touchstart", handleFirstUserInteraction);
+
+    return () => {
+      document.removeEventListener("click", handleFirstUserInteraction);
+      document.removeEventListener("touchstart", handleFirstUserInteraction);
+    };
   }, []);
 
   const playSound = useCallback(() => {

@@ -58,7 +58,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     "image": post.cover_image_url ? [post.cover_image_url] : [],
     "datePublished": post.created_at,
     "dateModified": post.updated_at || post.created_at,
-    "author": {
+    "author": post.author_name ? [
+      {
+        "@type": "Person",
+        "name": post.author_name
+      }
+    ] : {
       "@type": "Organization",
       "name": "Peyzajbul",
       "url": "https://www.peyzajbul.com"

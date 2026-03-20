@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/firma/panel/', '/hesabim/', secretAdminPath],
     },
-    sitemap: 'https://www.peyzajbul.com/sitemap.xml',
+    sitemap: 'https://www.peyzajbul.com/sitemap-index.xml',
   };
 }

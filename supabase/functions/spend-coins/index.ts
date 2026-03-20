@@ -80,7 +80,7 @@ serve(async (req) => {
       firm_id: firm.id,
       type: "spend",
       amount: -LEAD_COST,
-      description: "Lead açma",
+      description: "Müşteri adayı açma",
       lead_id,
     });
 
@@ -111,7 +111,7 @@ serve(async (req) => {
           body: JSON.stringify({
             from: "Peyzajbul <noreply@peyzajbul.com>",
             to: [lead.email],
-            subject: "Talebiniz İlgileniliyor! - Peyzajbul",
+            subject: "Talebinizle İlgileniliyor! - Peyzajbul",
             html: `
               <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#ffffff;border-radius:12px;">
                 <h1 style="color:#1a1a1a;font-size:22px;margin-bottom:8px;">Harika Haber! 🎉</h1>

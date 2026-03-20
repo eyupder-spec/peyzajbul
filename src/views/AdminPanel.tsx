@@ -408,6 +408,22 @@ const AdminPanel = () => {
   const pendingFirmCount = firmsData.filter((f) => !f.is_approved).length;
   const conversionRate = leads.length > 0 ? Math.round((purchases.length / leads.length) * 100) : 0;
 
+  // Daily Stats Calculations
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const todayPremiumCount = coinTransactions.filter((t: any) => 
+    t.type === "spend" && t.description?.toLowerCase().includes("premium") && new Date(t.created_at) >= startOfToday
+  ).length;
+
+  const todayCoinLoads = coinTransactions.filter((t: any) => 
+    (t.type === "purchase" || t.type === "add") && new Date(t.created_at) >= startOfToday
+  ).reduce((sum: number, t: any) => sum + t.amount, 0);
+
+  const todayLeadSales = purchases.filter((p: any) => 
+    new Date(p.created_at) >= startOfToday
+  ).length;
+
   const filteredLeads = leads.filter((l) => {
     if (filterCity && !l.city.toLowerCase().includes(filterCity.toLowerCase())) return false;
     if (filterStatus !== "all" && l.status !== filterStatus) return false;
@@ -439,7 +455,7 @@ const AdminPanel = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <Card className="border-border">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">Bugün</CardTitle>
+                      <CardTitle className="text-sm font-medium text-muted-foreground">Bugün (Elenen)</CardTitle>
                       <FileText className="h-5 w-5 text-primary" />
                     </CardHeader>
                     <CardContent><p className="text-2xl font-bold text-foreground">{todayLeads}</p><p className="text-xs text-muted-foreground">Bu hafta: {weekLeads} · Bu ay: {monthLeads}</p></CardContent>
@@ -466,6 +482,71 @@ const AdminPanel = () => {
                     <CardContent><p className="text-2xl font-bold text-foreground">{conversionRate}%</p></CardContent>
                   </Card>
                 </div>
+
+                {/* Daily Stats Row */}
+                <div>
+                  <h3 className="font-heading text-lg font-bold mb-4 text-foreground/80">Bugünkü Faaliyetler</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card className="border-border bg-primary/5">
+                      <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium text-primary">Satılan Premium</CardTitle>
+                        <Crown className="h-5 w-5 text-primary" />
+                      </CardHeader>
+                      <CardContent><p className="text-2xl font-bold text-foreground">{todayPremiumCount}</p></CardContent>
+                    </Card>
+                    <Card className="border-border bg-emerald-50 dark:bg-emerald-950/20">
+                      <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium text-emerald-600">Yüklenen Jeton</CardTitle>
+                        <Coins className="h-5 w-5 text-emerald-600" />
+                      </CardHeader>
+                      <CardContent><p className="text-2xl font-bold text-foreground">{todayCoinLoads} <span className="text-sm font-normal text-emerald-600/70">Jeton</span></p></CardContent>
+                    </Card>
+                    <Card className="border-border bg-amber-50 dark:bg-amber-950/20">
+                      <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium text-amber-600">Satılan Lead</CardTitle>
+                        <HandshakeIcon className="h-5 w-5 text-amber-600" />
+                      </CardHeader>
+                      <CardContent><p className="text-2xl font-bold text-foreground">{todayLeadSales} <span className="text-sm font-normal text-amber-600/70">Adet</span></p></CardContent>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Recent Activities */}
+                <Card className="border-border mt-8">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-heading">Son İşlemler</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {coinTransactions.slice(0, 10).map((tx: any) => {
+                        const firm = firmsData.find(f => f.user_id === tx.firm_id || f.id === tx.firm_id);
+                        const isAdd = tx.type === "purchase" || tx.type === "add" || tx.amount > 0;
+                        return (
+                          <div key={tx.id} className="flex items-center justify-between p-4 border border-border/50 rounded-xl bg-muted/10 hover:bg-muted/30 transition-colors">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${isAdd ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+                                {isAdd ? <Plus className="h-5 w-5" /> : <CreditCard className="h-5 w-5" />}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-semibold text-foreground text-sm md:text-base">{firm?.company_name || "Bilinmeyen Firma"}</span>
+                                <span className="text-xs md:text-sm text-muted-foreground">{tx.description || (isAdd ? "Jeton Yüklendi" : "Harcama Yapıldı")}</span>
+                              </div>
+                            </div>
+                            <div className="text-right flex flex-col items-end">
+                              <span className={`font-bold text-sm md:text-base ${isAdd ? 'text-emerald-600' : 'text-foreground'}`}>
+                                {isAdd ? '+' : ''}{tx.amount} Jeton
+                              </span>
+                              <span className="text-xs text-muted-foreground">{new Date(tx.created_at).toLocaleString("tr-TR", { dateStyle: "medium", timeStyle: "short" })}</span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                      {coinTransactions.length === 0 && (
+                        <p className="text-center text-muted-foreground py-8">Henüz hiçbir işlem bulunmuyor.</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
 

@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://www.peyzajbul.com',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
@@ -41,7 +41,7 @@ serve(async (req) => {
     // We'll use the /api/sendText endpoint
     const wahaUrl = `${WAHA_API_URL}/api/sendText`;
     
-    console.log(`Sending WhatsApp message to ${cleanPhone} via ${session} session...`);
+    console.log(`Sending WhatsApp message to ***${cleanPhone.slice(-4)} via ${session} session...`);
 
     const response = await fetch(wahaUrl, {
       method: 'POST',

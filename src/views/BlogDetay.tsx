@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import DOMPurify from "dompurify";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
@@ -179,7 +181,7 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                   prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-10
                   prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-accent/5 prose-blockquote:p-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic
                   prose-strong:text-foreground prose-strong:font-bold"
-                dangerouslySetInnerHTML={{ __html: post.content || "" }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || "") }}
               />
 
               <div className="mt-12 pt-8 border-t border-border flex items-center justify-between gap-4">

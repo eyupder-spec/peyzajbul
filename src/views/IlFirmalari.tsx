@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import DOMPurify from "dompurify";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FirmCard from "@/components/FirmCard";
@@ -61,7 +62,7 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
         <div className="container mx-auto px-4 py-10">
           {/* SEO Article */}
           <article className="prose prose-slate dark:prose-invert max-w-none mb-12 bg-card rounded-lg border border-border p-6 md:p-8">
-            <div dangerouslySetInnerHTML={{ __html: markdownToHtml(seo.article) }} />
+            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(markdownToHtml(seo.article)) }} />
           </article>
 
           {/* Firms */}

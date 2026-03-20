@@ -1,13 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { z } from "npm:zod@3.23.8";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://www.peyzajbul.com",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 const LEAD_COST = 20;
+
+const spendSchema = z.object({
+  lead_id: z.string().uuid("Geçersiz lead_id formatı"),
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -30,8 +35,8 @@ serve(async (req) => {
     const user = data.user;
     if (!user) throw new Error("Not authenticated");
 
-    const { lead_id } = await req.json();
-    if (!lead_id) throw new Error("lead_id is required");
+    const body = spendSchema.parse(await req.json());
+    const { lead_id } = body;
 
     // Check if already purchased
     const { data: existing } = await supabaseAdmin

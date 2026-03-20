@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import DOMPurify from "dompurify";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase/client";
@@ -92,7 +93,7 @@ const Changelog = () => {
                       {entry.content && (
                         <div
                           className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line"
-                          dangerouslySetInnerHTML={{ __html: entry.content }}
+                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(entry.content) }}
                         />
                       )}
                     </div>

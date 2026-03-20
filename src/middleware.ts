@@ -1,120 +1,97 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Protected routes that require authentication
 const FIRMA_PROTECTED = ['/firma/panel', '/firma/profil', '/firma/leadler', '/firma/jeton', '/firma/premium', '/firma/galeri']
-const ADMIN_EXCLUDED = ['/giris']
 
 function isProtectedRoute(pathname: string, secretPath: string): boolean {
   if (FIRMA_PROTECTED.some(route => pathname.startsWith(route))) return true
-  
-  // Eğer gizli yol ile gelirse ve /giris değilse korumalıdır
   if (pathname.startsWith(secretPath) && !pathname.endsWith('/giris')) return true
-  
   return false
 }
 
 export async function middleware(request: NextRequest) {
-  const botPatterns = /bot|crawl|spider|scraper|wget|curl/i;
   const ua = request.headers.get('user-agent') || '';
   const pathname = request.nextUrl.pathname;
-
-  // 🤖 Bot Kontrolü (SEO dosyaları hariç)
-  if (botPatterns.test(ua) && !pathname.includes('sitemap') && !pathname.includes('robots')) {
-    return new Response(null, { status: 403 });
-  }
-
   const secretPath = process.env.NEXT_PUBLIC_ADMIN_SECRET_PATH || '/admin-dash'
 
-  // 🕵️ ADMIN GİZLEME (Full Stealth): 
-  // 1. Standart /admin ile başlayan her şeye 404 ver (eğer gizli yol /admin değilse)
+  // 🤖 Akıllı Bot Yönetimi
+  const goodBots = /googlebot|bingbot|slurp|duckduckbot|yandexbot|baiduspider|twitterbot|facebookexternalhit|linkedinbot|whatsapp|telegrambot|applebot|gptbot|chatgpt-user|google-extended|perplexitybot|claudebot|cohere-ai|petalbot/i;
+  const badBots = /scraper|spam|wget|curl|python-requests|headlesschrome|phantomjs|selenium|puppeteer|httrack|harvest|extract|nikto|sqlmap|nmap/i;
+
+  // Sadece kötü botlardaysa VE iyi bot listesinde değilse engelle (Çifte kontrol)
+  if (badBots.test(ua) && !goodBots.test(ua)) {
+    return new Response(JSON.stringify({ error: 'Bot traffic detected' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  // 🕵️ ADMIN GİZLEME
   if (pathname.startsWith('/admin') && secretPath !== '/admin') {
     return NextResponse.rewrite(new URL('/404', request.url))
   }
 
-  // 2. Gizli yol ile gelen istekleri içten /admin'e yönlendir (rewrite)
   let effectivePath = pathname
+  let isAdminPath = false
+
   if (pathname.startsWith(secretPath)) {
+    isAdminPath = true
     effectivePath = pathname.replace(secretPath, '/admin')
     if (effectivePath === '/admin' || effectivePath === '/admin/') {
       effectivePath = '/admin/panel'
     }
   }
 
-  // 🚀 Public rotalar için Supabase'e hiç sorgu atmadan devam et
+  // 🚀 Public Rotalar (Supabase'e gitmeden önce)
   if (!isProtectedRoute(pathname, secretPath)) {
-    // Eğer gizli yolun render edilmesini istiyorsak rewrite ile devam etmeliyiz
-    if (pathname.startsWith(secretPath)) {
-      // ÖNEMLİ: Eğer effectivePath ana /admin değilse rewrite yap (Loop'u önle)
+    if (isAdminPath) {
       return NextResponse.rewrite(new URL(effectivePath, request.url))
     }
     return NextResponse.next()
   }
 
-  // Sadece korumalı rotalarda Supabase session kontrolü yap
-  let supabaseResponse = NextResponse.next({ request })
-  if (pathname.startsWith(secretPath)) {
-    supabaseResponse = NextResponse.rewrite(new URL(effectivePath, request.url))
-  }
+  // 🔑 Supabase İşlemleri
+  // Response nesnesini burada oluşturuyoruz
+  let response = isAdminPath
+    ? NextResponse.rewrite(new URL(effectivePath, request.url))
+    : NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
-          supabaseResponse = NextResponse.next({ request })
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          // ÖNEMLİ: Mevcut response üzerinden devam ediyoruz, sıfırlamıyoruz!
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            response.cookies.set(name, value, options)
           )
         },
       },
     }
   )
 
-  // 🛡️ try-catch ile sarmalama: Supabase kesintisi tüm siteyi durdurmasın
-  let user: any = null
   try {
-    const { data } = await supabase.auth.getUser()
-    user = data.user
-  } catch (error) {
-    // Supabase erişilemiyorsa kullanıcıyı geçir, sayfa kendi kontrolünü yapsın
-    console.error('[Middleware] Supabase auth error:', error)
-    return supabaseResponse
-  }
+    const { data: { user } } = await supabase.auth.getUser()
 
-  // Giriş yapmamış kullanıcıları yönlendir
-  if (!user) {
-    const url = request.nextUrl.clone()
-
-    if (FIRMA_PROTECTED.some(route => pathname.startsWith(route))) {
-      url.pathname = '/firma/giris'
-    } else {
-      url.pathname = `${secretPath}/giris`
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = pathname.startsWith('/firma') ? '/firma/giris' : `${secretPath}/giris`
+      url.searchParams.set('redirectedFrom', pathname)
+      return NextResponse.redirect(url)
     }
-
-    url.searchParams.set('redirectedFrom', pathname)
-    return NextResponse.redirect(url)
+  } catch (error) {
+    console.error('[Middleware] Auth error:', error)
+    return response
   }
 
-  return supabaseResponse
+  // 🛡️ Ekstra Güvenlik Katmanı: XSS ve Clickjacking koruması
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+
+  return response
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }

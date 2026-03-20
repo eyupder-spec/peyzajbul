@@ -90,7 +90,7 @@ serve(async (req) => {
         })
         .eq("user_id", firm_user_id);
       
-      console.log(`Premium activated for user ${firm_user_id} (${plan})`);
+      console.log(`Premium activated for user ***${firm_user_id.slice(-6)} (${plan})`);
     }
   }
 

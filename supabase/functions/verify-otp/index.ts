@@ -1,9 +1,18 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://www.peyzajbul.com",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+const otpSchema = z.object({
+  email: z.string().email("Geçersiz email formatı"),
+  code: z.string().min(4, "Kod en az 4 karakter olmalı").max(10),
+  fullName: z.string().max(100).optional(),
+  phone: z.string().max(20).optional(),
+  leadId: z.string().uuid().optional(),
+});
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -11,7 +20,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { email, code, fullName, phone, leadId } = await req.json();
+    const body = otpSchema.parse(await req.json());
+    const { email, code, fullName, phone, leadId } = body;
     if (!email || !code) {
       return new Response(JSON.stringify({ error: "Email ve kod gerekli" }), {
         status: 400,

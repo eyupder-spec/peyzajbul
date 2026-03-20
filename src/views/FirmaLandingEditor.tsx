@@ -194,7 +194,7 @@ const FirmaLandingEditor = () => {
         .eq("id", firmId);
 
       if (error) throw error;
-      toast({ title: "Landing page ayarları kaydedildi!" });
+      toast({ title: "Özel sayfa ayarları kaydedildi!" });
     } catch (err: any) {
       toast({ title: "Hata", description: err.message, variant: "destructive" });
     } finally {
@@ -233,7 +233,7 @@ const FirmaLandingEditor = () => {
 
               {/* Header */}
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">Landing Page Yönetimi</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Açılış Sayfası Yönetimi</h2>
                 <p className="text-muted-foreground text-sm">
                   Premium profilinizin tam sayfa görünümünü ve içeriklerini buradan yönetin.
                 </p>
@@ -245,7 +245,7 @@ const FirmaLandingEditor = () => {
                   <Crown className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="font-semibold text-yellow-800 dark:text-yellow-300 mb-1">Premium Gerekli</p>
-                    <p className="text-sm text-yellow-700 dark:text-yellow-400/80">Landing page özelliği sadece Premium üyelere açıktır.</p>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-400/80">Özel sayfa özelliği sadece Premium üyelere açıktır.</p>
                     <Button variant="outline" size="sm" className="mt-3 border-yellow-300" onClick={() => router.push("/firma/premium")}>
                       <Crown className="h-4 w-4 mr-2" /> Premium'a Geç
                     </Button>
@@ -278,11 +278,11 @@ const FirmaLandingEditor = () => {
                         </Button>
                       </div>
                     )}
-                    <Input 
-                      type="file" 
+                    <Input
+                      type="file"
                       accept="image/*"
                       disabled={uploadingImage}
-                      onChange={(e) => handleImageUpload(e, "hero", (url) => setConfig(p => ({ ...p, hero_image: url })))} 
+                      onChange={(e) => handleImageUpload(e, "hero", (url) => setConfig(p => ({ ...p, hero_image: url })))}
                     />
                     <p className="text-xs text-muted-foreground">Önerilen: 1920x1080px (Yatay). Maksimum 2MB.</p>
                   </div>
@@ -364,11 +364,11 @@ const FirmaLandingEditor = () => {
                           </Button>
                         </div>
                       )}
-                      <Input 
-                        type="file" 
+                      <Input
+                        type="file"
                         accept="image/*"
                         disabled={uploadingImage}
-                        onChange={(e) => handleImageUpload(e, "slider", (url) => setBeforeUrl(url))} 
+                        onChange={(e) => handleImageUpload(e, "slider", (url) => setBeforeUrl(url))}
                       />
                       <p className="text-[10px] text-muted-foreground mt-1">Önerilen: 800x600px. Maks: 2MB.</p>
                     </div>
@@ -382,11 +382,11 @@ const FirmaLandingEditor = () => {
                           </Button>
                         </div>
                       )}
-                      <Input 
-                        type="file" 
+                      <Input
+                        type="file"
                         accept="image/*"
                         disabled={uploadingImage}
-                        onChange={(e) => handleImageUpload(e, "slider", (url) => setAfterUrl(url))} 
+                        onChange={(e) => handleImageUpload(e, "slider", (url) => setAfterUrl(url))}
                       />
                       <p className="text-[10px] text-muted-foreground mt-1">Önerilen: 800x600px. Maks: 2MB.</p>
                     </div>
@@ -421,11 +421,11 @@ const FirmaLandingEditor = () => {
                                 <span className="text-xs text-muted-foreground text-center p-2 block">Görsel Seç</span>
                               </div>
                             )}
-                            <Input 
-                              type="file" 
+                            <Input
+                              type="file"
                               accept="image/*"
                               disabled={uploadingImage}
-                              onChange={(e) => handleImageUpload(e, "portfolio", (url) => { const u = [...portfolioItems]; u[i].image_url = url; setPortfolioItems(u); })} 
+                              onChange={(e) => handleImageUpload(e, "portfolio", (url) => { const u = [...portfolioItems]; u[i].image_url = url; setPortfolioItems(u); })}
                               className="text-[10px] p-1 h-7 file:h-full"
                             />
                             <p className="text-[10px] text-muted-foreground mt-1">Önerilen: 800x600px. Maks: 2MB.</p>
@@ -510,7 +510,7 @@ const FirmaLandingEditor = () => {
               <Card className={`border-border ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
                 <CardContent className="pt-6 space-y-1">
                   <h3 className="font-heading font-semibold text-foreground mb-4">Bölüm Görünürlüğü</h3>
-                  <p className="text-xs text-muted-foreground mb-6">Kapalı bölümler landing page'de gösterilmez. Verisi olmayan bölümler otomatik gizlenir.</p>
+                  <p className="text-xs text-muted-foreground mb-6">Kapalı bölümler özel sayfanızda gösterilmez. Verisi olmayan bölümler otomatik gizlenir.</p>
                   <div className="divide-y divide-border">
                     {(Object.keys(SECTION_LABELS) as (keyof LandingSections)[]).map((key) => (
                       <div key={key} className="flex items-center justify-between py-3">

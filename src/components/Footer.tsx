@@ -11,8 +11,8 @@ const Footer = () => {
               <Leaf className="h-6 w-6 text-accent" />
               <span className="font-heading text-xl font-bold text-accent">Peyzajbul</span>
             </div>
-            <p className="text-sm text-primary-foreground/70 leading-relaxed">
-              Türkiye'nin en kapsamlı peyzaj firma rehberi. Projeniz için doğru firmayı bulun.
+            <p className="text-sm text-primary-foreground/70 leading-relaxed italic">
+              Hayallerinizi yeşerten profesyonellerle tanışın. Türkiye'nin en büyük peyzaj platformunda, projeniz için en doğru uzmanı saniyeler içinde bulun.
             </p>
           </div>
           <div>

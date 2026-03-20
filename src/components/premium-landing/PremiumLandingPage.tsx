@@ -489,12 +489,23 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                       </button>
                     )}
 
-                    {firm.website && (
-                      <a href={firm.website.startsWith("http") ? firm.website : `https://${firm.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><Globe className="h-5 w-5 text-primary" /></div>
-                        {firm.website.replace(/^https?:\/\//, "")}
-                      </a>
-                    )}
+                    {firm.website && (() => {
+                      let utmUrl = firm.website.startsWith("http") ? firm.website : `https://${firm.website}`;
+                      try {
+                        const urlObj = new URL(utmUrl);
+                        urlObj.searchParams.set("utm_source", "peyzajbul.com");
+                        urlObj.searchParams.set("utm_medium", "rehber");
+                        urlObj.searchParams.set("utm_campaign", "ozel_sayfa");
+                        utmUrl = urlObj.toString();
+                      } catch (e) {}
+
+                      return (
+                        <a href={utmUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><Globe className="h-5 w-5 text-primary" /></div>
+                          {firm.website.replace(/^https?:\/\//, "")}
+                        </a>
+                      );
+                    })()}
 
                     {firm.address && (
                       <div className="flex items-center gap-3 text-muted-foreground">

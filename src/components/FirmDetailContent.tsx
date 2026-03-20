@@ -438,11 +438,22 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                     <Mail className="h-4 w-4 text-primary" /> <Eye className="h-3.5 w-3.5" /> E-postayı Göster
                   </button>
                 )}
-                {firm.is_premium && firm.website && (
-                  <a href={firm.website.startsWith("http") ? firm.website : `https://${firm.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                    <Globe className="h-4 w-4 text-primary" /> {firm.website.replace(/^https?:\/\//, "")}
-                  </a>
-                )}
+                {firm.is_premium && firm.website && (() => {
+                  let utmUrl = firm.website.startsWith("http") ? firm.website : `https://${firm.website}`;
+                  try {
+                    const urlObj = new URL(utmUrl);
+                    urlObj.searchParams.set("utm_source", "peyzajbul.com");
+                    urlObj.searchParams.set("utm_medium", "rehber");
+                    urlObj.searchParams.set("utm_campaign", "profil_sayfasi");
+                    utmUrl = urlObj.toString();
+                  } catch (e) {}
+                  
+                  return (
+                    <a href={utmUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                      <Globe className="h-4 w-4 text-primary" /> {firm.website.replace(/^https?:\/\//, "")}
+                    </a>
+                  );
+                })()}
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <MapPin className="h-4 w-4 text-primary" /> {firm.city}{firm.district ? ` / ${firm.district}` : ""}
                 </div>

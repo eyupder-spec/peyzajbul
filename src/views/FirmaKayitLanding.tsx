@@ -1,24 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
-  Building2,
   MapPin,
-  Search,
   MessageSquare,
+  Globe,
   CheckCircle2,
-  UserPlus,
-  Image as ImageIcon,
+  TrendingUp,
+  Target,
+  Users,
   Briefcase,
   ChevronRight,
-  Plus,
   Sparkles,
   ArrowRight,
-  Globe,
-  PieChart
+  ShieldCheck,
+  Star,
+  Zap
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -30,91 +28,98 @@ import {
 } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 
-// Assets
-import heroImg from "@/assets/landing/hero.png";
-import growthImg from "@/assets/landing/growth.png";
-
 const FirmaKayitLanding = () => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafdfb]">
+    <div className="min-h-screen flex flex-col bg-slate-50">
       <Navbar />
 
-      <main className="flex-1 pt-20">
-        {/* HERO SECTION - REVISED */}
-        <section className="relative py-24 px-4 overflow-hidden">
-          {/* Animated Background Elements */}
-          <div className="absolute top-0 left-0 w-full h-full -z-10 overflow-hidden">
-            <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-            <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-accent/15 rounded-full blur-[100px]" />
-          </div>
-
-          <div className="container mx-auto max-w-7xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div className="text-left space-y-8 animate-fade-in">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 backdrop-blur-md border border-primary/10 text-primary shadow-sm">
-                  <Sparkles className="h-4 w-4 text-accent" />
-                  <span className="text-sm font-semibold tracking-wide uppercase">İşinizi Dijitale Taşıyın</span>
-                </div>
-
-                <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-[1.1] tracking-tight">
-                  Türkiye'nin <span className="text-primary relative inline-block">
-                    En Büyük
-                    <svg className="absolute -bottom-2 left-0 w-full h-3 text-accent/40 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-                      <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
-                    </svg>
-                  </span> <br />
-                  Peyzaj Rehberinde Yer Alın!
-                </h1>
-
-                <p className="text-xl text-muted-foreground max-w-xl leading-relaxed">
-                  Artık kartvizit devri bitti. Ayda 50.000'den fazla bahçe sahibinin hizmet aradığı dev ekosistemde markanızı konumlandırın.
-                </p>
-
-                <div className="flex flex-col sm:flex-row items-center gap-5 pt-4">
-                  <Button size="lg" className="h-16 px-10 text-lg rounded-2xl shadow-2xl shadow-primary/20 hover:scale-105 transition-all bg-primary hover:bg-primary/95 group" asChild>
-                    <Link href="/firma/giris?tab=signup" className="flex items-center gap-2">
-                      Hemen Ücretsiz Katıl
-                      <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </Button>
-                  <div className="flex -space-x-4">
-                    {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-muted flex items-center justify-center overflow-hidden">
-                        <img src={`https://i.pravatar.cc/150?u=${i + 10}`} alt="User" />
-                      </div>
-                    ))}
-                    <div className="w-12 h-12 rounded-full border-4 border-white bg-accent flex items-center justify-center text-[10px] font-bold text-accent-foreground">
-                      +350
-                    </div>
-                  </div>
-                  <span className="text-sm text-muted-foreground font-medium">350+ Profesyonel Üye</span>
-                </div>
+      <main className="flex-1 pt-16">
+        {/* HERO SECTION - REIMAGINED */}
+        <section className="relative pt-20 pb-32 overflow-hidden bg-white">
+          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-emerald-50/50 to-transparent"></div>
+          
+          <div className="container mx-auto px-4 max-w-7xl relative z-10">
+            <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 font-medium text-sm animate-fade-in">
+                <Sparkles className="h-4 w-4" />
+                <span>Peyzaj Firmaları ve Mimarlar İçin Büyüme Platformu</span>
               </div>
 
-              <div className="relative group perspective-1000">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-[2.5rem] blur-2xl -z-10 opacity-75 group-hover:opacity-100 transition-opacity" />
-                <div className="relative rounded-[2.5rem] overflow-hidden border-8 border-white shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-700 bg-white aspect-[4/3] min-h-[300px]">
-                  <Image
-                    src={heroImg}
-                    alt="Peyzaj Profesyoneli"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6 p-6 bg-white/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                        <PieChart className="h-6 w-6 text-primary" />
+              <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.1]">
+                Yeni Müşteriler Aramayı Bırakın, <br className="hidden md:block" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Müşteriler Sizi Bulsun.</span>
+              </h1>
+
+              <p className="text-xl md:text-2xl text-slate-600 max-w-2xl leading-relaxed">
+                Her ay 50.000'den fazla villa sahibi ve kurum, peyzaj projeleri için bizi ziyaret ediyor. Onların karşısına çıkan ilk firma siz olun.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto h-16 px-10 text-lg rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 transition-all hover:scale-105 group" asChild>
+                  <Link href="/firma/giris?tab=signup" className="flex items-center gap-2">
+                    Ücretsiz Profilinizi Oluşturun
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+                <div className="text-sm text-slate-500 font-medium px-4">
+                  <span className="flex items-center gap-1.5 justify-center sm:justify-start">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Kredi kartı gerekmez
+                  </span>
+                  <span className="flex items-center gap-1.5 justify-center sm:justify-start mt-1">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" /> 2 dakikada yayında
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Platform Mockup UI */}
+            <div className="mt-20 relative max-w-5xl mx-auto animate-fade-in pb-10">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-400 blur-3xl opacity-20 rounded-[3rem] -z-10 translate-y-10"></div>
+              <div className="rounded-2xl border border-slate-200/60 bg-white/80 backdrop-blur-xl shadow-2xl p-4 md:p-8">
+                <div className="grid md:grid-cols-3 gap-6">
+                  {/* Mock Lead Card */}
+                  <div className="col-span-1 border border-slate-100 rounded-xl p-5 bg-white shadow-sm flex flex-col gap-4 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                    <div className="flex justify-between items-start">
+                      <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded">Yeni Talep</span>
+                      <span className="text-slate-400 text-xs">2 dk önce</span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-800">Villa Bahçesi Tasarımı</h4>
+                      <p className="text-sm text-slate-500 mt-1 flex items-center gap-1"><MapPin className="h-3 w-3" /> İstanbul, Beykoz (450m²)</p>
+                    </div>
+                    <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+                      <span className="font-bold text-slate-800">Tahmini Bütçe:</span>
+                      <span className="font-bold text-emerald-600">High-end</span>
+                    </div>
+                  </div>
+
+                  {/* Mock Stats */}
+                  <div className="col-span-2 grid grid-cols-2 gap-4">
+                    <div className="border border-slate-100 rounded-xl p-5 bg-white shadow-sm flex flex-col justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
+                        <Users className="h-5 w-5 text-blue-600" />
                       </div>
-                      <div>
-                        <div className="text-sm font-bold text-foreground">Aylık Raporunuz Hazır</div>
-                        <div className="text-xs text-muted-foreground">Geçen aya göre %24 daha fazla trafik.</div>
+                      <p className="text-sm text-slate-500 font-medium">Bu Ayki Profil Ziyareti</p>
+                      <div className="flex items-end gap-2 mt-1">
+                        <span className="text-3xl font-black text-slate-800">1,248</span>
+                        <span className="text-xs text-emerald-600 font-bold mb-1 flex items-center"><TrendingUp className="h-3 w-3 mr-0.5" /> +24%</span>
+                      </div>
+                    </div>
+                    <div className="border border-slate-100 rounded-xl p-5 bg-white shadow-sm flex flex-col justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
+                        <Star className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <p className="text-sm text-slate-500 font-medium">Bölge Sıralamanız</p>
+                      <div className="flex items-end gap-2 mt-1">
+                        <span className="text-3xl font-black text-slate-800">1.</span>
+                        <span className="text-xs text-slate-500 font-bold mb-1 flex items-center"> / 42 Firma</span>
                       </div>
                     </div>
                   </div>
@@ -124,166 +129,184 @@ const FirmaKayitLanding = () => {
           </div>
         </section>
 
-        {/* FEATURES - GLASSMORPHISM */}
-        <section className="py-32 px-4 relative bg-[#f1f6f3]">
-          <div className="container mx-auto max-w-7xl">
-            <div className="text-center mb-20 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">İşinizi Büyütmenin Akıllı Yolu</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-                Geleneksel reklamlarla bütçenizi yakmayın. İhtiyacı olan müşteriye, ihtiyacı olduğu anda görünün.
-              </p>
+        {/* LOGO CLOUD */}
+        <section className="py-10 border-y border-slate-200 bg-white">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-6">Türkiye'nin En İyi Peyzaj Firmaları Bizi Tercih Ediyor</p>
+            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale">
+               {/* Güven simgeleri / Sembolik logolar */}
+               <div className="flex items-center gap-2 text-xl font-bold font-serif"><LeafIcon /> Doğa Mimarlık</div>
+               <div className="flex items-center gap-2 text-xl font-bold"><ShieldCheck /> Güven Peyzaj</div>
+               <div className="flex items-center gap-2 text-xl font-bold font-sans tracking-tight"><Target /> Vizyon Tasarım</div>
+               <div className="flex items-center gap-2 text-xl font-bold"><Zap /> Elite Bahçe</div>
+            </div>
+          </div>
+        </section>
+
+        {/* VALUE PROPOSITION: THE PROBLEM VS SOLUTION */}
+        <section className="py-24 bg-slate-50 overflow-hidden">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
+                  Sosyal medya reklamlarında bütçenizi yakmaya <span className="text-red-500">son verin.</span>
+                </h2>
+                <p className="text-lg text-slate-600 leading-relaxed">
+                  Instagram'da beğeni toplamak faturaları ödemez. Ajanslara her ay binlerce lira ödemek yerine, sadece <strong>gerçekten iş arayan</strong>, projesi hazır müşterilerle eşleşin.
+                </p>
+                <ul className="space-y-4 pt-4">
+                  {[
+                    "Sıcak müşteri: Size gelen talepler, tam şu an hizmet arayan kişilerden gelir.",
+                    "Sıfır sabit ücret: Aidat yok, komisyon yok. Sadece beğendiğiniz müşterinin iletişim bilgisini almak için jeton harcarsınız.",
+                    "Haksız rekabet yok: Ev sahibi, projesiyle eşleşen en fazla 3 profesyonelden teklif alabilir."
+                  ].map((item, i) => (
+                    <li key={i} className="flex gap-3 text-slate-700">
+                      <CheckCircle2 className="h-6 w-6 text-emerald-500 shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-0 bg-emerald-500 transform rotate-3 rounded-3xl opacity-10"></div>
+                <div className="bg-white border border-slate-200 rounded-3xl p-8 relative shadow-xl">
+                  <h3 className="text-xl font-bold text-slate-900 mb-6">Acı Gerçekler vs. Yeni Nesil Model</h3>
+                  
+                  <div className="space-y-6">
+                    <div className="p-4 bg-red-50 rounded-xl border border-red-100">
+                      <div className="text-red-800 font-semibold mb-2 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-red-500"></div> Geleneksel Reklamlar</div>
+                      <p className="text-sm text-red-600/80">Yüksek maliyet, "Sadece fiyat soruyorum" diyen alakasız kitle, ölçülemeyen yatırım getirisi.</p>
+                    </div>
+                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                      <div className="text-emerald-800 font-semibold mb-2 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> Peyzajbul Modeli</div>
+                      <p className="text-sm text-emerald-700/80">Tamamen 무료 profil, sadece detayları verilmiş yüksek niyetli iş taleplerine ödeme, %100 ölçülebilir kazanç.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* HOW IT WORKS */}
+        <section className="py-24 bg-white">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="text-center mb-16 max-w-2xl mx-auto">
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">Nasıl Çalışır?</h2>
+              <p className="text-lg text-slate-600">Üç basit adımda hayalinizdeki projeleri almaya başlayın.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-8">
               {[
                 {
-                  title: "Nokta Atışı Lokasyon",
-                  desc: "Müşteriler kapı komşunuz bile olsa, sizi bulamıyorlarsa yoksundur. Biz sizi sokağınızda görünür yapıyoruz.",
-                  icon: MapPin,
-                  gradient: "from-blue-500 to-indigo-600",
-                  bg: "bg-blue-50"
+                  step: "1",
+                  title: "Vitrininizi Kurun",
+                  desc: "Dakikalar içinde firmanızı kaydedin. Hizmet bölgelerinizi, uzmanlık alanlarınızı ve en iyi projelerinizi portfolyonuza ekleyin.",
+                  icon: Briefcase
                 },
                 {
-                  title: "Google'da İlk Sırada",
-                  desc: "Sizin yerinize biz rekabet ediyoruz. 'İstanbul Peyzaj' aramasında dev bütçeli firmaların yanına adınızı yazıyoruz.",
-                  icon: Globe,
-                  gradient: "from-emerald-500 to-teal-600",
-                  bg: "bg-emerald-50"
+                  step: "2",
+                  title: "Bildirimleri Alın",
+                  desc: "Bölgenizde ve uzmanlık alanınızda yeni bir proje talebi (havuz, çim serme, tasarım vb.) olduğunda anında cebinize bildirim gelsin.",
+                  icon: Target
                 },
                 {
-                  title: "Karar Verici Yorumlar",
-                  desc: "Yeteneklerinizi biz anlatmayalım, mutlu müşterileriniz anlatsın. Güçlü bir profil, en iyi satış temsilcinizdir.",
-                  icon: MessageSquare,
-                  gradient: "from-amber-500 to-orange-600",
-                  bg: "bg-amber-50"
+                  step: "3",
+                  title: "Teklif Verin & İşin Sahibi Olun",
+                  desc: "Müşterinin detaylı isteklerine bakın, uygunsa iletişim bilgilerini açıp doğrudan görüşün. Komisyon ödemeden işi bağlayın.",
+                  icon: TrendingUp
                 }
-              ].map((item, i) => (
-                <div key={i} className="group relative">
-                  <div className="absolute inset-0 bg-white rounded-3xl -z-10 shadow-sm border border-black/5" />
-                  <div className="p-10 space-y-6">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
-                      <item.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold">{item.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed text-lg">
-                      {item.desc}
-                    </p>
+              ].map((feature, i) => (
+                <div key={i} className="relative p-8 rounded-3xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-2xl hover:shadow-emerald-500/5 transition-all duration-300 group">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                    <feature.icon className="h-8 w-8" />
                   </div>
+                  <div className="absolute top-8 right-8 text-6xl font-black text-slate-100 group-hover:text-emerald-50/50 transition-colors pointer-events-none">
+                    {feature.step}
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
+                  <p className="text-slate-600 leading-relaxed relative z-10">{feature.desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* HOW IT WORKS - ILLUSTRATED */}
-        <section className="py-32 px-4 bg-white overflow-hidden">
-          <div className="container mx-auto max-w-7xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-              <div className="relative order-2 lg:order-1">
-                <Image
-                  src={growthImg}
-                  alt="Growth Illustration"
-                  className="w-full h-auto drop-shadow-[0_35px_35px_rgba(34,197,94,0.15)]"
-                />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/5 rounded-full -z-10 blur-3xl" />
+        {/* PRICING (PAY PER LEAD CONCEPT) */}
+        <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/20 rounded-full blur-[120px] pointer-events-none"></div>
+          
+          <div className="container mx-auto px-4 max-w-4xl relative z-10 text-center">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">Sürpriz Ücret Yok. Kayıt Ücreti Yok.</h2>
+            <p className="text-xl text-slate-300 md:text-2xl mb-12 font-light">
+              Müşteri getirmezsek, para kazanmıyoruz. <br className="hidden md:block"/> Sadece ilgilendiğiniz projeler için ödeme yaparsınız.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8 text-left">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-8 flex flex-col">
+                <h3 className="text-2xl font-bold mb-2">Standart Profil</h3>
+                <div className="text-4xl font-black text-emerald-400 mb-6 flex items-baseline gap-1">0₺ <span className="text-base text-slate-400 font-normal">/ay</span></div>
+                <ul className="space-y-3 mb-8 flex-1">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400" /> Şehir rehberinde listelenme</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400" /> Sınırsız proje (portfolyo) yükleme</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400" /> Müşteri yorumları alma</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400" /> Talep havuzuna erişim</li>
+                </ul>
+                <Button variant="outline" className="w-full h-12 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300" asChild>
+                   <Link href="/firma/giris?tab=signup">Ücretsiz Katıl</Link>
+                </Button>
               </div>
 
-              <div className="space-y-12 order-1 lg:order-2">
-                <div className="space-y-4">
-                  <h2 className="text-4xl md:text-5xl font-bold leading-tight">Sadece 5 Dakikada <br />Yayına Hazırsınız</h2>
-                  <p className="text-xl text-muted-foreground leading-relaxed">
-                    Teknik detaylarla uğraşmanıza gerek yok. Biz her şeyi sizin için kurduk, size sadece yönetmek kaldı.
-                  </p>
-                </div>
-
-                <div className="space-y-10">
-                  {[
-                    {
-                      step: "01",
-                      title: "Profilini Kişiselleştir",
-                      desc: "Hizmet alanlarını seç, referans projelerini yükle. Profesyonel imajını dakikalar içinde oluştur.",
-                    },
-                    {
-                      step: "02",
-                      title: "Talepleri Takip Et",
-                      desc: "Sana özel panelden gelen aramaları ve mesajları izle. Müşteri davranışlarını analiz et.",
-                    },
-                    {
-                      step: "03",
-                      title: "İşini Büyüt",
-                      desc: "Doğrudan müşteriye ulaş, aracıları ortadan kaldır. Kazancının %100'ü sende kalsın.",
-                    }
-                  ].map((item, i) => (
-                    <div key={i} className="flex gap-8 group">
-                      <div className="flex-shrink-0 w-16 h-16 rounded-3xl bg-primary/5 border border-primary/10 flex items-center justify-center font-bold text-2xl text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                        {item.step}
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="text-2xl font-bold text-foreground">{item.title}</h4>
-                        <p className="text-lg text-muted-foreground leading-relaxed">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl border border-emerald-400 p-8 shadow-2xl flex flex-col transform md:-translate-y-4 relative">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-950 text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full">Yeni Firmalara Özel</div>
+                <h3 className="text-2xl font-bold mb-2">Başlangıç Hediyesi</h3>
+                <div className="text-4xl font-black text-white mb-6">Bedava <span className="text-base text-emerald-100 font-normal">jetonlar</span></div>
+                <ul className="space-y-3 mb-8 flex-1 text-emerald-50">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white" /> Sisteme kayıt olan tüm firmalara</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white" /> İlk müşterilerini bulmaları için</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white" /> Hoş geldin jeton bakiyesi tanımlanır</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white" /> Risksiz deneme fırsatı</li>
+                </ul>
+                <Button className="w-full h-12 bg-white text-emerald-700 hover:bg-slate-100 font-bold" asChild>
+                   <Link href="/firma/giris?tab=signup">Hediyeni Al ve Başla</Link>
+                </Button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* STATS - LIGHT CARD */}
-        <section className="py-24 px-4 bg-[#f1f6f3]">
-          <div className="container mx-auto max-w-7xl">
-            <div className="relative rounded-3xl md:rounded-[3rem] overflow-hidden p-6 sm:p-8 md:p-12 lg:p-20 shadow-xl bg-white border border-primary/5">
-              <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/leaf.png')] opacity-[0.03] pointer-events-none" />
-              
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 text-center">
-                {[
-                  { v: "50.000+", l: "Aylık Ziyaretçi" },
-                  { v: "81", l: "İl Kapsamı" },
-                  { v: "4.500+", l: "Eşleşme" },
-                  { v: "350+", l: "Aktif Profesyonel" }
-                ].map((stat, i) => (
-                  <div key={i} className="space-y-1 md:space-y-2 flex flex-col items-center justify-center">
-                    <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-accent tracking-tighter drop-shadow-sm whitespace-nowrap">{stat.v}</div>
-                    <div className="text-muted-foreground font-bold uppercase tracking-wider md:tracking-[0.2em] text-[10px] sm:text-xs md:text-sm text-balance">{stat.l}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ - CLEAN */}
-        <section className="py-32 px-4 bg-[#fafdfb]">
-          <div className="container mx-auto max-w-4xl">
-            <div className="text-center mb-16 space-y-4">
-              <h2 className="text-4xl font-bold">Aklınıza Takılanlar</h2>
-              <p className="text-muted-foreground text-lg">Platform hakkında daha fazla bilgi edinin.</p>
+        {/* FAQ */}
+        <section className="py-24 px-4 bg-slate-50">
+          <div className="container mx-auto max-w-3xl">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Sıkça Sorulan Sorular</h2>
             </div>
 
             {mounted && (
               <Accordion type="single" collapsible className="space-y-4">
                 {[
                   {
-                    q: "Kayıt olmak gerçekten ücretsiz mi?",
-                    a: "Evet, temel profilinizi oluşturup listelenmek tamamen ücretsizdir. Herhangi bir kart bilgisi gerekmez."
+                    q: "Kayıt olmak ücretli mi?",
+                    a: "Hayır. Profil oluşturmak, portfolyo yüklemek ve bölge/kategori aramalarında listelenmek tamamen ücretsizdir. Hiçbir zaman sürpriz bir fatura ile karşılaşmazsınız."
                   },
                   {
-                    q: "Müşterilerle nasıl iletişim kuracağım?",
-                    a: "Müşteriler profilinizdeki onaylı telefon numaranızdan sizi arayabilir veya sistem üzerinden mesaj bırakabilirler."
+                    q: "Peki siz nasıl para kazanıyorsunuz?",
+                    a: "Sistem, ön ödemeli 'Jeton' mantığıyla çalışır. Eğer müşteri doğrudan sizi aramaz da sisteme genel bir talep bırakırsa (örn: 'İstanbul'da 200m2 rulo çim yaptırmak istiyorum'), bu talebin telefon numarasına erişmek için ufak bir miktar jeton harcarsınız. İlgilenmediğiniz işlere para ödemezsiniz."
                   },
                   {
-                    q: "Komisyon ödüyor muyum?",
-                    a: "Hayır. Aldığınız işlerden platforma herhangi bir komisyon ödemezsiniz. Tüm kazanç iş ortaklarımızın olur."
+                    q: "Kazancımdan komisyon kesiliyor mu?",
+                    a: "Kesinlikle hayır. Biz aracı değil, sizi müşteriyle buluşturan bir köprüyüz. İşi aldıktan sonra sözleşme, ödeme ve süreç tamamen sizinle müşteri arasındadır."
                   },
                   {
-                    q: "Hizmet alanımı sonradan değiştirebilir miyim?",
-                    a: "Elbette. Admin paneliniz üzerinden hizmet verdiğiniz bölgeleri, kategorileri ve portfolyonuzu saniyeler içinde güncelleyebilirsiniz."
+                    q: "Müşterinin numarasını alınca işi kesin almış mı oluyorum?",
+                    a: "Hayır, numarayı alan firma müşteriye teklifini sunar. İşi almak sizin satıcılığınıza, sunduğunuz projeye ve fiyatlandırmanıza bağlıdır. Ancak biz sadece doğrulanmış ve yüksek niyetli talepleri sisteme düşürüyoruz."
                   }
                 ].map((item, i) => (
-                  <AccordionItem key={i} value={`item-${i}`} className="bg-white border border-black/5 rounded-2xl px-6 py-2 shadow-sm">
-                    <AccordionTrigger className="text-lg font-bold hover:no-underline hover:text-primary transition-colors">{item.q}</AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground text-lg leading-relaxed pt-2">
+                  <AccordionItem key={i} value={`faq-${i}`} className="bg-white border-none rounded-2xl shadow-sm px-6">
+                    <AccordionTrigger className="text-lg font-bold text-slate-800 hover:no-underline py-6">
+                      {item.q}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-slate-600 text-base leading-relaxed pb-6">
                       {item.a}
                     </AccordionContent>
                   </AccordionItem>
@@ -293,30 +316,17 @@ const FirmaKayitLanding = () => {
           </div>
         </section>
 
-        {/* FINAL CTA - VIBRANT */}
-        <section className="py-20 px-4 mb-20">
-          <div className="container mx-auto max-w-7xl">
-            <div className="relative rounded-[3rem] bg-accent p-12 md:p-24 text-center overflow-hidden shadow-2xl">
-              <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/20 rounded-full blur-[80px]" />
-              <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/15 rounded-full blur-[80px]" />
-
-              <div className="relative z-10 space-y-8 max-w-3xl mx-auto">
-                <h2 className="text-4xl md:text-6xl font-bold text-accent-foreground leading-tight">Peyzaj Sektörünün Dijital <br />Geleceğinde Yerinizi Alın</h2>
-                <p className="text-xl text-accent-foreground/80 leading-relaxed font-medium">
-                  Rakipleriniz burada, müşterileriniz ise sizi arıyor. Bugün kaydolun, bölgenizin en çok tercih edilen firması olun.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
-                  <Button size="lg" className="h-16 px-12 text-xl rounded-2xl shadow-xl hover:scale-105 transition-all bg-primary hover:bg-primary/90 text-white border-none group" asChild>
-                    <Link href="/firma/giris?tab=signup" className="flex items-center gap-3">
-                      Hemen Ücretsiz Başla
-                      <ChevronRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </Button>
-                  <span className="text-accent-foreground/60 font-semibold italic">Kayıt Süresi: ~2 Dakika</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* BOTTOM CTA */}
+        <section className="py-20 px-4 bg-white border-t border-slate-100">
+           <div className="container mx-auto max-w-4xl text-center">
+             <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">Bölgenizdeki projeleri rakiplerinize kaptırmayın.</h2>
+             <p className="text-xl text-slate-600 mb-10">2 dakikada profilinizi oluşturun, yeni müşterilerle tanışın.</p>
+             <Button size="lg" className="h-16 px-12 text-xl rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 transition-transform hover:scale-105" asChild>
+               <Link href="/firma/giris?tab=signup">
+                 Hemen Profilinizi Oluşturun
+               </Link>
+             </Button>
+           </div>
         </section>
       </main>
 
@@ -325,21 +335,9 @@ const FirmaKayitLanding = () => {
   );
 };
 
-// Missing icon fix
-const TrendingUpIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-    <polyline points="17 6 23 6 23 12"></polyline>
-  </svg>
+// Generic Leaf Icon for logo cloud
+const LeafIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
 );
 
 export default FirmaKayitLanding;

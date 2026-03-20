@@ -27,7 +27,7 @@ import {
 const FIRMA_MENU = [
   { title: "Özet", key: "panel", icon: FileText, path: "/firma/panel" },
   { title: "Profil", key: "profil", icon: Crown, path: "/firma/profil" },
-  { title: "Landing Page", key: "landing", icon: FileText, path: "/firma/landing" },
+  { title: "Özel Sayfa", key: "landing", icon: FileText, path: "/firma/landing" },
   { title: "Leadler", key: "leadler", icon: Users, path: "/firma/leadler" },
   { title: "Jeton Yükle", key: "jeton", icon: Coins, path: "/firma/jeton" },
   { title: "Premium", key: "premium", icon: Crown, path: "/firma/premium" },
@@ -493,7 +493,7 @@ const FirmaProfil = () => {
                     className="w-full gap-2 bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-950 border-0 hover:from-amber-300 hover:to-yellow-500 shadow-sm" 
                     onClick={() => router.push(form.is_premium ? "/firma/landing" : "/firma/premium")}
                   >
-                    <Crown className="h-4 w-4" /> {form.is_premium ? "Landing Page Ayarlarına Git" : "Premium'a Geç"}
+                    <Crown className="h-4 w-4" /> {form.is_premium ? "Özel Sayfa Ayarlarına Git" : "Premium'a Geç"}
                   </Button>
                 </CardContent>
               </Card>

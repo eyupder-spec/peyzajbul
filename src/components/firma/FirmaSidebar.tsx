@@ -13,11 +13,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Users, Coins, Crown, Image, FileText, FolderKanban } from "lucide-react";
+import { Users, Coins, Crown, Image, FileText, FolderKanban, Layout } from "lucide-react";
 
 export const FIRMA_MENU = [
   { title: "Özet", key: "panel", icon: FileText, path: "/firma/panel" },
   { title: "Profil", key: "profil", icon: FileText, path: "/firma/profil" },
+  { title: "Landing Page", key: "landing", icon: Layout, path: "/firma/landing" },
   { title: "Leadler", key: "leadler", icon: Users, path: "/firma/leadler" },
   { title: "Jeton Yükle", key: "jeton", icon: Coins, path: "/firma/jeton" },
   { title: "Premium", key: "premium", icon: Crown, path: "/firma/premium" },

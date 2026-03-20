@@ -57,13 +57,14 @@ type Lead = {
   irrigation_system?: string | null;
   water_source?: string | null;
   photo_urls?: string[] | null;
+  total_purchases?: number | null;
 };
 
 const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
-  if (count === 0) return { text: "Henüz teklif yok — tam zamanı!", icon: "✅", className: "text-emerald-600 bg-emerald-50 border-emerald-200" };
-  if (count === 1) return { text: "1 firma teklif verdi — acele edin!", icon: "⚡", className: "text-amber-600 bg-amber-50 border-amber-200" };
-  if (count === 2) return { text: "2 firma teklif verdi — son şans!", icon: "🔥", className: "text-red-600 bg-red-50 border-red-200" };
-  return { text: "3 firma teklif verdi — kapasite doldu!", icon: "🚫", className: "text-muted-foreground bg-muted border-border opacity-70" };
+  if (count === 0) return { text: "Henüz kimse almadı — ilk siz ulaşın!", icon: "✅", className: "text-emerald-600 bg-emerald-50 border-emerald-200" };
+  if (count === 1) return { text: "1 firma satın aldı — hemen alın!", icon: "⚡", className: "text-amber-600 bg-amber-50 border-amber-200" };
+  if (count === 2) return { text: "2 firma satın aldı — son şans!", icon: "🔥", className: "text-red-600 bg-red-50 border-red-200" };
+  return { text: "3 firma satın aldı — kapasite doldu!", icon: "🚫", className: "text-muted-foreground bg-muted border-border opacity-70" };
 };
 
 const maskName = (name: string) => {
@@ -115,6 +116,8 @@ const FirmaPanel = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState("");
+  const [firmId, setFirmId] = useState("");
   const [stats, setStats] = useState({ totalLeads: 0, purchased: 0, coinBalance: 0 });
   const [firmName, setFirmName] = useState("");
   const [isFirmPremium, setIsFirmPremium] = useState(false);
@@ -123,11 +126,10 @@ const FirmaPanel = () => {
   const [leadPurchaseCounts, setLeadPurchaseCounts] = useState<Record<string, number>>({});
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [purchasing, setPurchasing] = useState(false);
-  const [userId, setUserId] = useState("");
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   // Realtime browser + sound notifications
-  useLeadNotifications(userId || null, () => {
+  useLeadNotifications(firmId || null, () => {
     // Refresh leads on new lead
     const refreshLeads = async () => {
       const { data: leadsData } = await supabase
@@ -156,12 +158,12 @@ const FirmaPanel = () => {
 
       const { data: firmData } = await supabase
         .from("firms")
-        .select("is_approved, coin_balance, is_premium, premium_until, company_name")
+        .select("id, is_approved, coin_balance, is_premium, premium_until, company_name")
         .eq("user_id", user.id)
         .single();
 
       if (!firmData?.is_approved) { router.push("/firma/giris"); return; }
-      setFirmName(firmData.company_name);
+      setFirmId(firmData.id);
       setIsFirmPremium(firmData.is_premium || false);
 
       // Fetch leads
@@ -198,8 +200,38 @@ const FirmaPanel = () => {
         coinBalance: firmData.coin_balance || 0,
       });
       setLoading(false);
+
+      // Supabase Realtime Subscription for FOMO updates
+      const channel = supabase
+        .channel("firm-realtime-purchases")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "lead_purchases" },
+          (payload) => {
+            const newPurchase = payload.new as any;
+            setLeadPurchaseCounts(prev => ({ 
+              ...prev, 
+              [newPurchase.lead_id]: (prev[newPurchase.lead_id] || 0) + 1 
+            }));
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     };
-    checkAccess();
+    
+    // We only call checkAccess without returning its cleanup because useEffect async cannot return a cleanup directly.
+    // Instead we handle cleanup inside standard useEffect pattern.
+    let cleanupFn: (() => void) | undefined;
+    checkAccess().then(cleanup => {
+      cleanupFn = cleanup;
+    });
+    
+    return () => {
+      if (cleanupFn) cleanupFn();
+    };
   }, [router]);
 
   const handlePurchase = async (leadId: string) => {
@@ -330,7 +362,7 @@ const FirmaPanel = () => {
                     <HelpCircle className="h-4 w-4" /> Henüz gerçek bir talep almadınız. Aşağıda sistemin nasıl çalıştığını görmeniz için bir <strong>Örnek Talep</strong> oluşturulmuştur.
                   </p>
                 </div>
-                
+
                 {/* Desktop table demo */}
                 <div className="hidden lg:block" id="tour-lead-table">
                   <div className="rounded-lg border border-border overflow-hidden opacity-80">

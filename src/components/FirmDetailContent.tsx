@@ -22,7 +22,7 @@ interface FirmDetailContentProps {
 
 const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailContentProps) => {
   const params = useParams();
-  
+
   // React 19 / Next.js 15 async params unwrapping logic
   // If slug is passed as prop (from page.tsx), use it. Try to unwrap from params safely if not.
   const unwrappedParams = params ? (params as any) : {};
@@ -54,7 +54,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
     queryKey: ["firm-detail-slug", slug],
     queryFn: async () => {
       const firmId = slug ? extractFirmIdFromSlug(slug) : "";
-      
+
       // First try by slug
       let query = supabase
         .from("firms")
@@ -85,10 +85,18 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
     enabled: !!slug,
   });
 
-  const { data: gallery } = useFirmGallery(firm?.id || "");
+  const { data: galleryData } = useFirmGallery(firm?.id || "");
   const { data: reviews } = useFirmReviews(firm?.id || "");
   const { data: projectsData } = useFirmProjects(firm?.id || "");
-  const projects = projectsData as any[] | undefined;
+
+  const OLD_SUPABASE_HOST = "tfydaaxgaomdvthclcse.supabase.co";
+  const isOldUrl = (url?: string | null) => url?.includes(OLD_SUPABASE_HOST);
+
+  const gallery = (galleryData || []).filter(img => !isOldUrl(img.image_url));
+  const projects = (projectsData as any[] | undefined)?.map(p => ({
+    ...p,
+    cover_image: isOldUrl(p.cover_image) ? null : p.cover_image
+  }));
 
   if (isLoading) {
     return <div className="flex-1 flex items-center justify-center min-h-[400px]"><p className="text-muted-foreground">Yükleniyor...</p></div>;
@@ -102,6 +110,11 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
       </div>
     );
   }
+
+  const filteredLogoUrl = isOldUrl(firm.logo_url) ? null : firm.logo_url;
+  const filteredBeforeUrl = isOldUrl((firm as any).before_after?.before) ? null : (firm as any).before_after?.before;
+  const filteredAfterUrl = isOldUrl((firm as any).before_after?.after) ? null : (firm as any).before_after?.after;
+  const filteredPortfolio = ((firm as any).portfolio_items as any[] ?? []).filter(p => !isOldUrl(p.image_url));
 
   const citySlug = getCitySlug(firm.city);
   const avgRating = reviews && reviews.length > 0
@@ -161,7 +174,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
             {firm.is_premium && (firm as any).trust_badges && (firm as any).trust_badges.length > 0 && (
               <div className="bg-card rounded-lg border border-border p-4">
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                  {((firm as any).trust_badges as {icon: string; label: string}[]).map((b, i) => (
+                  {((firm as any).trust_badges as { icon: string; label: string }[]).map((b, i) => (
                     <span
                       key={i}
                       className="flex-shrink-0 flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap"
@@ -201,7 +214,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                   <span className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded">Sonra</span>
                   <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-xl" style={{ left: `${sliderPos}%` }}>
                     <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-foreground">
-                      <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2}><path d="M8 9l-3 3 3 3M16 9l3 3-3 3"/></svg>
+                      <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2}><path d="M8 9l-3 3 3 3M16 9l3 3-3 3" /></svg>
                     </div>
                   </div>
                 </div>
@@ -213,9 +226,9 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
               <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
                 <h2 className="font-heading text-xl font-semibold text-foreground mb-4">Tamamlanan Projeler</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {((firm as any).portfolio_items as {image_url: string; title: string; location?: string; date?: string}[]).slice(0, 6).map((p, i) => (
-                    <button 
-                      key={i} 
+                  {((firm as any).portfolio_items as { image_url: string; title: string; location?: string; date?: string }[]).slice(0, 6).map((p, i) => (
+                    <button
+                      key={i}
                       className="group relative aspect-[4/3] rounded-xl overflow-hidden text-left shadow-sm hover:shadow-md transition-shadow"
                       onClick={() => setSelectedImage(p.image_url)}
                     >
@@ -272,7 +285,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                         <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">{p.title}</h3>
                         {p.description && <p className="text-sm text-muted-foreground line-clamp-2 mt-1 flex-1">{p.description}</p>}
                         <div className="flex items-center text-xs text-muted-foreground mt-3 pt-3 border-t border-border/50 gap-1.5">
-                           <MapPin className="h-3 w-3" /> {p.city}
+                          <MapPin className="h-3 w-3" /> {p.city}
                         </div>
                       </div>
                     </Link>
@@ -392,7 +405,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
               <div className="bg-card rounded-lg border border-border p-6">
                 <h2 className="font-heading text-xl font-semibold text-foreground mb-4">Sık Sorulan Sorular</h2>
                 <Accordion type="single" collapsible className="space-y-1">
-                  {((firm as any).faq_items as {question: string; answer: string}[]).map((faq, i) => (
+                  {((firm as any).faq_items as { question: string; answer: string }[]).map((faq, i) => (
                     <AccordionItem key={i} value={`faq-${i}`} className="border border-border rounded-lg px-4">
                       <AccordionTrigger className="text-sm font-medium text-left">{faq.question}</AccordionTrigger>
                       <AccordionContent className="text-sm text-muted-foreground">{faq.answer}</AccordionContent>
@@ -474,7 +487,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                 </Button>
               </a>
             </div>
-            
+
             {!firm.is_claimed && (
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 space-y-4">
                 <h3 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">

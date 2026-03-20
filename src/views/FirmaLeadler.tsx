@@ -50,13 +50,14 @@ type Lead = {
   irrigation_system?: string | null;
   water_source?: string | null;
   photo_urls?: string[] | null;
+  total_purchases?: number | null;
 };
 
 const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
-  if (count === 0) return { text: "Henüz teklif yok — tam zamanı!", icon: "✅", className: "text-emerald-600 bg-emerald-50 border-emerald-200" };
-  if (count === 1) return { text: "1 firma teklif verdi — acele edin!", icon: "⚡", className: "text-amber-600 bg-amber-50 border-amber-200" };
-  if (count === 2) return { text: "2 firma teklif verdi — son şans!", icon: "🔥", className: "text-red-600 bg-red-50 border-red-200" };
-  return { text: "3 firma teklif verdi — kapasite doldu!", icon: "🚫", className: "text-muted-foreground bg-muted border-border opacity-70" };
+  if (count === 0) return { text: "Henüz kimse almadı — ilk siz ulaşın!", icon: "✅", className: "text-emerald-600 bg-emerald-50 border-emerald-200" };
+  if (count === 1) return { text: "1 firma satın aldı — hemen alın!", icon: "⚡", className: "text-amber-600 bg-amber-50 border-amber-200" };
+  if (count === 2) return { text: "2 firma satın aldı — son şans!", icon: "🔥", className: "text-red-600 bg-red-50 border-red-200" };
+  return { text: "3 firma satın aldı — kapasite doldu!", icon: "🚫", className: "text-muted-foreground bg-muted border-border opacity-70" };
 };
 
 const maskName = (name: string) => {
@@ -157,8 +158,41 @@ const FirmaLeadlerContent = () => {
       setLeadPurchaseCounts(counts);
 
       setLoading(false);
+
+      // Supabase Realtime Subscription
+      const channel = supabase
+        .channel("firm-leadler-realtime")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "leads" },
+          () => {
+            fetchData(); // Yeni lead gelirse vb listeyi tazele
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "lead_purchases" },
+          (payload) => {
+            const newPurchase = payload.new as any;
+            setLeadPurchaseCounts(prev => ({ 
+              ...prev, 
+              [newPurchase.lead_id]: (prev[newPurchase.lead_id] || 0) + 1 
+            }));
+            fetchData(); // Satın alım olduğunda görünüm de güncellensin
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     };
-    fetchData();
+    
+    let cleanupFn: (() => void) | undefined;
+    fetchData().then(cleanup => { cleanupFn = cleanup; });
+    return () => {
+      if (cleanupFn) cleanupFn();
+    };
   }, [router]);
 
   const handlePurchase = async (leadId: string) => {
@@ -290,8 +324,8 @@ const FirmaLeadlerContent = () => {
                               <Button size="sm" variant="outline" onClick={() => setSelectedLead(lead)}>
                                 <Eye className="h-4 w-4 mr-1" /> Önizle
                               </Button>
-                              <Button size="sm" onClick={() => handlePurchase(lead.id)} disabled={purchasing}>
-                                <Coins className="h-4 w-4 mr-1" /> 20 Jeton
+                              <Button size="sm" onClick={() => handlePurchase(lead.id)} disabled={purchasing || (leadPurchaseCounts[lead.id] || 0) >= 3}>
+                                <Coins className="h-4 w-4 mr-1" /> {(leadPurchaseCounts[lead.id] || 0) >= 3 ? "Tükendi" : "20 Jeton"}
                               </Button>
                             </div>
                           )}
@@ -356,8 +390,16 @@ const FirmaLeadlerContent = () => {
           </div>
 
           {leads.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground">Henüz lead bulunmuyor.</p>
+            <div className="text-center py-16 space-y-4">
+              <div className="text-4xl">🔍</div>
+              <h3 className="text-lg font-semibold text-foreground">Henüz eşleşen lead bulunmuyor</h3>
+              <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                Profilinizde kayıtlı il ve hizmetlerinizle eşleşen yeni talepler geldiğinde burada görünecek.
+                Hizmetlerinizi veya ilinizi güncellemek için profil sayfanızı ziyaret edin.
+              </p>
+              <Button variant="outline" onClick={() => router.push("/firma/profil")} className="gap-2">
+                Profili Düzenle
+              </Button>
             </div>
           )}
         </div>

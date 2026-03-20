@@ -4,9 +4,9 @@ import { useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-const NOTIFICATION_SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
+const NOTIFICATION_SOUND_URL = "https://actions.google.com/sounds/v1/controls/bell_ding_drop.ogg";
 
-export function useLeadNotifications(userId: string | null, onNewLead?: () => void) {
+export function useLeadNotifications(firmId: string | null, onNewLead?: () => void) {
   const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const permissionRef = useRef<NotificationPermission>("default");
@@ -26,19 +26,21 @@ export function useLeadNotifications(userId: string | null, onNewLead?: () => vo
   // Preload audio
   useEffect(() => {
     audioRef.current = new Audio(NOTIFICATION_SOUND_URL);
-    audioRef.current.volume = 0.5;
+    audioRef.current.volume = 1.0; // Sesi maksimuma alalım
   }, []);
 
   const playSound = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
+      audioRef.current.play().catch((err) => {
+        console.warn("Otomatik oynatma tarayıcı tarafından engellenmiş olabilir. Kullanıcının önce sayfada bir yere tıklaması gerekir:", err);
+      });
     }
   }, []);
 
   const showBrowserNotification = useCallback((serviceType: string, city: string) => {
     if ("Notification" in window && permissionRef.current === "granted") {
-      new Notification("🔔 Yeni Lead!", {
+      new Notification("🔔 Yeni Potansiyel Müşteri!", {
         body: `${serviceType} - ${city} bölgesinden yeni bir talep geldi!`,
         icon: "/favicon.ico",
         tag: "new-lead",
@@ -47,25 +49,25 @@ export function useLeadNotifications(userId: string | null, onNewLead?: () => vo
   }, []);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!firmId) return;
 
     const channel = supabase
       .channel("leads-realtime")
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "UPDATE",
           schema: "public",
           table: "leads",
         },
         (payload) => {
           const newLead = payload.new as any;
           // Check if this firm is assigned
-          if (newLead.assigned_firms && newLead.assigned_firms.includes(userId)) {
+          if (newLead.assigned_firms && newLead.assigned_firms.includes(firmId)) {
             playSound();
             showBrowserNotification(newLead.service_type, newLead.city);
             toast({
-              title: "🔔 Yeni Lead!",
+              title: "🔔 Yeni Potansiyel Müşteri!",
               description: `${newLead.service_type} - ${newLead.city} bölgesinden yeni talep geldi.`,
             });
             onNewLead?.();
@@ -77,6 +79,6 @@ export function useLeadNotifications(userId: string | null, onNewLead?: () => vo
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, toast, playSound, showBrowserNotification, onNewLead]);
+  }, [firmId, toast, playSound, showBrowserNotification, onNewLead]);
 }
 

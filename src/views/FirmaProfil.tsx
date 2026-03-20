@@ -27,6 +27,7 @@ import {
 const FIRMA_MENU = [
   { title: "Özet", key: "panel", icon: FileText, path: "/firma/panel" },
   { title: "Profil", key: "profil", icon: Crown, path: "/firma/profil" },
+  { title: "Landing Page", key: "landing", icon: FileText, path: "/firma/landing" },
   { title: "Leadler", key: "leadler", icon: Users, path: "/firma/leadler" },
   { title: "Jeton Yükle", key: "jeton", icon: Coins, path: "/firma/jeton" },
   { title: "Premium", key: "premium", icon: Crown, path: "/firma/premium" },
@@ -199,6 +200,13 @@ const FirmaProfil = () => {
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !firmId) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "Hata", description: "Logo boyutu 2MB'dan küçük olmalıdır.", variant: "destructive" });
+      if (e.target) e.target.value = "";
+      return;
+    }
+
     setUploadingLogo(true);
     try {
       const ext = file.name.split(".").pop();
@@ -246,10 +254,6 @@ const FirmaProfil = () => {
         social_x: form.social_x || null,
         social_youtube: form.social_youtube || null,
         social_linkedin: form.social_linkedin || null,
-        response_time: form.response_time || null,
-        trust_badges: form.trust_badges.length > 0 ? form.trust_badges : null,
-        faq_items: form.faq_items.length > 0 ? form.faq_items : null,
-        before_after: (form.before_url && form.after_url) ? { before: form.before_url, after: form.after_url } : null,
         is_approved: false,
       } as any).eq("id", firmId);
 
@@ -321,7 +325,7 @@ const FirmaProfil = () => {
                           <span>{uploadingLogo ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Yükleniyor...</> : <><Upload className="h-4 w-4 mr-2" /> Logo Yükle</>}</span>
                         </Button>
                       </label>
-                      <p className="text-xs text-muted-foreground">PNG veya JPG, max 2MB önerilir</p>
+                      <p className="text-xs text-muted-foreground">PNG veya JPG, maksimum 2MB. İdeal: 500x500px.</p>
                     </div>
                   </div>
                 </CardContent>
@@ -472,144 +476,28 @@ const FirmaProfil = () => {
                 </CardContent>
               </Card>
 
-              {/* ===== Premium İçerik Kartı ===== */}
-              <Card className="border-accent/30 bg-gradient-to-br from-[#fffbf0] to-white dark:from-[hsl(43_20%_12%)] dark:to-card relative overflow-hidden">
-                {!form.is_premium && (
-                  <div className="absolute inset-0 z-10 backdrop-blur-sm bg-background/60 flex flex-col items-center justify-center p-6 text-center">
-                    <div className="bg-card border border-border rounded-xl p-6 max-w-sm shadow-lg">
-                      <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Crown className="h-6 w-6 text-accent" />
-                      </div>
-                      <h3 className="font-heading text-lg font-bold mb-2">Premium Özellikler</h3>
-                      <p className="text-sm text-muted-foreground mb-6">
-                        Güven rozetleri, SSS, tamamlanan projeler ve öncesi/sonrası görselleri ile profilinizi zenginleştirmek için Premium'a geçin.
-                      </p>
-                      <Button className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-0" onClick={() => router.push("/firma/premium")}>
-                        <Crown className="h-4 w-4 mr-2" />
-                        Premium'a Geç
-                      </Button>
+
+              {/* Premium İçerik Yönlendirme */}
+              <Card className="border-accent/30 bg-gradient-to-br from-[#fffbf0] to-white dark:from-[hsl(43_20%_12%)] dark:to-card">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
+                      <Crown className="h-5 w-5 text-accent" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-semibold text-foreground">Premium İçerik Yönetimi</h3>
+                      <p className="text-xs text-muted-foreground">Trust rozetleri, SSS, Önce/Sonra, Detaylı Hizmetler ve daha fazlası</p>
                     </div>
                   </div>
-                )}
-
-                <CardContent className={`pt-6 space-y-6 ${!form.is_premium ? 'opacity-30 pointer-events-none' : ''}`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Crown className="h-5 w-5 text-accent" />
-                    <h3 className="font-heading font-semibold text-foreground">Premium İçerik Yönetimi</h3>
-                    <span className="text-xs text-muted-foreground">(Premium gösterilir)</span>
-                  </div>
-
-                  {/* Yanıt Süresi */}
-                  <div className="space-y-1.5">
-                    <Label>Yanıt Süresi</Label>
-                    <Input
-                      placeholder="Genellikle 2 saat içinde yanıtlar"
-                      value={form.response_time}
-                      onChange={(e) => update({ response_time: e.target.value })}
-                    />
-                    <p className="text-xs text-muted-foreground">Firma kartında ve detay sayfasında gösterilir.</p>
-                  </div>
-
-                  {/* Trust Rozetleri */}
-                  <div className="space-y-2">
-                    <Label>Trust Rozetleri</Label>
-                    <p className="text-xs text-muted-foreground">Emoji + metin formatında rozetler ekleyin (örn: 🏆 5+ Yıl Deneyim)</p>
-                    <div className="space-y-2">
-                      {form.trust_badges.map((b, i) => (
-                        <div key={i} className="flex gap-2">
-                          <Input
-                            placeholder="Emoji"
-                            value={b.icon}
-                            onChange={(e) => {
-                              const updated = [...form.trust_badges];
-                              updated[i] = { ...updated[i], icon: e.target.value };
-                              update({ trust_badges: updated });
-                            }}
-                            className="w-20"
-                          />
-                          <Input
-                            placeholder="Rozet metni"
-                            value={b.label}
-                            onChange={(e) => {
-                              const updated = [...form.trust_badges];
-                              updated[i] = { ...updated[i], label: e.target.value };
-                              update({ trust_badges: updated });
-                            }}
-                          />
-                          <Button variant="ghost" size="icon" onClick={() => update({ trust_badges: form.trust_badges.filter((_, j) => j !== i) })}>
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                      <Button variant="outline" size="sm" onClick={() => update({ trust_badges: [...form.trust_badges, { icon: "", label: "" }] })}>
-                        + Rozet Ekle
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Önce/Sonra */}
-                  <div className="space-y-2">
-                    <Label>Önce / Sonra Slider</Label>
-                    <p className="text-xs text-muted-foreground">Her iki alan dolu olduğunda slider sayfada görünür.</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">"Önce" Fotoğraf URL'i</Label>
-                        <Input placeholder="https://..." value={form.before_url} onChange={(e) => update({ before_url: e.target.value })} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">"Sonra" Fotoğraf URL'i</Label>
-                        <Input placeholder="https://..." value={form.after_url} onChange={(e) => update({ after_url: e.target.value })} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* SSS */}
-                  <div className="space-y-2">
-                    <Label>Sık Sorulan Sorular (SSS)</Label>
-                    <div className="space-y-3">
-                      {form.faq_items.map((faq, i) => (
-                        <div key={i} className="border border-border rounded-lg p-3 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium text-muted-foreground">Soru {i + 1}</span>
-                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => update({ faq_items: form.faq_items.filter((_, j) => j !== i) })}>
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                          <Input
-                            placeholder="Soru"
-                            value={faq.question}
-                            onChange={(e) => {
-                              const updated = [...form.faq_items];
-                              updated[i] = { ...updated[i], question: e.target.value };
-                              update({ faq_items: updated });
-                            }}
-                          />
-                          <Textarea
-                            placeholder="Cevap"
-                            rows={2}
-                            value={faq.answer}
-                            onChange={(e) => {
-                              const updated = [...form.faq_items];
-                              updated[i] = { ...updated[i], answer: e.target.value };
-                              update({ faq_items: updated });
-                            }}
-                          />
-                        </div>
-                      ))}
-                      <Button variant="outline" size="sm" onClick={() => update({ faq_items: [...form.faq_items, { question: "", answer: "" }] })}>
-                        + Soru Ekle
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-2">
-                    <Button onClick={handleSave} disabled={saving} className="gap-2">
-                      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                      Değişiklikleri Kaydet
-                    </Button>
-                  </div>
+                  <Button 
+                    className="w-full gap-2 bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-950 border-0 hover:from-amber-300 hover:to-yellow-500 shadow-sm" 
+                    onClick={() => router.push(form.is_premium ? "/firma/landing" : "/firma/premium")}
+                  >
+                    <Crown className="h-4 w-4" /> {form.is_premium ? "Landing Page Ayarlarına Git" : "Premium'a Geç"}
+                  </Button>
                 </CardContent>
               </Card>
+
             </div>
           </main>
         </div>

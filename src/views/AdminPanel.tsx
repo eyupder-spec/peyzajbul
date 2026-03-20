@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut,
@@ -71,6 +71,7 @@ type Lead = {
   lead_score: number | null;
   status: string;
   user_id: string;
+  assigned_firms?: string[] | null;
 };
 
 type UserRole = {
@@ -202,7 +203,32 @@ const AdminPanel = () => {
     setLoading(false);
   }, [router]);
 
-  useEffect(() => { checkAdmin(); }, [checkAdmin]);
+  useEffect(() => {
+    checkAdmin();
+
+    // Supabase Realtime Subscription for Leads
+    const channel = supabase
+      .channel("admin-realtime-leads")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "leads" },
+        () => {
+          checkAdmin(); // Lead değiştiğinde tüm listeyi tazele
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "lead_purchases" },
+        () => {
+          checkAdmin(); // Satın alım olduğunda geliri ve durumu tazele
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [checkAdmin]);
 
   const handleDeleteLead = async (id: string) => {
     const { error } = await supabase.from("leads").delete().eq("id", id);
@@ -256,6 +282,7 @@ const AdminPanel = () => {
 
   const handleLogout = async () => {
     const secretPath = process.env.NEXT_PUBLIC_ADMIN_SECRET_PATH || "/admin-dash";
+    await supabase.auth.signOut();
     router.push(`${secretPath}/giris`);
   };
 
@@ -470,6 +497,7 @@ const AdminPanel = () => {
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">Bütçe</th>
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">Skor</th>
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">Durum</th>
+                        <th className="text-left px-3 py-2 text-muted-foreground font-medium">Dağıtım</th>
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">Aksiyon</th>
                       </tr>
                     </thead>
@@ -494,6 +522,38 @@ const AdminPanel = () => {
                               <Badge variant={lead.status === "active" ? "default" : lead.status === "expired" ? "destructive" : "secondary"}>
                                 {lead.status}
                               </Badge>
+                            </td>
+                            <td className="px-3 py-2">
+                              {lead.assigned_firms && lead.assigned_firms.length > 0 ? (
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button size="sm" variant="outline" className="h-7 text-xs px-2 cursor-pointer bg-primary/5 hover:bg-primary/10 border-primary/20">
+                                      {new Set(lead.assigned_firms).size} Firma
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-md">
+                                    <DialogHeader>
+                                      <DialogTitle>Bildirim Gönderilen Firmalar ({new Set(lead.assigned_firms).size})</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="max-h-[60vh] overflow-y-auto space-y-2 pr-2">
+                                      {Array.from(new Set(lead.assigned_firms)).map(fid => {
+                                        const firm = firmsData.find(f => f.id === fid || f.user_id === fid);
+                                        return (
+                                          <div key={fid} className="flex justify-between items-center p-3 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
+                                            <div className="flex flex-col">
+                                              <span className="font-semibold text-sm">{firm?.company_name || 'Bilinmeyen Firma'}</span>
+                                              {firm && <span className="text-xs text-muted-foreground">{firm.phone}</span>}
+                                            </div>
+                                            {firm && <Badge variant="secondary">{firm.city}</Badge>}
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                              ) : (
+                                <span className="text-muted-foreground text-xs px-2">-</span>
+                              )}
                             </td>
                             <td className="px-3 py-2">
                               <div className="flex gap-1">
@@ -736,7 +796,7 @@ const AdminPanel = () => {
                           <td className="px-3 py-2">
                             <div className="flex gap-1 flex-wrap">
                               <Button size="sm" variant="ghost" title="Düzenle" onClick={() => {
-                setEditingFirm({
+                                setEditingFirm({
                                   id: firm.id,
                                   user_id: firm.user_id,
                                   company_name: firm.company_name,

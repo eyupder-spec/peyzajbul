@@ -1,38 +1,44 @@
 import { createClient } from "@/lib/supabase/server";
 import BlogDetayClient from "@/views/BlogDetay";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-// 1. Metadata: Sosyal medya (OG) etiketleri eklendi
+// 1. Metadata: Sosyal medya (OG) etiketleri ve hata yönetimi
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const resolvedParams = await params;
-  const supabase = await createClient();
-  const { data: post } = await supabase
-    .from("blog_posts")
-    .select("title, excerpt, cover_image_url")
-    .eq("slug", resolvedParams.slug)
-    .single();
+  try {
+    const resolvedParams = await params;
+    const supabase = await createClient();
+    const { data: post, error } = await supabase
+      .from("blog_posts")
+      .select("title, excerpt, cover_image_url")
+      .eq("slug", resolvedParams.slug)
+      .maybeSingle();
 
-  if (!post) return { title: "Yazı Bulunamadı" };
+    if (error || !post) return { title: "Yazı Bulunamadı | Peyzajbul Blog" };
 
-  const baseUrl = "https://www.peyzajbul.com";
+    const baseUrl = "https://www.peyzajbul.com";
 
-  return {
-    title: `${post.title} | Peyzajbul Blog`,
-    description: post.excerpt || `${post.title} hakkında detaylı bilgi.`,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt || "",
-      url: `${baseUrl}/blog/${resolvedParams.slug}`,
-      images: post.cover_image_url ? [{ url: post.cover_image_url }] : [],
-      type: "article",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: post.title,
-      description: post.excerpt || "",
-      images: post.cover_image_url ? [post.cover_image_url] : [],
-    },
-  };
+    return {
+      title: `${post.title} | Peyzajbul Blog`,
+      description: post.excerpt || `${post.title} hakkında detaylı bilgi.`,
+      openGraph: {
+        title: post.title,
+        description: post.excerpt || "",
+        url: `${baseUrl}/blog/${resolvedParams.slug}`,
+        images: post.cover_image_url ? [{ url: post.cover_image_url }] : [],
+        type: "article",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: post.title,
+        description: post.excerpt || "",
+        images: post.cover_image_url ? [post.cover_image_url] : [],
+      },
+    };
+  } catch (e) {
+    console.error("Metadata Generation Error:", e);
+    return { title: "Peyzajbul Blog" };
+  }
 }
 
 export const revalidate = 3600;
@@ -41,18 +47,20 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const resolvedParams = await params;
   const supabase = await createClient();
 
-  // Tüm datayı tek seferde çekiyoruz
-  const { data: post } = await supabase
+  // Tüm datayı maybesingle ile çekiyoruz
+  const { data: post, error } = await supabase
     .from("blog_posts")
     .select("*")
     .eq("slug", resolvedParams.slug)
-    .single();
+    .maybeSingle();
 
-  if (!post) return <div className="p-10 text-center">Yazı bulunamadı.</div>;
+  if (error || !post) {
+    notFound();
+  }
 
   const schema = {
     "@context": "https://schema.org",
-    "@type": "BlogPosting", // Daha spesifik bir tip
+    "@type": "BlogPosting",
     "headline": post.title || "Başlıksız Yazı",
     "description": post.excerpt || "",
     "image": post.cover_image_url ? [post.cover_image_url] : [],
@@ -90,7 +98,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
-      {/* 💡 KRİTİK: post verisini direkt prop olarak gönderiyoruz ki client tekrar fetch yapmasın! */}
       <BlogDetayClient post={post} />
     </>
   );

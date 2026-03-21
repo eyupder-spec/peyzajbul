@@ -10,7 +10,7 @@ import { getCityBySlug, generateCitySeoContent, CITIES } from "@/lib/cities";
 import { useFirmsByCity } from "@/hooks/useFirms";
 import { ArrowLeft, MapPin } from "lucide-react";
 import RelatedBlogPosts from "@/components/RelatedBlogPosts";
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 interface IlFirmalariProps {
   slug: string;
@@ -38,10 +38,21 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
 
   const seo = generateCitySeoContent(city.name);
 
-  const sanitizedContent = useMemo(() => {
-    const rawHtml = markdownToHtml(seo.article);
-    return DOMPurify.sanitize(rawHtml);
-  }, [seo.article]);
+  // SSR güvenliği için sanitize işlemini istemci tarafına taşıyoruz
+  const rawHtml = markdownToHtml(seo.article);
+  const [sanitizedContent, setSanitizedContent] = useState(rawHtml);
+
+  useEffect(() => {
+    try {
+      const purifier: any = DOMPurify;
+      const sanitizeFn = purifier.sanitize || (purifier.default && purifier.default.sanitize);
+      if (typeof sanitizeFn === 'function') {
+        setSanitizedContent(sanitizeFn(rawHtml));
+      }
+    } catch (e) {
+      console.error("IlFirmalari Sanitization Error:", e);
+    }
+  }, [rawHtml]);
 
   return (
     <div className="min-h-screen flex flex-col">

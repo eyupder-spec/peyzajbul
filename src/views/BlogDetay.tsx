@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import DOMPurify from "isomorphic-dompurify";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import FirmCard from "@/components/FirmCard";
 import Image from "next/image";
-import { useState } from "react";
 import LeadFormModal from "@/components/lead-form/LeadFormModal";
 import {
   ArrowLeft,
@@ -144,18 +143,19 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
     }
   }, [post.content]);
 
-  const sanitizedContent = useMemo(() => {
+  const [sanitizedContent, setSanitizedContent] = useState(contentWithIds);
+
+  useEffect(() => {
     try {
+      // DOMPurify'ı asenkron veya sadece client-side import/call şeklinde kullanıyoruz
       const purifier: any = DOMPurify;
       const sanitizeFn = purifier.sanitize || (purifier.default && purifier.default.sanitize);
       
       if (typeof sanitizeFn === 'function') {
-        return sanitizeFn(contentWithIds);
+        setSanitizedContent(sanitizeFn(contentWithIds));
       }
-      return contentWithIds;
     } catch (e) {
-      console.error("Sanitization Error:", e);
-      return contentWithIds;
+      console.error("Client-side Sanitization Error:", e);
     }
   }, [contentWithIds]);
 

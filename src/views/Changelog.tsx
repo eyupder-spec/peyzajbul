@@ -17,6 +17,67 @@ type ChangelogEntry = {
   is_published: boolean;
 };
 
+const ChangelogEntryItem = ({ entry, i }: { entry: ChangelogEntry; i: number }) => {
+  const [sanitizedContent, setSanitizedContent] = useState(entry.content || "");
+
+  useEffect(() => {
+    try {
+      if (entry.content) {
+        const purifier: any = DOMPurify;
+        const sanitizeFn = purifier.sanitize || (purifier.default && purifier.default.sanitize);
+        if (typeof sanitizeFn === 'function') {
+          setSanitizedContent(sanitizeFn(entry.content));
+        }
+      }
+    } catch (e) {
+      console.error("Changelog Sanitization Error:", e);
+    }
+  }, [entry.content]);
+
+  return (
+    <div className="relative flex gap-6">
+      {/* Timeline dot */}
+      <div className="hidden md:flex flex-col items-center">
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${i === 0 ? "bg-accent text-accent-foreground" : "bg-secondary text-primary"}`}>
+          <Rocket className="h-5 w-5" />
+        </div>
+      </div>
+
+      {/* Content card */}
+      <div className="flex-1 bg-card border border-border rounded-xl p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-3 mb-3 flex-wrap">
+          <Badge variant="outline" className="font-mono text-xs">
+            {entry.version}
+          </Badge>
+          {entry.published_at && (
+            <span className="text-xs text-muted-foreground">
+              {new Date(entry.published_at).toLocaleDateString("tr-TR", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
+          )}
+          {i === 0 && (
+            <Badge className="bg-accent text-accent-foreground text-xs">Yeni</Badge>
+          )}
+        </div>
+        <h2 className="font-heading text-lg font-semibold text-foreground mb-2">
+          {entry.title}
+        </h2>
+        {entry.content && (
+          <div
+            className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line"
+            dangerouslySetInnerHTML={{
+              __html: sanitizedContent,
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
 const Changelog = () => {
   const [entries, setEntries] = useState<ChangelogEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,46 +121,7 @@ const Changelog = () => {
 
               <div className="space-y-8">
                 {entries.map((entry, i) => (
-                  <div key={entry.id} className="relative flex gap-6">
-                    {/* Timeline dot */}
-                    <div className="hidden md:flex flex-col items-center">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${i === 0 ? "bg-accent text-accent-foreground" : "bg-secondary text-primary"}`}>
-                        <Rocket className="h-5 w-5" />
-                      </div>
-                    </div>
-
-                    {/* Content card */}
-                    <div className="flex-1 bg-card border border-border rounded-xl p-6 hover:shadow-md transition-shadow">
-                      <div className="flex items-center gap-3 mb-3 flex-wrap">
-                        <Badge variant="outline" className="font-mono text-xs">
-                          {entry.version}
-                        </Badge>
-                        {entry.published_at && (
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(entry.published_at).toLocaleDateString("tr-TR", {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })}
-                          </span>
-                        )}
-                        {i === 0 && (
-                          <Badge className="bg-accent text-accent-foreground text-xs">Yeni</Badge>
-                        )}
-                      </div>
-                      <h2 className="font-heading text-lg font-semibold text-foreground mb-2">
-                        {entry.title}
-                      </h2>
-                      {entry.content && (
-                        <div
-                          className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line"
-                          dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(entry.content),
-                          }}
-                        />
-                      )}
-                    </div>
-                  </div>
+                  <ChangelogEntryItem key={entry.id} entry={entry} i={i} />
                 ))}
               </div>
             </div>

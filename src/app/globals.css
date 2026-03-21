@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -45,8 +43,9 @@
     --sidebar-border: 120 15% 88%;
     --sidebar-ring: 153 43% 15%;
 
-    --font-heading: 'Playfair Display', serif;
-    --font-body: 'Inter', sans-serif;
+    --font-heading: var(--font-playfair), serif;
+    --font-body: var(--font-inter), sans-serif;
+    --font-nunito: var(--font-nunito), sans-serif;
   }
 
   .dark {

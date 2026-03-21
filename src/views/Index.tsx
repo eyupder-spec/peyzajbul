@@ -15,7 +15,7 @@ const Index = () => {
   const [formOpen, setFormOpen] = useState(false);
 
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen">
       <Navbar />
       <Hero onTeklifAl={() => setFormOpen(true)} />
       <FeaturedFirms />
@@ -25,7 +25,7 @@ const Index = () => {
       <SeoLocationLinks />
       <Footer />
       <LeadFormModal open={formOpen} onClose={() => setFormOpen(false)} />
-    </div>
+    </main>
   );
 };
 

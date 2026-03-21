@@ -24,6 +24,8 @@ const Hero = ({ onTeklifAl }: HeroProps) => {
           fill
           className="object-cover opacity-30"
           priority
+          quality={85}
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/90" />
         <div className="container mx-auto px-4 py-24 md:py-36 text-center relative z-10">

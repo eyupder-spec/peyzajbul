@@ -51,7 +51,12 @@ const Navbar = () => {
             </Button>
           </div>
 
-          <button className="md:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button 
+            className="md:hidden text-foreground p-2 -mr-2" 
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? "Menüyü Kapat" : "Menüyü Aç"}
+            aria-expanded={mobileOpen}
+          >
             {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>

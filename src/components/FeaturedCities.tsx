@@ -52,7 +52,8 @@ const FeaturedCities = () => {
                 src={city.image}
                 alt={`${city.name} peyzaj firmaları`}
                 fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
+                quality={80}
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-300" />

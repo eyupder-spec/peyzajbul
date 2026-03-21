@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FirmCard from "@/components/FirmCard";
@@ -10,6 +10,7 @@ import { getCityBySlug, generateCitySeoContent, CITIES } from "@/lib/cities";
 import { useFirmsByCity } from "@/hooks/useFirms";
 import { ArrowLeft, MapPin } from "lucide-react";
 import RelatedBlogPosts from "@/components/RelatedBlogPosts";
+import { useMemo } from "react";
 
 interface IlFirmalariProps {
   slug: string;
@@ -37,6 +38,11 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
 
   const seo = generateCitySeoContent(city.name);
 
+  const sanitizedContent = useMemo(() => {
+    const rawHtml = markdownToHtml(seo.article);
+    return DOMPurify.sanitize(rawHtml);
+  }, [seo.article]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -62,7 +68,7 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
         <div className="container mx-auto px-4 py-10">
           {/* SEO Article */}
           <article className="prose prose-slate dark:prose-invert max-w-none mb-12 bg-card rounded-lg border border-border p-6 md:p-8">
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(markdownToHtml(seo.article)) }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
           </article>
 
           {/* Firms */}

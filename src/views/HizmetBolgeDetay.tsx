@@ -33,25 +33,26 @@ const HizmetBolgeDetay = ({
   const [formOpen, setFormOpen] = useState(false);
   const { data: firms, isLoading } = useApprovedFirms();
 
-  // Firmaları konuma ve hizmete göre filtreleyelim
+  // Firmaları konuma ve hizmete göre filtreleyelim (Tam eşleşme)
   const filteredFirms = useMemo(() => {
     if (!firms) return [];
     return firms.filter((f) => {
       const matchCity = f.city?.toLowerCase() === cityName.toLowerCase();
-      const matchDistrict = !districtName || !f.district || f.district.toLowerCase() === districtName.toLowerCase();
+      // İlçe sayfasıysa, firmanın ilçesi tam olarak eşleşmek zorunda
+      const matchDistrict = !districtName || (f.district?.toLowerCase() === districtName.toLowerCase());
       const matchService = f.services?.includes(category.label);
-      return matchService && (matchCity || matchDistrict);
+      return matchService && matchCity && matchDistrict;
     });
   }, [firms, category.label, cityName, districtName]);
 
-  // Eğer bölgede firma yoksa, en azından şehirden öne çıkanları gösterelim
+  // Öne Çıkan Firmalar (Sidebar): Tüm İzmir'i (veya ilgili şehri) kapsayabilir
   const sidebarFirms = useMemo(() => {
-    if (filteredFirms.length > 0) return filteredFirms.slice(0, 5);
     if (!firms) return [];
+    // Sidebar'da her zaman şehre ait firmaları (ilçe gözetmeksizin) gösterebiliriz
     return firms
       .filter(f => f.city?.toLowerCase() === cityName.toLowerCase() && f.services?.includes(category.label))
       .slice(0, 5);
-  }, [filteredFirms, firms, cityName, category.label]);
+  }, [firms, cityName, category.label]);
 
   const scrollToFirms = () => {
     const el = document.getElementById("firmalar-listesi");

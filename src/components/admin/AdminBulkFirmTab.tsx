@@ -19,6 +19,11 @@ type BulkFirmRow = {
   website: string;
   description: string;
   services: string;
+  instagram?: string;
+  facebook?: string;
+  twitter?: string;
+  linkedin?: string;
+  youtube?: string;
   status?: "pending" | "success" | "error";
   errorMsg?: string;
 };
@@ -26,9 +31,10 @@ type BulkFirmRow = {
 const EMPTY_ROW: BulkFirmRow = {
   company_name: "", phone: "", email: "", city: "", district: "",
   address: "", website: "", description: "", services: "",
+  instagram: "", facebook: "", twitter: "", linkedin: "", youtube: "",
 };
 
-const CSV_HEADERS = "firma_adi;telefon;email;il;ilce;adres;website;aciklama;hizmetler";
+const CSV_HEADERS = "firma_adi;telefon;email;il;ilce;adres;website;aciklama;hizmetler;instagram;facebook;twitter;linkedin;youtube";
 const HEADER_MAP: Record<string, keyof BulkFirmRow> = {
   firma_adi: "company_name", firma_adı: "company_name", company_name: "company_name",
   telefon: "phone", phone: "phone",
@@ -39,6 +45,11 @@ const HEADER_MAP: Record<string, keyof BulkFirmRow> = {
   website: "website", web: "website",
   aciklama: "description", açıklama: "description", description: "description",
   hizmetler: "services", services: "services",
+  instagram: "instagram", insta: "instagram", ig: "instagram",
+  facebook: "facebook", fb: "facebook",
+  twitter: "twitter", x: "twitter",
+  linkedin: "linkedin",
+  youtube: "youtube", yt: "youtube"
 };
 
 function parseCSV(text: string): BulkFirmRow[] {
@@ -89,7 +100,7 @@ export default function AdminBulkFirmTab() {
   };
 
   const downloadTemplate = () => {
-    const blob = new Blob([CSV_HEADERS + "\nÖrnek Peyzaj;05001234567;info@ornek.com;İstanbul;Kadıköy;Caferağa Mah;www.ornek.com;Açıklama metni;Bahçe bakımı, Çim ekimi"], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([CSV_HEADERS + "\nÖrnek Peyzaj;05001234567;info@ornek.com;İstanbul;Kadıköy;Caferağa Mah;www.ornek.com;Açıklama metni;Bahçe bakımı, Çim ekimi;peyzajornek;ornekpeyzaj;;;"], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -127,6 +138,11 @@ export default function AdminBulkFirmTab() {
             website: url,
             description: c.description || "",
             services: Array.isArray(c.services) ? c.services.join(", ") : (c.services || ""),
+            instagram: c.instagram || "",
+            facebook: c.facebook || "",
+            twitter: c.twitter || "",
+            linkedin: c.linkedin || "",
+            youtube: c.youtube || "",
           });
         }
       } catch (err: any) {
@@ -174,17 +190,24 @@ export default function AdminBulkFirmTab() {
           ? r.services.split(",").map(s => s.trim()).filter(Boolean)
           : [];
 
+        const cleanEmail = r.email ? r.email.trim().replace(/^https?:\/\//, "") : "";
+
         const { data: inserted, error } = await supabase.from("firms").insert({
           user_id: user.id,
           company_name: r.company_name,
           phone: r.phone,
-          email: r.email,
+          email: cleanEmail,
           city: r.city,
           district: r.district || null,
           address: r.address || null,
           website: r.website || null,
           description: r.description || null,
           services: servicesArr,
+          social_instagram: r.instagram || null,
+          social_facebook: r.facebook || null,
+          social_x: r.twitter || null,
+          social_linkedin: r.linkedin || null,
+          social_youtube: r.youtube || null,
           is_approved: true,
           is_active: true,
         }).select("id, company_name").single();
@@ -242,7 +265,7 @@ export default function AdminBulkFirmTab() {
               className="max-w-sm"
             />
             <p className="text-xs text-muted-foreground mt-2">
-              Sütunlar: firma_adi, telefon, email, il, ilce, adres, website, aciklama, hizmetler (noktalı virgül veya virgül ayraç)
+              Sütunlar: firma_adi, telefon, email, il, ilce, adres, website, aciklama, hizmetler, instagram, facebook, twitter, linkedin, youtube
             </p>
           </CardContent>
         </Card>
@@ -299,6 +322,11 @@ export default function AdminBulkFirmTab() {
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">İlçe</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[160px]">Adres</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[120px]">Website</th>
+                    <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">Instagram</th>
+                    <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">Facebook</th>
+                    <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">Twitter(X)</th>
+                    <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">LinkedIn</th>
+                    <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">YouTube</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium">Durum</th>
                     <th className="px-2 py-1.5"></th>
                   </tr>
@@ -327,6 +355,21 @@ export default function AdminBulkFirmTab() {
                       </td>
                       <td className="px-2 py-1">
                         <Input value={row.website} onChange={(e) => updateRow(idx, "website", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input value={row.instagram} onChange={(e) => updateRow(idx, "instagram", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input value={row.facebook} onChange={(e) => updateRow(idx, "facebook", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input value={row.twitter} onChange={(e) => updateRow(idx, "twitter", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input value={row.linkedin} onChange={(e) => updateRow(idx, "linkedin", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input value={row.youtube} onChange={(e) => updateRow(idx, "youtube", e.target.value)} className="h-7 text-xs" />
                       </td>
                       <td className="px-2 py-1">
                         {row.status === "success" && <Badge className="bg-green-600 text-[10px]">Eklendi</Badge>}

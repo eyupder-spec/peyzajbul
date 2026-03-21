@@ -246,7 +246,7 @@ const AdminBlogTab = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label>Başlık *</Label>
+                <Label>Başlık (H1 ve SEO Meta Title) *</Label>
                 <Input value={title} onChange={(e) => handleTitleChange(e.target.value)} placeholder="Bahçe bakımında 10 altın kural" />
               </div>
               <div className="space-y-1.5">
@@ -256,8 +256,8 @@ const AdminBlogTab = () => {
             </div>
 
             <div className="space-y-1.5">
-              <Label>Özet</Label>
-              <Textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} placeholder="Kısa açıklama..." rows={2} />
+              <Label>Kısa Özet (SEO Meta Description)</Label>
+              <Textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} placeholder="Google arama sonuçlarında çıkacak 1-2 cümlelik özet açıklama..." rows={2} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

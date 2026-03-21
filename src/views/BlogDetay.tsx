@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
@@ -44,6 +44,32 @@ interface BlogPost {
   excerpt: string | null;
   slug: string;
 }
+
+// TOC Oluşturma Yardımcı Fonksiyonu
+const generateTOC = (htmlStr: string) => {
+  if (!htmlStr) return { html: "", toc: [] };
+  const toc: { id: string; text: string; level: number }[] = [];
+
+  const modifiedHtml = htmlStr.replace(/<h([2-4])([^>]*)>(.*?)<\/h\1>/gi, (match, levelStr, attrs, innerHtml) => {
+    const level = parseInt(levelStr, 10);
+    const text = innerHtml.replace(/<[^>]+>/g, '').trim();
+    if (!text) return match;
+
+    // Create a slug
+    const slug = text
+      .toLowerCase()
+      .replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ş/g, "s").replace(/ı/g, "i").replace(/ö/g, "o").replace(/ç/g, "c")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
+    const uniqueId = `${slug}-${Math.random().toString(36).substr(2, 5)}`;
+    toc.push({ id: uniqueId, text, level });
+
+    return `<h${level} id="${uniqueId}"${attrs}>${innerHtml}</h${level}>`;
+  });
+
+  return { html: modifiedHtml, toc };
+};
 
 // 2. Prop tanımına "post"u ekledik (Hata burada çözülüyor)
 interface BlogDetayProps {
@@ -107,6 +133,14 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
 
   const shareUrl = `https://www.peyzajbul.com/blog/${post.slug}`;
   const shareText = post.title;
+
+  const { html: contentWithIds, toc } = useMemo(() => {
+    return generateTOC(post.content || "");
+  }, [post.content]);
+
+  const sanitizedContent = useMemo(() => {
+    return DOMPurify.sanitize(contentWithIds);
+  }, [contentWithIds]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -172,16 +206,45 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                 )}
               </div>
 
+              {toc.length > 0 && (
+                <div className="bg-muted/30 border border-border/50 rounded-2xl p-6 mb-12 shadow-sm">
+                  <h3 className="font-heading font-bold text-lg mb-4 text-foreground flex items-center gap-2">
+                    Bu Yazıda Neler Var?
+                  </h3>
+                  <ul className="space-y-2.5">
+                    {toc.map((item) => (
+                      <li key={item.id} className={item.level === 3 ? "ml-4" : item.level === 4 ? "ml-8" : ""}>
+                        <a
+                          href={`#${item.id}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            // Update URL without jump
+                            window.history.pushState(null, '', `#${item.id}`);
+                          }}
+                          className="text-muted-foreground hover:text-primary transition-colors text-sm flex items-center gap-2 before:content-[''] before:w-1.5 before:h-1.5 before:bg-primary/50 hover:before:bg-primary hover:before:scale-110 before:transition-all before:rounded-full before:shrink-0"
+                        >
+                          {item.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <article
                 className="prose prose-base md:prose-lg max-w-none text-foreground/90 
                   prose-headings:font-heading prose-headings:text-foreground prose-headings:font-bold
-                  prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6
+                  prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:scroll-mt-24
+                  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4 prose-h3:scroll-mt-24
                   prose-p:leading-relaxed prose-p:mb-6
                   prose-a:text-primary prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
                   prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-10
                   prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-accent/5 prose-blockquote:p-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic
                   prose-strong:text-foreground prose-strong:font-bold"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || "") }}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizedContent
+                }}
               />
 
               <div className="mt-12 pt-8 border-t border-border flex items-center justify-between gap-4">

@@ -8,10 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MapPin, Phone, Mail, ArrowLeft, Building2, Crown, Star, Image as ImageIcon, Globe, Eye, MessageCircle, Instagram, Facebook, Youtube, Linkedin, Twitter, Shield, Award, CheckCircle, Zap, Clock, X } from "lucide-react";
-import { extractFirmIdFromSlug, getSocialUrl } from "@/lib/firmUtils";
+import { extractFirmIdFromSlug, getSocialUrl, generateFirmSlug } from "@/lib/firmUtils";
 import { useFirmGallery, useFirmReviews, useFirmProjects } from "@/hooks/useFirms";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
+import FirmCard from "@/components/FirmCard";
 import { getCitySlug } from "@/lib/cities";
 import { useState, useRef, useCallback, use } from "react";
 
@@ -87,16 +88,33 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
 
   const { data: galleryData } = useFirmGallery(firm?.id || "");
   const { data: reviews } = useFirmReviews(firm?.id || "");
-  const { data: projectsData } = useFirmProjects(firm?.id || "");
+  const { data: projectsData } = useFirmProjects(firm?.id);
 
-  const OLD_SUPABASE_HOST = "tfydaaxgaomdvthclcse.supabase.co";
-  const isOldUrl = (url?: string | null) => url?.includes(OLD_SUPABASE_HOST);
+  const { data: relatedFirms } = useQuery({
+    queryKey: ["related-firms-detail", firm?.city, firm?.id],
+    enabled: !!firm?.city,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("firms")
+        .select("*")
+        .eq("is_approved", true)
+        .eq("is_active", true)
+        .eq("city", firm.city)
+        .neq("id", firm.id)
+        .order("is_premium", { ascending: false })
+        .limit(20);
+        
+      if (!data) return [];
+      return data.sort(() => 0.5 - Math.random()).slice(0, 4); // Pick 4 random
+    }
+  });
 
-  const gallery = (galleryData || []).filter(img => !isOldUrl(img.image_url));
-  const projects = (projectsData as any[] | undefined)?.map(p => ({
-    ...p,
-    cover_image: isOldUrl(p.cover_image) ? null : p.cover_image
-  }));
+  const citySlug = getCitySlug(firm?.city || "");
+
+  const gallery = galleryData || [];
+  const projects = projectsData as any[] | undefined;
 
   if (isLoading) {
     return <div className="flex-1 flex items-center justify-center min-h-[400px]"><p className="text-muted-foreground">Yükleniyor...</p></div>;
@@ -111,12 +129,11 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
     );
   }
 
-  const filteredLogoUrl = isOldUrl(firm.logo_url) ? null : firm.logo_url;
-  const filteredBeforeUrl = isOldUrl((firm as any).before_after?.before) ? null : (firm as any).before_after?.before;
-  const filteredAfterUrl = isOldUrl((firm as any).before_after?.after) ? null : (firm as any).before_after?.after;
-  const filteredPortfolio = ((firm as any).portfolio_items as any[] ?? []).filter(p => !isOldUrl(p.image_url));
+  const filteredLogoUrl = firm.logo_url;
+  const filteredBeforeUrl = (firm as any).before_after?.before;
+  const filteredAfterUrl = (firm as any).before_after?.after;
+  const filteredPortfolio = (firm as any).portfolio_items as any[] ?? [];
 
-  const citySlug = getCitySlug(firm.city);
   const avgRating = reviews && reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : null;
@@ -414,6 +431,49 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                 </Accordion>
               </div>
             )}
+
+            {/* Premium Olmayanlar için İlgili Firmalar */}
+            {!firm.is_premium && relatedFirms && relatedFirms.length > 0 && (
+              <div className="mt-8">
+                <h2 className="font-heading text-xl font-semibold text-foreground mb-4">
+                  {firm.city} İlindeki Diğer Firmalar
+                </h2>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {relatedFirms.map((rf) => {
+                    const rfSlug = rf.slug || generateFirmSlug(rf.company_name, rf.id);
+                    return (
+                      <Link key={rf.id} href={`/firma/${rfSlug}`} className="block group">
+                        <div className="border border-border/60 rounded-xl p-4 flex flex-col h-full bg-card hover:border-primary/50 transition-colors shadow-sm hover:shadow-md">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0 border border-border/50 overflow-hidden relative">
+                              {rf.logo_url ? (
+                                <Image src={rf.logo_url} alt={rf.company_name} fill sizes="40px" className="object-cover" />
+                              ) : (
+                                <span className="font-heading font-bold text-primary text-sm">{rf.company_name[0]}</span>
+                              )}
+                            </div>
+                            <div className="overflow-hidden">
+                              <h3 className="font-heading font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">{rf.company_name}</h3>
+                              <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-0.5">
+                                <MapPin className="h-3 w-3 shrink-0" /> <span className="truncate">{rf.city}</span>
+                              </div>
+                            </div>
+                          </div>
+                          {rf.is_premium && (
+                            <Badge className="bg-accent/10 text-accent gap-1 text-[10px] shadow-sm w-fit mb-2 border-accent/20">
+                              <Crown className="h-3 w-3" /> Premium
+                            </Badge>
+                          )}
+                          <p className="text-xs text-muted-foreground line-clamp-2 mt-auto">
+                            {rf.description || (rf.services && rf.services.length > 0 && rf.services.join(", ")) || "Peyzaj Hizmetleri"}
+                          </p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -514,14 +574,6 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                 </Link>
               </div>
             )}
-
-            <div className="flex flex-col gap-3">
-              <Link href={`/iller/${citySlug}-peyzaj-firmalari`}>
-                <Button variant="outline" className="w-full">
-                  {firm.city} İlindeki Diğer Firmalar
-                </Button>
-              </Link>
-            </div>
           </div>
         </div>
       </div>

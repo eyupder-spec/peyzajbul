@@ -32,6 +32,11 @@ async function scrapeUrl(apiKey: string, url: string, prompt: string) {
             district: { type: 'string', description: 'District/ilçe name (e.g. Kadıköy, Çankaya, Karşıyaka)' },
             description: { type: 'string', description: 'Company description, about text, or slogan' },
             services: { type: 'array', items: { type: 'string' }, description: 'List of services offered' },
+            instagram: { type: 'string', description: 'Instagram profile URL if found' },
+            facebook: { type: 'string', description: 'Facebook page URL if found' },
+            twitter: { type: 'string', description: 'Twitter or X profile URL if found' },
+            linkedin: { type: 'string', description: 'LinkedIn company URL if found' },
+            youtube: { type: 'string', description: 'YouTube channel URL if found' }
           },
         },
       },

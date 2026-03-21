@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import DOMPurify from "isomorphic-dompurify";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FirmCard from "@/components/FirmCard";
@@ -43,15 +42,18 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
   const [sanitizedContent, setSanitizedContent] = useState(rawHtml);
 
   useEffect(() => {
-    try {
-      const purifier: any = DOMPurify;
-      const sanitizeFn = purifier.sanitize || (purifier.default && purifier.default.sanitize);
-      if (typeof sanitizeFn === 'function') {
-        setSanitizedContent(sanitizeFn(rawHtml));
+    const sanitize = async () => {
+      try {
+        const DOMPurify = (await import("isomorphic-dompurify")).default;
+        const sanitizeFn = (DOMPurify as any).sanitize || DOMPurify;
+        if (typeof sanitizeFn === 'function') {
+          setSanitizedContent(sanitizeFn(rawHtml));
+        }
+      } catch (e) {
+        console.error("IlFirmalari Sanitization Error:", e);
       }
-    } catch (e) {
-      console.error("IlFirmalari Sanitization Error:", e);
-    }
+    };
+    sanitize();
   }, [rawHtml]);
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DOMPurify from "isomorphic-dompurify";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase/client";
@@ -21,17 +20,20 @@ const ChangelogEntryItem = ({ entry, i }: { entry: ChangelogEntry; i: number }) 
   const [sanitizedContent, setSanitizedContent] = useState(entry.content || "");
 
   useEffect(() => {
-    try {
-      if (entry.content) {
-        const purifier: any = DOMPurify;
-        const sanitizeFn = purifier.sanitize || (purifier.default && purifier.default.sanitize);
-        if (typeof sanitizeFn === 'function') {
-          setSanitizedContent(sanitizeFn(entry.content));
+    const sanitize = async () => {
+      try {
+        if (entry.content) {
+          const DOMPurify = (await import("isomorphic-dompurify")).default;
+          const sanitizeFn = (DOMPurify as any).sanitize || DOMPurify;
+          if (typeof sanitizeFn === 'function') {
+            setSanitizedContent(sanitizeFn(entry.content));
+          }
         }
+      } catch (e) {
+        console.error("Changelog Sanitization Error:", e);
       }
-    } catch (e) {
-      console.error("Changelog Sanitization Error:", e);
-    }
+    };
+    sanitize();
   }, [entry.content]);
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import DOMPurify from "isomorphic-dompurify";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
@@ -146,17 +145,21 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
   const [sanitizedContent, setSanitizedContent] = useState(contentWithIds);
 
   useEffect(() => {
-    try {
-      // DOMPurify'ı asenkron veya sadece client-side import/call şeklinde kullanıyoruz
-      const purifier: any = DOMPurify;
-      const sanitizeFn = purifier.sanitize || (purifier.default && purifier.default.sanitize);
-      
-      if (typeof sanitizeFn === 'function') {
-        setSanitizedContent(sanitizeFn(contentWithIds));
+    const sanitize = async () => {
+      try {
+        // Dinamik import: Sadece tarayıcıda çalışır ve sunucunun jsdom yüklemesini engeller
+        const DOMPurify = (await import("isomorphic-dompurify")).default;
+        const sanitizeFn = (DOMPurify as any).sanitize || DOMPurify;
+        
+        if (typeof sanitizeFn === 'function') {
+          setSanitizedContent(sanitizeFn(contentWithIds));
+        }
+      } catch (e) {
+        console.error("Client-side Sanitization Error:", e);
       }
-    } catch (e) {
-      console.error("Client-side Sanitization Error:", e);
-    }
+    };
+    
+    sanitize();
   }, [contentWithIds]);
 
   return (

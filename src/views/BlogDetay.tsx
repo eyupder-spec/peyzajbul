@@ -135,11 +135,28 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
   const shareText = post.title;
 
   const { html: contentWithIds, toc } = useMemo(() => {
-    return generateTOC(post.content || "");
+    try {
+      if (!post.content) return { html: "", toc: [] };
+      return generateTOC(post.content);
+    } catch (e) {
+      console.error("TOC Generation Error:", e);
+      return { html: post.content || "", toc: [] };
+    }
   }, [post.content]);
 
   const sanitizedContent = useMemo(() => {
-    return DOMPurify.sanitize(contentWithIds);
+    try {
+      const purifier: any = DOMPurify;
+      const sanitizeFn = purifier.sanitize || (purifier.default && purifier.default.sanitize);
+      
+      if (typeof sanitizeFn === 'function') {
+        return sanitizeFn(contentWithIds);
+      }
+      return contentWithIds;
+    } catch (e) {
+      console.error("Sanitization Error:", e);
+      return contentWithIds;
+    }
   }, [contentWithIds]);
 
   return (

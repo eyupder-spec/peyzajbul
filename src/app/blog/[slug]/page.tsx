@@ -53,21 +53,23 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const schema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting", // Daha spesifik bir tip
-    "headline": post.title,
+    "headline": post.title || "Başlıksız Yazı",
     "description": post.excerpt || "",
     "image": post.cover_image_url ? [post.cover_image_url] : [],
-    "datePublished": post.created_at,
-    "dateModified": post.updated_at || post.created_at,
+    "datePublished": post.created_at || new Date().toISOString(),
+    "dateModified": post.updated_at || post.created_at || new Date().toISOString(),
     "author": post.author_name ? [
       {
         "@type": "Person",
         "name": post.author_name
       }
-    ] : {
-      "@type": "Organization",
-      "name": "Peyzajbul",
-      "url": "https://www.peyzajbul.com"
-    },
+    ] : [
+      {
+        "@type": "Organization",
+        "name": "Peyzajbul",
+        "url": "https://www.peyzajbul.com"
+      }
+    ],
     "publisher": {
       "@type": "Organization",
       "name": "Peyzajbul",

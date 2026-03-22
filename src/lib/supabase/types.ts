@@ -425,6 +425,7 @@ export type Database = {
       leads: {
         Row: {
           address: string | null
+          admin_approved: boolean
           area_size: string | null
           assigned_firms: string[] | null
           budget: string
@@ -451,9 +452,11 @@ export type Database = {
           updated_at: string
           user_id: string
           water_source: string | null
+          token_price: number
         }
         Insert: {
           address?: string | null
+          admin_approved?: boolean
           area_size?: string | null
           assigned_firms?: string[] | null
           budget: string
@@ -480,9 +483,11 @@ export type Database = {
           updated_at?: string
           user_id: string
           water_source?: string | null
+          token_price?: number
         }
         Update: {
           address?: string | null
+          admin_approved?: boolean
           area_size?: string | null
           assigned_firms?: string[] | null
           budget?: string
@@ -509,6 +514,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           water_source?: string | null
+          token_price?: number
         }
         Relationships: []
       }
@@ -581,6 +587,7 @@ export type Database = {
           timeline: string | null
           updated_at: string | null
           user_id: string | null
+          token_price: number | null
         }
         Insert: {
           address?: string | null
@@ -600,6 +607,7 @@ export type Database = {
           timeline?: string | null
           updated_at?: string | null
           user_id?: string | null
+          token_price?: number | null
         }
         Update: {
           address?: string | null
@@ -619,6 +627,7 @@ export type Database = {
           timeline?: string | null
           updated_at?: string | null
           user_id?: string | null
+          token_price?: number | null
         }
         Relationships: []
       }

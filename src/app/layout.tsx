@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   description: "Türkiye'nin en kapsamlı peyzaj firmaları rehberi. Peyzajbul ile bahçe tasarımı ve peyzaj hizmeti veren en iyi firmaları keşfedin.",
   verification: {
     google: "Z9mTtfx6Lhx4bXEr959QKYsNbdaPXcIbnUFv_vNdy8w",
+    other: {
+      "p:domain_verify": ["c67dc4a6480a0f1ffdd29dcf041111db"],
+    },
   },
 };
 

@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
   const secretPath = process.env.NEXT_PUBLIC_ADMIN_SECRET_PATH || '/admin-dash'
 
   // 🤖 Akıllı Bot Yönetimi
-  const goodBots = /googlebot|bingbot|slurp|duckduckbot|yandexbot|baiduspider|twitterbot|facebookexternalhit|linkedinbot|whatsapp|telegrambot|applebot|gptbot|chatgpt-user|google-extended|perplexitybot|claudebot|cohere-ai|petalbot/i;
+  const goodBots = /googlebot|google-inspectiontool|chrome-lighthouse|storebot-google|bingbot|slurp|duckduckbot|yandexbot|baiduspider|twitterbot|facebookexternalhit|linkedinbot|whatsapp|telegrambot|applebot|gptbot|chatgpt-user|google-extended|perplexitybot|claudebot|cohere-ai|petalbot/i;
   const badBots = /scraper|spam|wget|curl|python-requests|headlesschrome|phantomjs|selenium|puppeteer|httrack|harvest|extract|nikto|sqlmap|nmap/i;
 
   // Sadece kötü botlardaysa VE iyi bot listesinde değilse engelle (Çifte kontrol)

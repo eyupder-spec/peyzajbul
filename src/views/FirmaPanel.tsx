@@ -58,6 +58,7 @@ type Lead = {
   water_source?: string | null;
   photo_urls?: string[] | null;
   total_purchases?: number | null;
+  token_price?: number;
 };
 
 const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
@@ -109,6 +110,7 @@ const MOCK_TOUR_LEAD: Lead = {
   email: "demo@example.com",
   lead_score: 85,
   status: "active",
+  token_price: 20,
 };
 import { FirmaSidebar } from "@/components/firma/FirmaSidebar";
 
@@ -400,7 +402,7 @@ const FirmaPanel = () => {
                                 <Eye className="h-4 w-4 mr-1" /> Önizle
                               </Button>
                               <Button size="sm" id="tour-lead-purchase" disabled>
-                                <Coins className="h-4 w-4 mr-1" /> 20 Jeton
+                                <Coins className="h-4 w-4 mr-1" /> {MOCK_TOUR_LEAD.token_price} Jeton
                               </Button>
                             </div>
                           </td>
@@ -429,7 +431,7 @@ const FirmaPanel = () => {
                           <Eye className="h-4 w-4 mr-1" /> Önizle
                         </Button>
                         <Button size="sm" className="flex-1" disabled>
-                          <Coins className="h-4 w-4 mr-1" /> 20 Jeton
+                          <Coins className="h-4 w-4 mr-1" /> {MOCK_TOUR_LEAD.token_price} Jeton
                         </Button>
                       </div>
                     </CardContent>
@@ -510,7 +512,7 @@ const FirmaPanel = () => {
                                       <Eye className="h-4 w-4 mr-1" /> Önizle
                                     </Button>
                                     <Button size="sm" onClick={() => handlePurchase(lead.id)} disabled={purchasing} id={lead === leads[0] ? "tour-lead-purchase" : undefined}>
-                                      <Coins className="h-4 w-4 mr-1" /> 20 Jeton
+                                      <Coins className="h-4 w-4 mr-1" /> {lead.token_price || 20} Jeton
                                     </Button>
                                   </div>
                                 )}
@@ -562,7 +564,7 @@ const FirmaPanel = () => {
                                 <Eye className="h-4 w-4 mr-1" /> Önizle
                               </Button>
                               <Button size="sm" className="flex-1" onClick={() => handlePurchase(lead.id)} disabled={purchasing}>
-                                <Coins className="h-4 w-4 mr-1" /> 20 Jeton
+                                <Coins className="h-4 w-4 mr-1" /> {lead.token_price || 20} Jeton
                               </Button>
                             </div>
                           )}
@@ -715,7 +717,7 @@ const FirmaPanel = () => {
             {selectedLead && !purchasedLeadIds.has(selectedLead.id) && (
               <Button onClick={() => handlePurchase(selectedLead.id)} disabled={purchasing}>
                 <Coins className="h-4 w-4 mr-2" />
-                Lead Aç (20 Jeton)
+                Lead Aç ({selectedLead.token_price || 20} Jeton)
               </Button>
             )}
             {selectedLead && purchasedLeadIds.has(selectedLead.id) && (

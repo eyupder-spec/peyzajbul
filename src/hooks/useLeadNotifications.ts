@@ -84,8 +84,8 @@ export function useLeadNotifications(firmId: string | null, onNewLead?: () => vo
         },
         (payload) => {
           const newLead = payload.new as any;
-          // Check if this firm is assigned
-          if (newLead.assigned_firms && newLead.assigned_firms.includes(firmId)) {
+          // Check if this firm is assigned and admin has approved
+          if (newLead.admin_approved && newLead.assigned_firms && newLead.assigned_firms.includes(firmId)) {
             playSound();
             showBrowserNotification(newLead.service_type, newLead.city);
             toast({

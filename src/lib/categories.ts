@@ -17,7 +17,17 @@ export const CATEGORIES: Category[] = [
     shortDescription: "Profesyonel peyzaj projesi ve mimari tasarım hizmetleri.",
     seoTitle: "Peyzaj Mimarlığı Firmaları | Peyzajbul",
     seoDescription: "Türkiye'nin en iyi peyzaj mimarlığı firmalarını keşfedin. Profesyonel proje tasarımı, uygulama ve danışmanlık hizmetleri.",
-    seoArticle: `Peyzaj mimarlığı, açık alanların estetik ve fonksiyonel olarak tasarlanmasını kapsayan profesyonel bir disiplindir. Peyzaj mimarları; konut bahçeleri, ticari alanlar, parklar ve kamusal mekanlar için bütüncül projeler hazırlar. Bitki seçimi, sert zemin tasarımı, su öğeleri ve aydınlatma gibi unsurları bir araya getirerek yaşanabilir ve sürdürülebilir dış mekanlar yaratırlar. Türkiye'de peyzaj mimarlığı hizmeti sunan firmaları rehberimizde bulabilirsiniz.`,
+    seoArticle: `
+Peyzaj mimarlığı, dış mekanların sadece estetik değil, aynı zamanda ekolojik ve fonksiyonel olarak tasarlanmasını hedefleyen profesyonel bir disiplindir. Bir peyzaj mimarı; konut bahçelerinden kamusal parklara, ticari komplekslerden kentsel meydanlara kadar geniş bir yelpazede yaşam alanları kurgular. 
+
+### Profesyonel Peyzaj Projelendirme Süreci
+İyi bir peyzaj mimarlığı hizmeti şu aşamalardan oluşur:
+1. **Keşif ve Analiz**: Toprak yapısı, ışık yönü ve mevcut bitki örtüsünün incelenmesi.
+2. **Konsept Tasarım**: Müşteri ihtiyaçları ile estetik değerlerin harmanlandığı ilk taslaklar.
+3. **Teknik Uygulama Verileri**: Sulama, aydınlatma ve sert zemin detaylarının teknik çizimleri.
+4. **Bitkilendirme Planı**: Bölge iklimine en uygun floral türlerin seçimi ve konumlandırılması.
+
+Peyzaj mimarları, sürdürülebilir bir gelecek için biyoçeşitliliği koruyan ve su tasarrufunu ön plana çıkaran projeler üretir. Türkiye'nin en iyi peyzaj mimarlık ofislerini rehberimizde bulabilir, projeleriniz için profesyonel danışmanlık alabilirsiniz.`,
     imageUrl: "https://images.unsplash.com/photo-1558904541-efa843a96f0f?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {
@@ -27,7 +37,16 @@ export const CATEGORIES: Category[] = [
     shortDescription: "Hayalinizdeki bahçeyi profesyonel tasarımcılarla oluşturun.",
     seoTitle: "Bahçe Tasarımı Firmaları | Peyzajbul",
     seoDescription: "Profesyonel bahçe tasarımı firmaları. Villa, konut ve ticari alanlar için özel bahçe projeleri.",
-    seoArticle: `Bahçe tasarımı, dış mekanlarınızı kişisel zevkinize ve ihtiyaçlarınıza göre şekillendiren yaratıcı bir süreçtir. İyi bir bahçe tasarımı; bitki kompozisyonu, yürüyüş yolları, oturma alanları ve dekoratif öğeleri harmanlayarak evinize değer katar. Profesyonel bahçe tasarımcıları, toprağın yapısından iklim koşullarına kadar tüm faktörleri değerlendirerek size özel projeler üretir.`,
+    seoArticle: `
+Bahçe tasarımı, hayalinizdeki dış mekanı gerçeğe dönüştüren yaratıcı bir sanattır. İyi bir tasarım; görsel estetiğin ötesinde, kullanıcının yaşam stilini bahçeye yansıtır. Villa bahçelerinden butik alanlara kadar her metrekare, doğru bir planlamayla fonksiyonel bir yaşam alanına dönüşebilir.
+
+### Bahçe Tasarımında Kritik Unsurlar
+- **Sirkülasyon**: Yürüyüş yolları ve oturma alanları arasındaki akışın doğru kurgulanması.
+- **Odak Noktaları**: Su öğeleri, heykeller veya özel ağaç formları ile görsel derinlik yaratılması.
+- **Fonksiyonel Alanlar**: Çocuk oyun alanları, hobi bahçeleri ve BBQ köşelerinin akıllıca yerleşimi.
+- **Mevsimsel Denge**: Bahçenizin sadece baharda değil, kış aylarında da estetik görünmesini sağlayan bitki seçimi.
+
+Hayalinizdeki bahçeyi oluşturmak için uzman tasarımcılarımız ve profesyonel peyzaj firmalarımızdan ücretsiz teklif alabilir, mekanınıza değer katacak projeleri keşfedebilirsiniz.`,
     imageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {
@@ -37,7 +56,17 @@ export const CATEGORIES: Category[] = [
     shortDescription: "Düzenli bahçe bakımı, budama ve mevsimsel bakım hizmetleri.",
     seoTitle: "Bahçe Bakımı & Bahçıvanlık Firmaları | Peyzajbul",
     seoDescription: "Profesyonel bahçe bakımı ve bahçıvanlık hizmetleri. Düzenli bakım, budama, gübreleme ve mevsimsel işlemler.",
-    seoArticle: `Bahçe bakımı ve bahçıvanlık, yeşil alanlarınızın sağlıklı ve bakımlı kalmasını sağlayan düzenli hizmetlerdir. Çim biçme, yabani ot temizliği, gübreleme, ilaçlama ve mevsimsel bitki değişimleri gibi işlemleri kapsar. Deneyimli bahçıvanlar, bitkilerinizin sağlığını takip eder ve bahçenizin her mevsim canlı kalmasını sağlar.`,
+    seoArticle: `
+Bahçe bakımı ve profesyonel bahçıvanlık hizmetleri, yeşil alanlarınızın sağlığını ve estetiğini uzun vadede koruyan en önemli yatırımdır. Bir bahçe kurulduktan sonra kendi haline bırakıldığında, yabani otlar ve hastalıklar nedeniyle kısa sürede formunu kaybedebilir.
+
+### Periyodik Bahçe Bakımı Neleri Kapsar?
+Düzenli bir bakım takvimi şu işlemleri içermelidir:
+- **Profesyonel Budama**: Ağaç ve çalıların formunu korumak ve sağlıklı büyümelerini sağlamak için doğru zamanda kesim.
+- **Gübreleme ve İlaçlama**: Bitki beslenmesi ve zararlılara karşı mevsimsel koruma önlemleri.
+- **Çim Bakımı**: Havalandırma, yabancı ot temizliği ve düzenli biçim işlemleri.
+- **Teknik Kontrol**: Sulama kanallarının ve peyzaj aydınlatma sistemlerinin gözden geçirilmesi.
+
+Yaz-kış canlı ve nefes alan bir bahçe için deneyimli ekiplerden periyodik bakım hizmeti alabilir, bitkilerinizin ömrünü uzatabilirsiniz.`,
     imageUrl: "https://images.unsplash.com/photo-1416879598555-520eed53bfb8?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {
@@ -47,7 +76,16 @@ export const CATEGORIES: Category[] = [
     shortDescription: "Rulo çim serimi, tohum ekimi ve profesyonel çim bakımı.",
     seoTitle: "Çim Serme & Çim Bakımı Firmaları | Peyzajbul",
     seoDescription: "Rulo çim serimi ve çim bakımı firmaları. Profesyonel yeşil alan oluşturma hizmetleri.",
-    seoArticle: `Çim serme, bahçenize hızlı ve etkili bir şekilde yeşil bir görünüm kazandırmanın en pratik yoludur. Rulo çim uygulaması, tohum ekimine kıyasla çok daha kısa sürede sonuç verir. Profesyonel çim bakımı ise düzenli biçim, sulama, gübreleme ve havalandırma işlemlerini içerir. Doğru çim türü seçimi ve bakım programı ile yıl boyunca yeşil, sağlıklı bir çim alan elde edebilirsiniz.`,
+    seoArticle: `
+Modern peyzajın kalbi sayılan otomatik sulama sistemleri, bitkilerinizin can damarıdır. Yanlış veya yetersiz sulama, en pahalı peyzaj projelerinin bile kurumasına neden olabilir. Akıllı sistemler sayesinde hem su tasarrufu yapabilir hem de bitkilerinizin ihtiyacı olan nemi tam zamanında almasını sağlayabilirsiniz.
+
+### Akıllı Sulama Çözümleri
+- **Damlama Sulama**: Su kaybını minimuma indiren, doğrudan kök bölgesine odaklanan sistemler.
+- **Pop-up Yağmurlama**: Çim alanlar için estetik, kullanım anında yüzeye çıkan geniş açılı başlıklar.
+- **Wi-Fi Kontrol Üniteleri**: Cep telefonunuzdan yönetilebilen, hava durumuna göre sulamayı otomatik erteleyen sistemler.
+- **Sensör Teknolojisi**: Yağmur ve nem sensörleri ile gereksiz sulamanın önlenmesi.
+
+Profesyonel bir sulama sistemi kurulumu, bahçenizin geleceğini garanti altına alır. Uzman firmalarımızdan projelendirme ve montaj desteği alarak sürdürülebilir bir bahçeye sahip olabilirsiniz.`,
     imageUrl: "https://images.unsplash.com/photo-1592424001802-bd9280453303?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {
@@ -87,7 +125,16 @@ export const CATEGORIES: Category[] = [
     shortDescription: "Taş döşeme, parke, duvar ve sert zemin uygulamaları.",
     seoTitle: "Sert Zemin (Hardscape) Firmaları | Peyzajbul",
     seoDescription: "Sert zemin ve hardscape firmaları. Taş döşeme, parke, istinat duvarı ve dış mekan kaplama hizmetleri.",
-    seoArticle: `Sert zemin (hardscape), bahçe ve dış mekanlardaki taş, beton, ahşap ve metal gibi malzemelerle yapılan yapısal uygulamaları kapsar. Yürüyüş yolları, teraslar, istinat duvarları, merdiven ve patioların inşası bu kategoriye girer. Doğru hardscape tasarımı, bahçenize karakter katar ve fonksiyonel kullanım alanları yaratır.`,
+    seoArticle: `
+Sert zemin (hardscape), bir bahçenin iskeletini oluşturan en kritik yapısal unsurdur. Taş, beton, ahşap ve kompozit malzemelerin doğru kullanımı, dış mekanın hem karakterini belirler hem de fonksiyonel kullanım alanları yaratır.
+
+### Sert Zemin Uygulama Alanları
+- **Yürüyüş ve Araç Yolları**: Aşınmaya dayanıklı, drenajı iyi yapılmış doğal taş veya kilit parke döşemeleri.
+- **Teras ve Oturma Alanları**: Kaymaz özellikli seramik, traverten veya ahşap deck kaplamaları.
+- **İstinat Duvarları**: Eğimli arazilerde toprak kaymasını önleyen, dekoratif taşlarla örülen yapısal çözümler.
+- **Sınır Belirleyiciler**: Bahçe bölümlerini birbirinden ayıran estetik bordür ve çit temelleri.
+
+Kaliteli bir sert zemin işçiliği, bahçenizin değerini artırırken bakım ihtiyacını minimize eder. Profesyonel ekiplerimizden malzeme seçimi ve uygulama desteği alabilirsiniz.`,
     imageUrl: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {
@@ -107,7 +154,16 @@ export const CATEGORIES: Category[] = [
     shortDescription: "Yüzme havuzu yapımı ve havuz çevresi peyzaj düzenlemesi.",
     seoTitle: "Havuz Yapımı & Çevresi Firmaları | Peyzajbul",
     seoDescription: "Havuz yapımı ve çevre düzenlemesi firmaları. Yüzme havuzu inşaatı, havuz peyzajı ve bakım hizmetleri.",
-    seoArticle: `Havuz yapımı, bahçenizi lüks bir yaşam alanına dönüştüren önemli bir yatırımdır. Profesyonel havuz firmaları; betonarme, fiberglass ve prefabrik havuz seçenekleri sunar. Havuz çevresi peyzaj düzenlemesi ise güverte döşeme, bitkilendirme ve aydınlatma ile havuz alanınızı tamamlar.`,
+    seoArticle: `
+Yüzme havuzu yapımı, bir bahçeyi lüks bir yaşam alanına ve kişisel bir tatile dönüştüren en prestijli peyzaj yatırımıdır. Ancak doğru bir havuz projesi; sadece bir çukur kazıp içine su doldurmak değil, mimari uyum, izolasyon ve kusursuz bir mekanik tesisat sürecidir.
+
+### Havuz Yapım Süreçleri
+1. **Mimari Projelendirme**: Bahçenin ölçeğine ve evin mimarisine uygun havuz formunun belirlenmesi.
+2. **Kaba İnşaat ve İzolasyon**: Sızdırmazlık garantili betonarme yapı ve yüksek kaliteli izolasyon katmanları.
+3. **Mekanik Tesisat**: Filtrasyon sistemleri, dozaj pompaları ve isteğe bağlı ısıtma/aydınlatma çözümleri.
+4. **Çevre Düzenleme**: Havuz çevresi için kaymaz güneşlenme alanları ve uygun bitkilendirme.
+
+Deneyimli havuz firmalarımız, projenizin başından sonuna kadar tüm teknik detayları yöneterek size uzun yıllar güvenle kullanabileceğiniz havuzlar sunar.`,
     imageUrl: "https://images.unsplash.com/photo-1576013551627-142f77eec821?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {
@@ -137,7 +193,16 @@ export const CATEGORIES: Category[] = [
     shortDescription: "İç ve dış mekan dikey bahçe sistemleri ve yeşil duvar uygulamaları.",
     seoTitle: "Dikey Bahçe Firmaları | Peyzajbul",
     seoDescription: "Dikey bahçe ve yeşil duvar firmaları. İç ve dış mekan dikey bitkilendirme sistemleri.",
-    seoArticle: `Dikey bahçeler, duvar yüzeylerini yeşile dönüştüren modern peyzaj uygulamalarıdır. Hem iç hem de dış mekanlarda uygulanabilen dikey bahçe sistemleri, sınırlı alanlarda maksimum yeşillik sağlar. Otomatik sulama ve beslenme sistemleri ile bakımı kolaylaştırılmış çözümler sunan firmalar, mekanlarınıza doğa dokunuşu katar.`,
+    seoArticle: `
+Dikey bahçeler (yeşil duvarlar), sınırlı alanda maksimum yeşil alan yaratmanın en modern ve estetik yoludur. Özellikle kentsel alanlarda, teraslarda veya iç mekanlarda doğayı dikey düzleme taşıyan bu sistemler, hava kalitesini artırırken mükemmel bir ses ve ısı yalıtımı sağlar.
+
+### Dikey Bahçe Sistemleri ve Avantajları
+- **Hidroponik Sistemler**: Topraksız, su ve besin solüsyonu ile bitki besleyen profesyonel modüller.
+- **Keçe Panel Sistemleri**: Hafif yapısı ile her türlü duvara kolayca adapte edilebilen ekonomik çözümler.
+- **Modüler Saksı Sistemleri**: Değiştirilebilir bitki hazneleri ile kolay bakım imkanı sunan yapılar.
+- **Psikolojik ve Çevresel Etki**: İç mekanlarda stresi azaltırken, dış mekanlarda bina cephesini korur.
+
+Otomatik sulama ve besleme üniteleri ile entegre dikey bahçe projeleri için uzman firmalarımızdan keşif ve projelendirme desteği alabilirsiniz.`,
     imageUrl: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {
@@ -147,7 +212,16 @@ export const CATEGORIES: Category[] = [
     shortDescription: "Şehir parkları, meydanlar ve kamusal alan peyzaj projeleri.",
     seoTitle: "Kentsel Peyzaj Firmaları | Peyzajbul",
     seoDescription: "Kentsel peyzaj firmaları. Şehir parkları, meydanlar, bulvarlar ve kamusal alan peyzaj projeleri.",
-    seoArticle: `Kentsel peyzaj, şehirlerin yaşanabilirliğini artıran büyük ölçekli peyzaj projelerini kapsar. Parklar, meydanlar, bulvar düzenlemeleri, kıyı peyzajı ve rekreasyon alanları kentsel peyzajın başlıca uygulama alanlarıdır. Bu projeler; belediyeler, kamu kurumları ve özel sektör için uzman peyzaj firmaları tarafından gerçekleştirilir.`,
+    seoArticle: `
+Kentsel peyzaj, şehirlerin yaşanabilirliğini, estetiğini ve ekolojik dengesini artıran büyük ölçekli projeleri kapsar. Parklar, meydanlar, sahil şeridi düzenlemeleri ve kamusal rekreasyon alanları, kentsel peyzajın temel taşlarıdır.
+
+### Kentsel Peyzajın Temel Bileşenleri
+1. **Kamusal Alan Tasarımı**: İnsan odaklı, erişilebilir ve güvenli şehir meydanları ve parkların kurgulanması.
+2. **Kentsel Ekoloji**: Şehir içindeki biyoçeşitliliğin korunması ve yeşil koridorların oluşturulması.
+3. **Rekreasyon Alanları**: Çocuk parkları, spor alanları ve yürüyüş parkurlarının fonksiyonel yerleşimi.
+4. **Altyapı Entegrasyonu**: Yağmur suyu yönetimi (yağmur bahçeleri) ve sürdürülebilir drenaj çözümleri.
+
+Büyük ölçekli kentsel projeler için deneyimli peyzaj ofisleri ve uygulama firmalarımızla iletişime geçebilirsiniz.`,
     imageUrl: "https://images.unsplash.com/photo-1496851473196-e26508c21494?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {
@@ -177,7 +251,16 @@ export const CATEGORIES: Category[] = [
     shortDescription: "Peyzaj taşları, dekoratif malzemeler ve bahçe ekipmanları satışı.",
     seoTitle: "Peyzaj Malzemeleri Satışı | Peyzajbul",
     seoDescription: "Peyzaj malzemeleri satan firmalar. Dekoratif taşlar, bordürler, bahçe ekipmanları ve peyzaj ürünleri.",
-    seoArticle: `Peyzaj malzemeleri, bahçe ve dış mekan projelerinde kullanılan tüm ürünleri kapsar. Dekoratif taşlar, bordürler, bahçe süsleri, saksılar, toprak ürünleri ve bahçe ekipmanları bu kategorideki başlıca ürünlerdir. Kaliteli malzeme seçimi, projenizin uzun ömürlü ve estetik olmasını sağlar.`,
+    seoArticle: `
+Kaliteli peyzaj uygulamalarının temelinde doğru ve dayanıklı malzeme seçimi yatar. Peyzaj malzemeleri; dekoratif unsurlardan teknik altyapı ürünlerine kadar çok geniş bir yelpazeyi kapsar.
+
+### Başlıca Peyzaj Malzemeleri ve Ürün Grupları
+- **Dekoratif Taşlar ve Bordürler**: Dolomit, podima, dere taşı ve sınırlayıcı plastik/metal bordürler.
+- **Zemin Kaplama Ürünleri**: Doğal taşlar, kilit parkeler, ahşap deck ve kompozit malzemeler.
+- **Toprak ve Gübre**: Bitki besleyici torf karışımları, organik gübreler ve bitki ıslah ürünleri.
+- **Aydınlatma ve Sulama**: Solar lambalar, pop-up fıskiyeler, damlama hortumları ve kontrol üniteleri.
+
+Projeniz için ihtiyacınız olan tüm malzemeleri toptan veya perakende olarak temin edebileceğiniz güvenilir tedarikçileri listemizde bulabilirsiniz.`,
     imageUrl: "https://images.unsplash.com/photo-1416879598555-520eed53bfb8?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {

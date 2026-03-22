@@ -66,7 +66,7 @@ const HizmetBolgeDetay = ({
         {/* BREADCRUMB & HERO STACKED WITH BACKGROUND */}
         <section className="relative w-full overflow-hidden bg-black pb-12 pt-28">
           {/* Background Image */}
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center z-0 opacity-40"
             style={{ backgroundImage: `url(${category.imageUrl})` }}
           />
@@ -91,11 +91,11 @@ const HizmetBolgeDetay = ({
                 <MapPin className="h-4 w-4" />
                 <span className="text-sm font-medium">{fullLocation} Bölgesi</span>
               </div>
-              
+
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
                 {districtName || cityName} <span className="text-primary-foreground">{category.label}</span> Hizmeti
               </h1>
-              
+
               <p className="text-lg text-white/90 leading-relaxed mb-8 drop-shadow max-w-2xl">
                 {districtName} bölgesinde profesyonel {category.label.toLowerCase()} hizmeti veren en iyi peyzaj firmalarını sizin için listeledik. Yaşam alanlarınızı güzelleştirmek için uzman ekiplerden hemen ücretsiz teklif alın.
               </p>
@@ -115,28 +115,62 @@ const HizmetBolgeDetay = ({
         {/* İÇERİK VE FİRMALAR GRID */}
         <section className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
+
             {/* SOL KOLON (Makale & Projeler) */}
             <div className="lg:col-span-2 space-y-12">
-              <article className="prose prose-gray max-w-none prose-headings:text-foreground prose-p:text-muted-foreground">
-                <h2 className="heading-premium-h2">{fullLocation} Bölgesinde {category.label} Çözümleri</h2>
-                <p>
-                  {category.seoArticle || ""} <strong>{districtName}</strong> bölgesinin iklimsel koşulları, toprak yapısı ve mimari dokusu göz önünde bulundurularak {category.label.toLowerCase()} uygulamaları profesyonel peyzaj mimarları tarafından özenle planlanmalıdır. Özellikle <strong>{cityName}</strong> gibi büyükşehirlerde dış mekanların doğru değerlendirilmesi yaşam kalitesini doğrudan artırır.
-                </p>
-                
-                <h3 className="heading-premium-h3"><Sparkles className="h-5 w-5 text-primary" /> Ayrıcalıklı Hizmet Anlayışı</h3>
-                <p>
-                  Sürecin ilk aşamasında alan keşfi ve toprak analizi yapılır. {category.label} projelerinde doğru karar verebilmek için mekanın güneş alma süresi, rüzgar yönü ve mevcut altyapı detaylıca incelenir. {districtName} çevresindeki konutlarda ve ticari alanlarda uygulanan modern peyzaj trendleri mekana hem estetik bir değer hem de ekonomik bir artı katar.
-                </p>
-                
-                <ul className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 mt-6">
-                  {['Ücretsiz Alan Keşfi ve Projelendirme', 'Uzman Peyzaj Mimarı Kadrosu', 'Bölge İklimine Uygun Bitki Seçimi', 'Garantili ve Sürekli Bakım Hizmeti'].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+              <article className="prose prose-sm md:prose-base max-w-none prose-headings:text-foreground prose-p:text-muted-foreground leading-relaxed">
+                <h2 className="text-2xl font-bold text-foreground mb-6">{fullLocation} Bölgesinde {category.label} Çözümleri</h2>
+
+                {category.seoArticle?.split('\n').map((line, i) => {
+                  const trimmedLine = line.trim();
+                  if (!trimmedLine) return <br key={i} className="hidden" />;
+
+                  // Başlıklar
+                  if (trimmedLine.startsWith('###')) {
+                    return (
+                      <h3 key={i} className="text-xl font-bold text-foreground mt-8 mb-4 border-l-4 border-primary pl-3">
+                        {trimmedLine.replace('###', '').trim()}
+                      </h3>
+                    );
+                  }
+                  if (trimmedLine.startsWith('##')) {
+                    return <h2 key={i} className="text-2xl font-bold text-foreground mt-10 mb-6">{trimmedLine.replace('##', '').trim()}</h2>;
+                  }
+
+                  // Liste elemanları
+                  if (trimmedLine.startsWith('- ')) {
+                    return (
+                      <div key={i} className="flex items-start gap-2 mb-2 ml-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                        <span className="text-sm md:text-base">{trimmedLine.replace('- ', '').replace(/\*\*(.*?)\*\*/g, '$1')}</span>
+                      </div>
+                    );
+                  }
+
+                  // Sayısal listeler
+                  if (/^\d+\./.test(trimmedLine)) {
+                    return (
+                      <div key={i} className="flex items-start gap-2 mb-2 ml-2 font-semibold text-foreground">
+                        <span className="text-primary">{trimmedLine.split('.')[0]}.</span>
+                        <span className="text-sm md:text-base font-normal text-muted-foreground">{trimmedLine.split('.').slice(1).join('.').trim()}</span>
+                      </div>
+                    );
+                  }
+
+                  // Normal Paragraf (Kalın metin desteği ile)
+                  return (
+                    <p key={i} className="mb-4 text-sm md:text-base">
+                      {trimmedLine.split(/\*\*(.*?)\*\*/g).map((part, index) =>
+                        index % 2 === 1 ? <strong key={index} className="text-foreground">{part}</strong> : part
+                      )}
+                      {i === 1 && (
+                        <span className="ml-1">
+                          <strong>{districtName || cityName}</strong> bölgesinin iklimsel koşulları, toprak yapısı ve mimari dokusu göz önünde bulundurularak {category.label.toLowerCase()} uygulamaları profesyonel peyzaj mimarları tarafından özenle planlanmalıdır.
+                        </span>
+                      )}
+                    </p>
+                  );
+                })}
               </article>
 
               {/* WHY CHOOSE US - NEW SEO SECTION */}
@@ -145,7 +179,7 @@ const HizmetBolgeDetay = ({
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <h4 className="font-bold flex items-center gap-2">
-                       <Sparkles className="h-4 w-4 text-accent" /> Yerel Deneyim
+                      <Sparkles className="h-4 w-4 text-accent" /> Yerel Deneyim
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       {cityName} bölgesindeki iklim ve toprak yapısını en iyi bilen firmalarla çalışarak, projenizin uzun ömürlü ve sağlıklı kalmasını sağlarsınız.
@@ -153,7 +187,7 @@ const HizmetBolgeDetay = ({
                   </div>
                   <div className="space-y-2">
                     <h4 className="font-bold flex items-center gap-2">
-                       <CheckCircle2 className="h-4 w-4 text-accent" /> Hızlı Teklif Alın
+                      <CheckCircle2 className="h-4 w-4 text-accent" /> Hızlı Teklif Alın
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       Peyzajbul üzerinden {districtName || cityName} bölgesindeki birden fazla firmadan hızlıca teklif toplayarak maliyet avantajı elde edebilirsiniz.
@@ -161,7 +195,7 @@ const HizmetBolgeDetay = ({
                   </div>
                   <div className="space-y-2">
                     <h4 className="font-bold flex items-center gap-2">
-                       <Building2 className="h-4 w-4 text-accent" /> Şeffaf Süreç
+                      <Building2 className="h-4 w-4 text-accent" /> Şeffaf Süreç
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       Müşteri yorumları ve puanları sayesinde, {category.label} hizmetinde uzmanlaşmış en güvenilir ekipleri kolayca ayırt edin.
@@ -169,7 +203,7 @@ const HizmetBolgeDetay = ({
                   </div>
                   <div className="space-y-2">
                     <h4 className="font-bold flex items-center gap-2">
-                       <MapPin className="h-4 w-4 text-accent" /> Yaygın Hizmet Ağı
+                      <MapPin className="h-4 w-4 text-accent" /> Yaygın Hizmet Ağı
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       {districtName} ve çevresindeki tüm mahallelerde hizmet sunan profesyonellere tek tıkla ulaşım imkanı.
@@ -255,7 +289,7 @@ const HizmetBolgeDetay = ({
                   <Building2 className="h-5 w-5 text-primary" />
                   Öne Çıkan Firmalar
                 </h3>
-                
+
                 <div className="space-y-4">
                   {sidebarFirms.map((firm) => (
                     <Card key={firm.id} className="group hover:border-primary/50 transition-colors shadow-sm">
@@ -268,20 +302,20 @@ const HizmetBolgeDetay = ({
                             <Badge variant="default" className="bg-amber-500 hover:bg-amber-600 text-[10px] px-1.5 py-0 h-4 shrink-0 ml-2">Önerilen</Badge>
                           )}
                         </div>
-                        
+
                         <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
                           <span className="flex items-center truncate">
                             <MapPin className="w-3.5 h-3.5 mr-1 shrink-0" />
                             <span className="truncate">{firm.district ? `${firm.district}, ` : ''}{firm.city}</span>
                           </span>
                         </div>
-                        
+
                         {firm.description && (
                           <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
                             {firm.description}
                           </p>
                         )}
-                        
+
                         <Button variant="outline" size="sm" className="w-full text-xs h-8" asChild>
                           <Link href={`/firma/${firm.slug}`}>Profili İncele</Link>
                         </Button>

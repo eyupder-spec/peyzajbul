@@ -8,8 +8,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const LEAD_COST = 20;
-
 const spendSchema = z.object({
   lead_id: z.string().uuid("Geçersiz lead_id formatı"),
 });
@@ -59,6 +57,16 @@ serve(async (req) => {
       throw new Error("Bu müşteri adayı satış limitine ulaştı (Maksimum 3 firma satın alabilir).");
     }
 
+    // Get lead token_price
+    const { data: leadModel } = await supabaseAdmin
+      .from("leads")
+      .select("token_price")
+      .eq("id", lead_id)
+      .single();
+
+    if (!leadModel) throw new Error("Lead bulunamadı");
+    const leadCost = leadModel.token_price || 20;
+
     // Get firm and check balance
     const { data: firm } = await supabaseAdmin
       .from("firms")
@@ -67,19 +75,19 @@ serve(async (req) => {
       .single();
 
     if (!firm) throw new Error("Firma bulunamadı");
-    if (firm.coin_balance < LEAD_COST) throw new Error("Yetersiz jeton bakiyesi");
+    if (firm.coin_balance < leadCost) throw new Error("Yetersiz jeton bakiyesi");
 
     // Deduct coins
     await supabaseAdmin
       .from("firms")
-      .update({ coin_balance: firm.coin_balance - LEAD_COST })
+      .update({ coin_balance: firm.coin_balance - leadCost })
       .eq("id", firm.id);
 
     // Record transaction
     await supabaseAdmin.from("coin_transactions").insert({
       firm_id: firm.id,
       type: "spend",
-      amount: -LEAD_COST,
+      amount: -leadCost,
       description: "Müşteri adayı açma",
       lead_id,
     });
@@ -88,7 +96,7 @@ serve(async (req) => {
     await supabaseAdmin.from("lead_purchases").insert({
       lead_id,
       firm_id: user.id,
-      amount: LEAD_COST,
+      amount: leadCost,
       status: "paid",
     });
 
@@ -136,7 +144,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, new_balance: firm.coin_balance - LEAD_COST }),
+      JSON.stringify({ success: true, new_balance: firm.coin_balance - leadCost }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error) {

@@ -76,11 +76,52 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
         </div>
 
         <div className="container mx-auto px-4 py-12">
-          <article className="prose prose-lg max-w-3xl mx-auto mb-16 font-body text-muted-foreground leading-relaxed">
-            <p className="mb-4">{category.seoArticle}</p>
-            <p>
-              Profesyonel <strong>{category.label.toLowerCase()}</strong> hizmetleri, sadece estetik bir görünüm değil, aynı zamanda mülkünüzün değerini artıran ve ekosisteme katkı sağlayan yatırım odaklı çalışmalardır. Peyzajbul olarak Türkiye genelindeki en deneyimli firmaları, uzman peyzaj mimarlarını ve uygulama ekiplerini bir araya getiriyoruz. İhtiyacınız olan çözüm için doğru uzmanla eşleşerek projenizi güvenle hayata geçirebilirsiniz.
-            </p>
+          <article className="prose prose-sm md:prose-base max-w-4xl mx-auto mb-16 font-body text-muted-foreground leading-relaxed px-4">
+            {category.seoArticle.split('\n').map((line, i) => {
+              const trimmedLine = line.trim();
+              if (!trimmedLine) return <br key={i} className="hidden" />;
+
+              // Başlıklar
+              if (trimmedLine.startsWith('###')) {
+                return <h3 key={i} className="text-xl font-bold text-foreground mt-8 mb-4 border-l-4 border-primary pl-3">{trimmedLine.replace('###', '').trim()}</h3>;
+              }
+              if (trimmedLine.startsWith('##')) {
+                return <h2 key={i} className="text-2xl font-bold text-foreground mt-10 mb-6">{trimmedLine.replace('##', '').trim()}</h2>;
+              }
+
+              // Liste elemanları
+              if (trimmedLine.startsWith('- ')) {
+                return (
+                  <div key={i} className="flex items-start gap-2 mb-2 ml-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                    <span className="text-sm md:text-base">{trimmedLine.replace('- ', '').replace(/\*\*(.*?)\*\*/g, '$1')}</span>
+                  </div>
+                );
+              }
+
+              // Sayısal listeler
+              if (/^\d+\./.test(trimmedLine)) {
+                return (
+                  <div key={i} className="flex items-start gap-2 mb-2 ml-2 font-semibold text-foreground">
+                    <span className="text-primary">{trimmedLine.split('.')[0]}.</span>
+                    <span className="text-sm md:text-base font-normal text-muted-foreground">{trimmedLine.split('.').slice(1).join('.').trim()}</span>
+                  </div>
+                );
+              }
+
+              // Normal Paragraf (Kalın metin desteği ile)
+              return (
+                <p key={i} className="mb-4 text-sm md:text-base">
+                  {trimmedLine.split(/\*\*(.*?)\*\*/g).map((part, index) =>
+                    index % 2 === 1 ? <strong key={index} className="text-foreground">{part}</strong> : part
+                  )}
+                </p>
+              );
+            })}
+
+            <div className="mt-8 pt-8 border-t border-border/50 italic text-sm">
+              Profesyonel <strong>{category.label.toLowerCase()}</strong> hizmetleri, sadece estetik bir görünüm değil, aynı zamanda mülkünüzün değerini artıran bir yatırımdır. Peyzajbul olarak doğru uzmanla eşleşmenizi sağlıyoruz.
+            </div>
           </article>
 
           <LeadFormBanner />

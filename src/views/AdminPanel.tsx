@@ -72,6 +72,8 @@ type Lead = {
   status: string;
   user_id: string;
   assigned_firms?: string[] | null;
+  token_price?: number;
+  admin_approved?: boolean;
 };
 
 type UserRole = {
@@ -250,6 +252,16 @@ const AdminPanel = () => {
       toast({ title: "Durum güncellendi" });
     }
     setEditingStatus(null);
+  };
+
+  const handleApproveLead = async (id: string, currentTokenPrice: number) => {
+    const { error } = await supabase.from("leads").update({ admin_approved: true, token_price: currentTokenPrice }).eq("id", id);
+    if (error) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    } else {
+      setLeads((prev) => prev.map((l) => l.id === id ? { ...l, admin_approved: true, token_price: currentTokenPrice } as Lead : l));
+      toast({ title: "Lead onaylandı ve firmalara açıldı" });
+    }
   };
 
   const handleApproveFirm = async (firmId: string) => {
@@ -576,6 +588,7 @@ const AdminPanel = () => {
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">Hizmet</th>
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">İl</th>
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">Bütçe</th>
+                        <th className="text-left px-3 py-2 text-muted-foreground font-medium">Jeton</th>
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">Skor</th>
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">Durum</th>
                         <th className="text-left px-3 py-2 text-muted-foreground font-medium">Dağıtım</th>
@@ -595,14 +608,30 @@ const AdminPanel = () => {
                             <td className="px-3 py-2 text-foreground">{lead.city}</td>
                             <td className="px-3 py-2 text-foreground">{lead.budget}</td>
                             <td className="px-3 py-2">
+                              {!lead.admin_approved ? (
+                                <Input 
+                                  type="number" 
+                                  className="w-16 h-8 text-xs bg-muted/50 border-border" 
+                                  defaultValue={lead.token_price || 20} 
+                                  id={`price-${lead.id}`}
+                                />
+                              ) : (
+                                <Badge variant="outline" className="text-foreground">{lead.token_price || 20} Jeton</Badge>
+                              )}
+                            </td>
+                            <td className="px-3 py-2">
                               <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${badge.className}`}>
                                 {badge.emoji} {lead.lead_score || 0}
                               </span>
                             </td>
                             <td className="px-3 py-2">
-                              <Badge variant={lead.status === "active" ? "default" : lead.status === "expired" ? "destructive" : "secondary"}>
-                                {lead.status}
-                              </Badge>
+                              {!lead.admin_approved ? (
+                                <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">Onay Bekliyor</Badge>
+                              ) : (
+                                <Badge variant={lead.status === "active" ? "default" : lead.status === "expired" ? "destructive" : "secondary"}>
+                                  {lead.status}
+                                </Badge>
+                              )}
                             </td>
                             <td className="px-3 py-2">
                               {lead.assigned_firms && lead.assigned_firms.length > 0 ? (
@@ -637,11 +666,19 @@ const AdminPanel = () => {
                               )}
                             </td>
                             <td className="px-3 py-2">
-                              <div className="flex gap-1">
-                                <Button size="sm" variant="ghost" onClick={() => setEditingStatus({ id: lead.id, status: lead.status })}>
+                              <div className="flex gap-1" style={{ alignItems: 'center' }}>
+                                {!lead.admin_approved && (
+                                  <Button size="sm" variant="default" className="h-7 text-xs px-2" onClick={() => {
+                                    const val = (document.getElementById(`price-${lead.id}`) as HTMLInputElement)?.value;
+                                    handleApproveLead(lead.id, parseInt(val || "20"));
+                                  }}>
+                                    Onayla
+                                  </Button>
+                                )}
+                                <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => setEditingStatus({ id: lead.id, status: lead.status })}>
                                   <Edit className="h-3 w-3" />
                                 </Button>
-                                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setDeletingLead(lead.id)}>
+                                <Button size="sm" variant="ghost" className="h-7 px-2 text-destructive" onClick={() => setDeletingLead(lead.id)}>
                                   <Trash2 className="h-3 w-3" />
                                 </Button>
                               </div>

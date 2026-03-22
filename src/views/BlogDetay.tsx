@@ -23,7 +23,9 @@ import {
   ChevronRight,
   Sparkles,
   MessageSquare,
-  Bookmark
+  Bookmark,
+  List,
+  ChevronDown
 } from "lucide-react";
 import { CATEGORIES } from "@/lib/categories";
 import { CITIES } from "@/lib/cities";
@@ -47,20 +49,41 @@ interface BlogPost {
 const generateTOC = (htmlStr: string) => {
   if (!htmlStr) return { html: "", toc: [] };
   const toc: { id: string; text: string; level: number }[] = [];
+  const seenSlugs: Record<string, number> = {};
 
   const modifiedHtml = htmlStr.replace(/<h([2-4])([^>]*)>(.*?)<\/h\1>/gi, (match, levelStr, attrs, innerHtml) => {
     const level = parseInt(levelStr, 10);
     const text = innerHtml.replace(/<[^>]+>/g, '').trim();
     if (!text) return match;
 
-    // Create a slug
-    const slug = text
+    // Generate slug with correct Turkish character handling
+    let slug = text
+      .replace(/İ/g, "i")
+      .replace(/I/g, "i")
+      .replace(/ı/g, "i")
+      .replace(/ğ/g, "g")
+      .replace(/Ğ/g, "g")
+      .replace(/ü/g, "u")
+      .replace(/Ü/g, "u")
+      .replace(/ş/g, "s")
+      .replace(/Ş/g, "s")
+      .replace(/ö/g, "o")
+      .replace(/Ö/g, "o")
+      .replace(/ç/g, "c")
+      .replace(/Ç/g, "c")
       .toLowerCase()
-      .replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ş/g, "s").replace(/ı/g, "i").replace(/ö/g, "o").replace(/ç/g, "c")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-    const uniqueId = `${slug}-${Math.random().toString(36).substr(2, 5)}`;
+    // Deterministic slug handling for duplicates
+    if (seenSlugs[slug] !== undefined) {
+      seenSlugs[slug]++;
+      slug = `${slug}-${seenSlugs[slug]}`;
+    } else {
+      seenSlugs[slug] = 0;
+    }
+
+    const uniqueId = slug;
     toc.push({ id: uniqueId, text, level });
 
     return `<h${level} id="${uniqueId}"${attrs}>${innerHtml}</h${level}>`;
@@ -76,6 +99,7 @@ interface BlogDetayProps {
 
 const BlogDetay = ({ post }: BlogDetayProps) => {
   const [isLeadFormOpen, setIsLeadFormOpen] = useState(false);
+  const [isTocOpen, setIsTocOpen] = useState(false);
 
   // 3. ANA POST FETCH'İNİ SİLDİK (Gereksizdi, Server'dan geliyor)
 
@@ -227,28 +251,59 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
               </div>
 
               {toc.length > 0 && (
-                <div className="bg-muted/30 border border-border/50 rounded-2xl p-6 mb-12 shadow-sm">
-                  <h3 className="font-heading font-bold text-lg mb-4 text-foreground flex items-center gap-2">
-                    Bu Yazıda Neler Var?
-                  </h3>
-                  <ul className="space-y-2.5">
-                    {toc.map((item) => (
-                      <li key={item.id} className={item.level === 3 ? "ml-4" : item.level === 4 ? "ml-8" : ""}>
-                        <a
-                          href={`#${item.id}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            // Update URL without jump
-                            window.history.pushState(null, '', `#${item.id}`);
-                          }}
-                          className="text-muted-foreground hover:text-primary transition-colors text-sm flex items-center gap-2 before:content-[''] before:w-1.5 before:h-1.5 before:bg-primary/50 hover:before:bg-primary hover:before:scale-110 before:transition-all before:rounded-full before:shrink-0"
-                        >
-                          {item.text}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="bg-muted/30 border border-border/50 rounded-2xl mb-12 shadow-sm overflow-hidden group/toc">
+                  <div className="p-6 pb-2">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <List className="h-5 w-5 text-primary" />
+                      </div>
+                      <h3 className="font-heading font-bold text-lg text-foreground">
+                        Bu Yazıda Neler Var?
+                      </h3>
+                    </div>
+                    
+                    <ul className="space-y-3 pt-4 border-t border-border/50 relative">
+                      {(isTocOpen ? toc : toc.slice(0, 5)).map((item) => (
+                        <li key={item.id} className={`${item.level === 3 ? "ml-4" : item.level === 4 ? "ml-8" : ""} transition-all duration-300`}>
+                          <a
+                            href={`#${item.id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              window.history.pushState(null, '', `#${item.id}`);
+                            }}
+                            className="text-muted-foreground hover:text-primary transition-all text-sm flex items-center gap-3 group/link py-1"
+                          >
+                            <span className="w-1.5 h-1.5 bg-primary/30 group-hover/link:bg-primary group-hover/link:scale-150 transition-all rounded-full shrink-0" />
+                            <span className="group-hover/link:translate-x-1 transition-transform inline-block font-medium">{item.text}</span>
+                          </a>
+                        </li>
+                      ))}
+                      
+                      {!isTocOpen && toc.length > 5 && (
+                        <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-muted/30 to-transparent pointer-events-none" />
+                      )}
+                    </ul>
+                  </div>
+
+                  {toc.length > 5 && (
+                    <button 
+                      onClick={() => setIsTocOpen(!isTocOpen)}
+                      className="w-full flex items-center justify-center p-4 text-xs font-bold text-primary hover:bg-primary/5 transition-all gap-2 border-t border-border/50 bg-muted/10"
+                    >
+                      {isTocOpen ? (
+                        <>
+                          <ChevronDown className="h-4 w-4 rotate-180" />
+                          Listeyi Daralt
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-4 w-4" />
+                          Tümünü Gör ({toc.length} Başlık)
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               )}
 

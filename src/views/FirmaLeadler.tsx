@@ -51,6 +51,8 @@ type Lead = {
   water_source?: string | null;
   photo_urls?: string[] | null;
   total_purchases?: number | null;
+  token_price?: number;
+  admin_approved?: boolean;
 };
 
 const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
@@ -325,7 +327,7 @@ const FirmaLeadlerContent = () => {
                                 <Eye className="h-4 w-4 mr-1" /> Önizle
                               </Button>
                               <Button size="sm" onClick={() => handlePurchase(lead.id)} disabled={purchasing || (leadPurchaseCounts[lead.id] || 0) >= 3}>
-                                <Coins className="h-4 w-4 mr-1" /> {(leadPurchaseCounts[lead.id] || 0) >= 3 ? "Tükendi" : "20 Jeton"}
+                                <Coins className="h-4 w-4 mr-1" /> {(leadPurchaseCounts[lead.id] || 0) >= 3 ? "Tükendi" : `${lead.token_price || 20} Jeton`}
                               </Button>
                             </div>
                           )}
@@ -379,7 +381,7 @@ const FirmaLeadlerContent = () => {
                           <Eye className="h-4 w-4 mr-1" /> Önizle
                         </Button>
                         <Button size="sm" className="flex-1" onClick={() => handlePurchase(lead.id)} disabled={purchasing}>
-                          <Coins className="h-4 w-4 mr-1" /> 20 Jeton
+                          <Coins className="h-4 w-4 mr-1" /> {lead.token_price || 20} Jeton
                         </Button>
                       </div>
                     )}
@@ -546,7 +548,7 @@ const FirmaLeadlerContent = () => {
             {selectedLead && !purchasedLeadIds.has(selectedLead.id) && (
               <Button onClick={() => handlePurchase(selectedLead.id)} disabled={purchasing}>
                 <Coins className="h-4 w-4 mr-2" />
-                Lead Aç (20 Jeton)
+                Lead Aç ({selectedLead.token_price || 20} Jeton)
               </Button>
             )}
             {selectedLead && purchasedLeadIds.has(selectedLead.id) && (

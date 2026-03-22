@@ -9,7 +9,7 @@ import { getCityBySlug, generateCitySeoContent, CITIES } from "@/lib/cities";
 import { useFirmsByCity } from "@/hooks/useFirms";
 import { ArrowLeft, MapPin } from "lucide-react";
 import RelatedBlogPosts from "@/components/RelatedBlogPosts";
-import { useState, useEffect, useMemo } from "react";
+
 
 interface IlFirmalariProps {
   slug: string;
@@ -37,24 +37,7 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
 
   const seo = generateCitySeoContent(city.name);
 
-  // SSR güvenliği için sanitize işlemini istemci tarafına taşıyoruz
-  const rawHtml = markdownToHtml(seo.article);
-  const [sanitizedContent, setSanitizedContent] = useState(rawHtml);
 
-  useEffect(() => {
-    const sanitize = async () => {
-      try {
-        const DOMPurify = (await import("isomorphic-dompurify")).default;
-        const sanitizeFn = (DOMPurify as any).sanitize || DOMPurify;
-        if (typeof sanitizeFn === 'function') {
-          setSanitizedContent(sanitizeFn(rawHtml));
-        }
-      } catch (e) {
-        console.error("IlFirmalari Sanitization Error:", e);
-      }
-    };
-    sanitize();
-  }, [rawHtml]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -79,12 +62,7 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
         </div>
 
         <div className="container mx-auto px-4 py-10">
-          {/* SEO Article */}
-          <article className="prose prose-slate dark:prose-invert max-w-none mb-12 bg-card rounded-lg border border-border p-6 md:p-8">
-            <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
-          </article>
-
-          {/* Firms */}
+          {/* Firms Section First */}
           <h2 className="font-heading text-2xl font-bold text-foreground mb-6">
             <MapPin className="inline h-5 w-5 mr-2 text-primary" />
             {city.name} İlindeki Firmalar
@@ -93,7 +71,7 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
           {isLoading ? (
             <p className="text-muted-foreground">Yükleniyor...</p>
           ) : firms && firms.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
               {firms.map((firm) => (
                 <FirmCard
                   key={firm.id}
@@ -110,7 +88,7 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-card rounded-lg border border-border">
+            <div className="text-center py-16 bg-card rounded-lg border border-border mb-16">
               <p className="text-muted-foreground text-lg mb-2">
                 {city.name} ilinde henüz kayıtlı firma bulunmuyor.
               </p>
@@ -123,8 +101,57 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
             </div>
           )}
 
+          {/* SEO Article at the Bottom */}
+          <div className="pt-16 border-t border-border/50 mb-16">
+            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">{city.name} Peyzaj Rehberi ve Çözümleri</h2>
+            <article className="prose prose-sm md:prose-base max-w-4xl mx-auto font-body text-muted-foreground leading-relaxed bg-card rounded-lg border border-border p-6 md:p-8 px-4">
+              {seo.article.split('\n').map((line, i) => {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) return <br key={i} className="hidden" />;
+
+                if (trimmedLine.startsWith('###')) {
+                  return (
+                    <h3 key={i} className="text-xl font-bold text-foreground mt-8 mb-4 border-l-4 border-primary pl-3">
+                      {trimmedLine.replace('###', '').trim()}
+                    </h3>
+                  );
+                }
+                if (trimmedLine.startsWith('##')) {
+                  return <h2 key={i} className="text-2xl font-bold text-foreground mt-10 mb-6">{trimmedLine.replace('##', '').trim()}</h2>;
+                }
+
+                if (trimmedLine.startsWith('- ')) {
+                  return (
+                    <div key={i} className="flex items-start gap-2 mb-2 ml-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                      <span className="text-sm md:text-base">{trimmedLine.replace('- ', '').replace(/\*\*(.*?)\*\*/g, '$1')}</span>
+                    </div>
+                  );
+                }
+
+                if (/^\d+\./.test(trimmedLine)) {
+                  return (
+                    <div key={i} className="flex items-start gap-2 mb-2 ml-2 font-semibold text-foreground">
+                      <span className="text-primary">{trimmedLine.split('.')[0]}.</span>
+                      <span className="text-sm md:text-base font-normal text-muted-foreground">{trimmedLine.split('.').slice(1).join('.').trim()}</span>
+                    </div>
+                  );
+                }
+
+                return (
+                  <p key={i} className="mb-4 text-sm md:text-base">
+                    {trimmedLine.split(/\*\*(.*?)\*\*/g).map((part, index) => 
+                      index % 2 === 1 ? <strong key={index} className="text-foreground">{part}</strong> : part
+                    )}
+                  </p>
+                );
+              })}
+            </article>
+          </div>
+
           {/* Related Blog Posts */}
           <RelatedBlogPosts citySlug={citySlug} title={`${city.name} Hakkında Blog Yazıları`} />
+
 
           {/* Other cities */}
           <div className="mt-16">
@@ -146,17 +173,5 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
     </div>
   );
 };
-
-// Simple markdown to HTML converter for the article
-function markdownToHtml(md: string): string {
-  return md
-    .replace(/### (.*)/g, '<h3>$1</h3>')
-    .replace(/## (.*)/g, '<h2>$1</h2>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^- (.*)/gm, '<li>$1</li>')
-    .replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^(?!<[hul])/gm, (match) => match ? match : '');
-}
 
 export default IlFirmalari;

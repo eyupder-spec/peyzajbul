@@ -102,26 +102,45 @@ export function generateCitySeoContent(cityName: string): { title: string; descr
     title: `${cityName} Peyzaj Firmaları | En İyi Peyzaj Şirketleri`,
     description: `${cityName} ilindeki en iyi peyzaj firmalarını karşılaştırın. Bahçe tasarımı, peyzaj mimarlığı, sulama sistemleri ve daha fazlası için ücretsiz teklif alın.`,
     article: `
-## ${cityName} Peyzaj Firmaları
+## ${cityName} Peyzaj Firmaları ve Profesyonel Bahçe Çözümleri
 
-${cityName} ilinde profesyonel peyzaj hizmetleri sunan onlarca firma bulunmaktadır. İster yeni bir bahçe tasarımı, ister mevcut alanınızın yenilenmesi, isterse de ticari peyzaj projeleri için güvenilir firmalarla çalışabilirsiniz.
+${cityName} ilinde profesyonel peyzaj hizmetleri sunan onlarca deneyimli firma bulunmaktadır. Modern şehir yaşamının getirdiği yeşil alan ihtiyacı, ${cityName}'da bahçe tasarımı ve dış mekan düzenleme hizmetlerine olan talebi her geçen gün artırmaktadır. İster yeni bir konut projesi için bahçe tasarımı, ister mevcut ticari alanınızın yenilenmesi, isterse de düzenli periyodik bakım hizmetleri için ${cityName} peyzaj firmaları geniş bir yelpazede çözümler sunar.
 
-### ${cityName}'da Peyzaj Hizmetleri
+### ${cityName}'da Sunulan Başlıca Peyzaj Hizmetleri
 
-${cityName} bölgesinde en çok talep edilen peyzaj hizmetleri arasında **bahçe tasarımı**, **çim serme ve bakımı**, **sulama sistemleri kurulumu**, **peyzaj aydınlatma**, **havuz çevresi düzenleme** ve **ağaçlandırma** yer almaktadır.
+${cityName} bölgesindeki firmalar, estetik ve fonksiyonelliği bir araya getiren pek çok farklı uzmanlık alanında hizmet vermektedir:
 
-### Neden ${cityName}'da Profesyonel Peyzaj Firması Tercih Etmelisiniz?
+- **Profesyonel Bahçe Tasarımı ve Projelendirme**: Alanınızın potansiyelini en iyi şekilde kullanan, modern ve klasik çizgileri birleştiren mimari tasarımlar.
+- **Rulo Çim ve Tohum Ekelimi**: ${cityName} toprak yapısına en uygun çim türlerinin seçimi ve profesyonel serim işlemleri.
+- **Akıllı Sulama Sistemleri**: Su tasarrufu sağlayan, zaman ayarlı otomatik damlama ve yağmurlama sistemleri kurulumu.
+- **Aydınlatma Tasarımı**: Bahçenizin geceleri de büyüleyici görünmesini sağlayan enerji verimli LED aydınlatma çözümleri.
+- **Sert Zemin ve Hardscape**: Yürüyüş yolları, teras kaplamaları, doğal taş döşemeleri ve istinat duvarı uygulamaları.
+- **Bitki Temini ve Dikimi**: Mevsimlik çiçeklerden asırlık ağaçlara kadar zengin bitki seçenekleri.
 
-Profesyonel bir peyzaj firması, bölgenin iklim koşullarına uygun bitki seçimi yaparak uzun ömürlü ve bakımı kolay bahçeler tasarlar. ${cityName}'ın yerel toprak yapısını ve iklim özelliklerini bilen firmalar, projenizin başarılı olmasını sağlar.
+### Neden ${cityName} İlinde Yerel Bir Peyzaj Firması Seçmelisiniz?
 
-### ${cityName} Peyzaj Firması Seçerken Dikkat Edilmesi Gerekenler
+Profesyonel bir peyzaj firmasıyla çalışmak, sadece görsel bir güzellik değil, aynı zamanda uzun vadeli bir yatırım koruması sağlar. ${cityName} ilinin kendine has iklim koşulları ve toprak özelliklerini bilen yerel bir ekip, bitkilerinizin sağlığını riske atmadan en doğru flora seçimini yapar. Özellikle ${cityName}'ın mevsim geçişlerindeki sıcaklık farkları ve yağış rejimi, peyzaj tasarımının sürdürülebilirliği için kritik öneme sahiptir.
 
-- **Referansları ve portföyü inceleyin**: Firmanın daha önce tamamladığı projeleri mutlaka görün.
-- **Lisans ve sigorta kontrolü yapın**: Profesyonel firmalar gerekli belgelere sahip olmalıdır.
-- **Birden fazla teklif alın**: En az 3 firmadan teklif alarak karşılaştırma yapın.
-- **Garanti ve bakım hizmetlerini sorun**: Proje sonrası destek sunan firmaları tercih edin.
+### Profesyonel Peyzaj Bakımının Avantajları
 
-Aşağıda ${cityName} ilinde hizmet veren onaylı peyzaj firmalarını inceleyebilir ve ücretsiz teklif alabilirsiniz.
+Peyzaj sadece bir kez kurulan bir yapı değil, yaşayan bir organizmadır. ${cityName} bölgesinde düzenli bakım hizmeti alarak:
+1. Bitkilerinizin hastalık ve zararlılardan korunmasını sağlarsınız.
+2. Bahçenizin her mevsim canlı ve bakımlı görünmesini garanti edersiniz.
+3. Budama ve gübreleme gibi teknik işlemlerle bitki ömrünü uzatırsınız.
+4. Karmaşık sulama ve aydınlatma sistemlerinin teknik arızalarını önceden önlersiniz.
+
+### Sıkça Sorulan Sorular (SSS) - ${cityName} Peyzaj Rehberi
+
+**1. ${cityName}'da peyzaj projesi ne kadar sürer?**
+Projenin büyüklüğüne ve kapsamına bağlı olarak, standart bir bahçe düzenlemesi genellikle 1 ile 3 hafta arasında tamamlanır. Büyük ticari projeler veya karmaşık sert zemin uygulamaları daha uzun sürebilir.
+
+**2. ${cityName} iklimine en uygun bitkiler hangileridir?**
+Bu sorunun cevabı ${cityName}'ın hangi bölgesinde olduğunuzla ilişkilidir. Ancak genel olarak dayanıklı çalı grupları, bölgeye uyumlu iğne yapraklılar ve yerli örtücü bitkiler en başarılı sonuçları vermektedir.
+
+**3. Bahçe bakımı için ne sıklıkla profesyonel yardım almalıyım?**
+İdeal bir görünüm için ${cityName}'da ilkbahar ve sonbahar aylarında yoğun bakım, yazın ise düzenli (2 haftada bir) kontroller önerilir.
+
+Aşağıda **${cityName} peyzaj firmaları** listemizi inceleyerek, projeniz için en uygun iş ortağını bulabilir ve hızlıca teklif formunu doldurarak ücretsiz keşif talebinde bulunabilirsiniz.
     `.trim(),
   };
 }

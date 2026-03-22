@@ -13,11 +13,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut,
+  Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Eye,
   Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
   LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon, Upload, FolderKanban
 } from "lucide-react";
-import { getScoreBadge } from "@/lib/leadScoring";
+import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
 import AdminBlogTab from "@/components/admin/AdminBlogTab";
 import AdminChangelogTab from "@/components/admin/AdminChangelogTab";
@@ -29,6 +29,20 @@ import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  SERVICE_LABELS,
+  PROJECT_TYPE_LABELS,
+  PROPERTY_TYPE_LABELS,
+  CONDITION_LABELS,
+  BUDGET_LABELS,
+  TIMELINE_LABELS,
+  AREA_LABELS,
+  IRRIGATION_TYPE_LABELS,
+  IRRIGATION_SYSTEM_LABELS,
+  WATER_SOURCE_LABELS,
+  getLeadLabel
+} from "@/lib/formatLead";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 type Firm = {
   id: string;
@@ -61,10 +75,12 @@ type Lead = {
   created_at: string;
   service_type: string;
   project_size: string | null;
+  area_size?: string | null;
   budget: string;
   timeline: string;
   city: string;
   district: string | null;
+  address?: string | null;
   full_name: string;
   phone: string;
   email: string;
@@ -74,6 +90,15 @@ type Lead = {
   assigned_firms?: string[] | null;
   token_price?: number;
   admin_approved?: boolean;
+  project_type?: string | null;
+  property_type?: string | null;
+  current_condition?: string | null;
+  notes?: string | null;
+  scope?: string[] | null;
+  irrigation_type?: string | null;
+  irrigation_system?: string | null;
+  water_source?: string | null;
+  photo_urls?: string[] | null;
 };
 
 type UserRole = {
@@ -155,6 +180,8 @@ const AdminPanel = () => {
   const [adminReviews, setAdminReviews] = useState<any[]>([]);
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [galleryCaption, setGalleryCaption] = useState("");
+  const [selectedLeadForDetail, setSelectedLeadForDetail] = useState<Lead | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   // Filters
   const [filterCity, setFilterCity] = useState("");
@@ -443,7 +470,8 @@ const AdminPanel = () => {
   });
 
   return (
-    <SidebarProvider>
+    <TooltipProvider>
+      <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <AdminSidebar tab={tab} setTab={setTab} pendingFirmCount={pendingFirmCount} />
 
@@ -667,6 +695,9 @@ const AdminPanel = () => {
                             </td>
                             <td className="px-3 py-2">
                               <div className="flex gap-1" style={{ alignItems: 'center' }}>
+                                <Button size="sm" variant="outline" className="h-7 px-2" onClick={() => setSelectedLeadForDetail(lead)}>
+                                  <Eye className="h-3 w-3" />
+                                </Button>
                                 {!lead.admin_approved && (
                                   <Button size="sm" variant="default" className="h-7 text-xs px-2" onClick={() => {
                                     const val = (document.getElementById(`price-${lead.id}`) as HTMLInputElement)?.value;
@@ -1150,7 +1181,171 @@ const AdminPanel = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+      </SidebarProvider>
+
+      {/* Lead Detail Modal */}
+      <Dialog open={!!selectedLeadForDetail} onOpenChange={() => setSelectedLeadForDetail(null)}>
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" /> Lead Detayları
+            </DialogTitle>
+          </DialogHeader>
+          {selectedLeadForDetail && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Hizmet Türü</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(SERVICE_LABELS, selectedLeadForDetail.service_type)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Proje Türü</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(PROJECT_TYPE_LABELS, selectedLeadForDetail.project_type)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Mülk Tipi</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(PROPERTY_TYPE_LABELS, selectedLeadForDetail.property_type)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Alan Büyüklüğü</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(AREA_LABELS, selectedLeadForDetail.area_size || selectedLeadForDetail.project_size)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Mevcut Durum</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(CONDITION_LABELS, selectedLeadForDetail.current_condition)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Bütçe</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(BUDGET_LABELS, selectedLeadForDetail.budget)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Zaman Çizelgesi</p>
+                  <p className="font-medium text-foreground">{getLeadLabel(TIMELINE_LABELS, selectedLeadForDetail.timeline)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Konum</p>
+                  <p className="font-medium text-foreground">
+                    {selectedLeadForDetail.city} {selectedLeadForDetail.district ? `/ ${selectedLeadForDetail.district}` : ""}
+                  </p>
+                </div>
+
+                {selectedLeadForDetail.service_type === "sulama-sistemi" && (
+                  <>
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Sulama Türü</p>
+                      <p className="font-medium text-foreground">{getLeadLabel(IRRIGATION_TYPE_LABELS, selectedLeadForDetail.irrigation_type)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Sulama Sistemi</p>
+                      <p className="font-medium text-foreground">{getLeadLabel(IRRIGATION_SYSTEM_LABELS, selectedLeadForDetail.irrigation_system)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Su Kaynağı</p>
+                      <p className="font-medium text-foreground">{getLeadLabel(WATER_SOURCE_LABELS, selectedLeadForDetail.water_source)}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {selectedLeadForDetail.scope && selectedLeadForDetail.scope.length > 0 && (
+                <div className="pt-2">
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Kapsam</p>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedLeadForDetail.scope.map((s, i) => (
+                      <Badge key={i} variant="secondary" className="text-[10px] py-0">{s.replace(/-/g, " ")}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedLeadForDetail.notes && (
+                <div className="pt-2 bg-muted/30 p-3 rounded-lg border border-border/50">
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Notlar</p>
+                  <p className="text-sm text-foreground whitespace-pre-wrap">{selectedLeadForDetail.notes}</p>
+                </div>
+              )}
+
+              {selectedLeadForDetail.photo_urls && selectedLeadForDetail.photo_urls.length > 0 && (
+                <div className="pt-2">
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-2">Fotoğraflar</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {selectedLeadForDetail.photo_urls.map((url, i) => (
+                      <div key={i} onClick={() => setSelectedPhoto(url)} className="relative w-20 h-20 rounded-md overflow-hidden border border-border hover:opacity-80 transition-opacity cursor-pointer shadow-sm">
+                        <img src={url} alt={`Lead Photo ${i + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="border-t border-border pt-4">
+                <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-3">Müşteri Bilgileri</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Ad Soyad</p>
+                    <p className="font-medium text-foreground">{selectedLeadForDetail.full_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Telefon</p>
+                    <p className="font-medium text-foreground">{selectedLeadForDetail.phone}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-xs text-muted-foreground">E-posta</p>
+                    <p className="font-medium text-foreground">{selectedLeadForDetail.email}</p>
+                  </div>
+                  {selectedLeadForDetail.address && (
+                    <div className="col-span-2">
+                      <p className="text-xs text-muted-foreground">Adres</p>
+                      <p className="font-medium text-foreground">{selectedLeadForDetail.address}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-border">
+                 <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Birim Jeton Fiyatı:</span>
+                    <Badge variant="outline" className="text-primary font-bold">
+                      {selectedLeadForDetail.token_price || 20} Jeton
+                    </Badge>
+                 </div>
+                 <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Lead Skoru:</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge className={`${getScoreBadge(selectedLeadForDetail.lead_score).className} border-none`}>
+                          {getScoreBadge(selectedLeadForDetail.lead_score).emoji} {selectedLeadForDetail.lead_score || 0}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {getScoreBreakdown(selectedLeadForDetail).map((item, i) => (
+                          <div key={i} className="flex justify-between text-xs gap-4">
+                            <span>{item.label}</span>
+                            <span className="font-mono">+{item.points}</span>
+                          </div>
+                        ))}
+                      </TooltipContent>
+                    </Tooltip>
+                 </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setSelectedLeadForDetail(null)}>Kapat</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Full Screen Photo Modal */}
+      <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
+        <DialogContent className="max-w-4xl p-1 bg-transparent border-none shadow-none flex justify-center items-center [&>button]:text-white [&>button]:bg-black/50 hover:[&>button]:bg-black/70 [&>button]:rounded-full [&>button]:p-2 max-h-[95vh] w-[95vw]">
+          <DialogTitle className="sr-only">Görsel İnceleme</DialogTitle>
+          {selectedPhoto && (
+            <img src={selectedPhoto} alt="Detaylı Görsel" className="max-w-full max-h-[85vh] object-contain rounded-md shadow-2xl" />
+          )}
+        </DialogContent>
+      </Dialog>
+    </TooltipProvider>
   );
 };
 

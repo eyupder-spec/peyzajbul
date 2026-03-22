@@ -28,7 +28,7 @@ const COIN_PACKAGES = [
     badgeText: null as string | null,
     badgeBg: "",
     savingsBadge: null as string | null,
-    perks: ["2 müşteri adayı", "Temel erişim"],
+    perks: ["Temel erişim"],
   },
   {
     id: "advantage",
@@ -42,7 +42,7 @@ const COIN_PACKAGES = [
     badgeText: "Popüler",
     badgeBg: "bg-emerald-500",
     savingsBadge: "%10 Tasarruf",
-    perks: ["11 müşteri adayı", "+20 bonus jeton"],
+    perks: ["+20 bonus jeton"],
   },
   {
     id: "pro",
@@ -56,7 +56,7 @@ const COIN_PACKAGES = [
     badgeText: "En İyi Değer",
     badgeBg: "bg-violet-500",
     savingsBadge: "%20 Tasarruf",
-    perks: ["30 müşteri adayı", "+100 bonus jeton"],
+    perks: ["+100 bonus jeton"],
   },
   {
     id: "ultra",
@@ -70,7 +70,7 @@ const COIN_PACKAGES = [
     badgeText: "Maks. Tasarruf",
     badgeBg: "bg-amber-500",
     savingsBadge: "%30 Tasarruf",
-    perks: ["65 müşteri adayı", "+300 bonus jeton"],
+    perks: ["+300 bonus jeton"],
   },
 ];
 
@@ -165,7 +165,7 @@ const FirmaJetonContent = () => {
     );
   }
 
-  const leadsCanBuy = Math.floor(coinBalance / 20);
+
 
   return (
     <SidebarProvider>
@@ -200,22 +200,6 @@ const FirmaJetonContent = () => {
                     <div className="flex items-end gap-3">
                       <span className="text-6xl font-extrabold text-foreground tracking-tight">{coinBalance.toLocaleString("tr-TR")}</span>
                       <span className="text-xl font-semibold text-muted-foreground mb-2">Jeton</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      ≈ <span className="font-semibold text-foreground">{leadsCanBuy}</span> müşteri adayına erişebilirsiniz
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="bg-card border border-border rounded-2xl px-5 py-4 text-center min-w-[120px]">
-                      <p className="text-xs text-muted-foreground mb-1">Lead Başına</p>
-                      <p className="text-2xl font-bold text-foreground">20</p>
-                      <p className="text-xs text-muted-foreground">Jeton</p>
-                    </div>
-                    <div className="bg-card border border-border rounded-2xl px-5 py-4 text-center min-w-[120px]">
-                      <p className="text-xs text-muted-foreground mb-1">Kullanılabilir</p>
-                      <p className="text-2xl font-bold text-accent">{leadsCanBuy}</p>
-                      <p className="text-xs text-muted-foreground">Lead</p>
                     </div>
                   </div>
                 </div>
@@ -274,21 +258,9 @@ const FirmaJetonContent = () => {
                           )}
                           {!pkg.savingsBadge && <div className="mb-3" />}
 
-                          {/* 🎯 Müşteri Adayı Vurgusu */}
-                          <div className={`rounded-xl bg-gradient-to-r ${pkg.gradient} p-3 mb-4`}>
-                            <div className="flex items-center gap-2">
-                              <Users className="h-5 w-5 text-white/90" />
-                              <div>
-                                <p className="text-xl font-black text-white leading-none">
-                                  {pkg.perks[0].replace(' müşteri adayı', '')}
-                                </p>
-                                <p className="text-[11px] text-white/80 font-medium mt-0.5">Müşteri Adayı</p>
-                              </div>
-                            </div>
-                          </div>
 
                           <ul className="space-y-1.5 mb-5 flex-1">
-                            {pkg.perks.slice(1).map((perk) => (
+                            {pkg.perks.map((perk) => (
                               <li key={perk} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
                                 {perk}

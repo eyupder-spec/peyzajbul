@@ -77,15 +77,15 @@ Yaz-kış canlı ve nefes alan bir bahçe için deneyimli ekiplerden periyodik b
     seoTitle: "Çim Serme & Çim Bakımı Firmaları | Peyzajbul",
     seoDescription: "Rulo çim serimi ve çim bakımı firmaları. Profesyonel yeşil alan oluşturma hizmetleri.",
     seoArticle: `
-Modern peyzajın kalbi sayılan otomatik sulama sistemleri, bitkilerinizin can damarıdır. Yanlış veya yetersiz sulama, en pahalı peyzaj projelerinin bile kurumasına neden olabilir. Akıllı sistemler sayesinde hem su tasarrufu yapabilir hem de bitkilerinizin ihtiyacı olan nemi tam zamanında almasını sağlayabilirsiniz.
+Çim serme ve profesyonel çim bakımı, bahçenizin estetiğini ve yaşanabilirliğini belirleyen en temel unsurdur. Rulo çim (hazır çim) uygulaması ile sadece birkaç gün içerisinde yemyeşil, pürüzsüz ve sağlıklı bir bahçeye sahip olabilirsiniz. 
 
-### Akıllı Sulama Çözümleri
-- **Damlama Sulama**: Su kaybını minimuma indiren, doğrudan kök bölgesine odaklanan sistemler.
-- **Pop-up Yağmurlama**: Çim alanlar için estetik, kullanım anında yüzeye çıkan geniş açılı başlıklar.
-- **Wi-Fi Kontrol Üniteleri**: Cep telefonunuzdan yönetilebilen, hava durumuna göre sulamayı otomatik erteleyen sistemler.
-- **Sensör Teknolojisi**: Yağmur ve nem sensörleri ile gereksiz sulamanın önlenmesi.
+### Çim Serme & Bakımında Uzmanlık Alanlarımız
+- **Rulo Çim Uygulaması**: Toprak hazırlığı, drenaj kontrolü ve kısa sürede kök salan kaliteli rulo çim serimi.
+- **Tohum Ekimi & Gübreleme**: Bölge iklimine en uygun çim tohumlarının seçimi ve periyodik gübreleme programları.
+- **Havalandırma (Skarifikasyon)**: Mevcut çim alanların nefes almasını sağlayan derinlemesine temizlik ve havalandırma işlemleri.
+- **Hastalık ve Zararlı Kontrolü**: Mantar ve böcek zararlılarına karşı bitki pasaportlu, onaylı ilaçlama çözümleri.
 
-Profesyonel bir sulama sistemi kurulumu, bahçenizin geleceğini garanti altına alır. Uzman firmalarımızdan projelendirme ve montaj desteği alarak sürdürülebilir bir bahçeye sahip olabilirsiniz.`,
+Profesyonel bir çim serme hizmeti, sadece görsel bir şölen değil, aynı zamanda mülkünüzün değerini artıran bir yatırımdır. Uzman ekiplerimizden destek alarak uzun yıllar formunu koruyan yeşil alanlara sahip olabilirsiniz.`,
     imageUrl: "https://images.unsplash.com/photo-1592424001802-bd9280453303?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {
@@ -115,7 +115,16 @@ Profesyonel bir sulama sistemi kurulumu, bahçenizin geleceğini garanti altına
     shortDescription: "Otomatik sulama sistemi kurulumu ve bakımı.",
     seoTitle: "Sulama Sistemleri Firmaları | Peyzajbul",
     seoDescription: "Otomatik sulama sistemi kurulum ve bakım firmaları. Damla sulama, yağmurlama ve akıllı sulama çözümleri.",
-    seoArticle: `Sulama sistemleri, bahçenizin düzenli ve verimli bir şekilde sulanmasını sağlayan modern çözümlerdir. Otomatik yağmurlama sistemleri, damla sulama hatları ve akıllı sulama kontrol üniteleri ile su tasarrufu yapılırken bitkileriniz optimal nem seviyesinde tutulur. Profesyonel sulama sistemi firmaları, alanınıza uygun projelendirme ve kurulum hizmeti sunar.`,
+    seoArticle: `
+Modern peyzaj tasarımlarının en kritik bileşeni olan otomatik sulama sistemleri, bitkilerinizin sürdürülebilirliği için hayatidir. Doğru planlanmamış bir sulama, en değerli bitkilerin bile kurumasına veya aşırı su tüketimiyle ciddi maliyetlere neden olabilir. Akıllı ve otomatik sistemler, bahçenizdeki nem dengesini optimize eder.
+
+### Akıllı Sulama Çözümleri ve Teknolojiler
+- **Damlama Sulama**: Su kaybını minimize eden, doğrudan kök bölgesine hedefli sulama yapan sistemler.
+- **Pop-up Yağmurlama**: Çim alanlar için gizlenebilir, geniş açılı ve verimli sulama başlıkları.
+- **Wi-Fi & Akıllı Kontrol**: Hava durumu verileriyle senkronize, mobil cihazlardan yönetilebilen kontrol üniteleri.
+- **Sensör Entegrasyonu**: Yağmur ve toprak nem sensörleri ile gereksiz sulamanın tamamen önlenmesi.
+
+Doğru bir sulama projesi ile %50'ye varan su tasarrufu sağlayabilir, bahçenizin her mevsim canlı kalmasını garanti altına alabilirsiniz. Profesyonel kurulum ve bakım hizmetleri için uzman ekiplerimize danışın.`,
     imageUrl: "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?q=80&w=2000&auto=format&fit=crop", // Replaced below
   },
   {

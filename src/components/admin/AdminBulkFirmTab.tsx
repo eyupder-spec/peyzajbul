@@ -7,7 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { generateFirmSlug } from "@/lib/firmUtils";
-import { Upload, Globe, Download, Trash2, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { SERVICE_LABELS } from "@/lib/categories";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Upload, Globe, Download, Trash2, Loader2, CheckCircle, XCircle, ChevronsUpDown, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type BulkFirmRow = {
   company_name: string;
@@ -95,12 +99,19 @@ export default function AdminBulkFirmTab() {
       setRows(parsed);
       toast({ title: `${parsed.length} firma bulundu` });
     };
-    reader.readAsText(file, "UTF-8");
+
+    // Excel'den gelen CSV'lerdeki Türkçe karakter (ş, ı, ğ, vb.) sorunu için "windows-1254" 
+    reader.readAsText(file, "windows-1254");
     if (fileRef.current) fileRef.current.value = "";
   };
 
   const downloadTemplate = () => {
-    const blob = new Blob([CSV_HEADERS + "\nÖrnek Peyzaj;05001234567;info@ornek.com;İstanbul;Kadıköy;Caferağa Mah;www.ornek.com;Açıklama metni;Bahçe bakımı, Çim ekimi;peyzajornek;ornekpeyzaj;;;"], { type: "text/csv;charset=utf-8;" });
+    // Türkçe karakterleri desteklemesi için BOM (Byte Order Mark) ekliyoruz ve charseti utf-8 tutuyoruz 
+    // veya windows-1254 ile Blob oluştururken sorun yaşamamak için standart virgül ayracıyla verebiliriz.
+    // Ancak daha önce FileReader'ı windows-1254 okumaya ayarladık. Şablonu UTF-8 olarak verip, Excel'de düzgün açılması için BOM koymak en garantisidir.
+    const BOM = "\uFEFF";
+    const csvContent = CSV_HEADERS + "\nÖrnek Peyzaj;05001234567;info@ornek.com;İstanbul;Kadıköy;Caferağa Mah;www.ornek.com;Açıklama metni;Peyzaj Mimarlığı, Bahçe Bakımı & Bahçıvanlık;peyzajornek;ornekpeyzaj;;;";
+    const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -158,6 +169,20 @@ export default function AdminBulkFirmTab() {
 
   const updateRow = (index: number, field: keyof BulkFirmRow, value: string) => {
     setRows(prev => prev.map((r, i) => i === index ? { ...r, [field]: value, status: undefined, errorMsg: undefined } : r));
+  };
+
+  const toggleService = (index: number, service: string) => {
+    setRows(prev => prev.map((r, i) => {
+      if (i !== index) return r;
+      const currentServices = r.services ? r.services.split(",").map(s => s.trim()).filter(Boolean) : [];
+      let newServices;
+      if (currentServices.includes(service)) {
+        newServices = currentServices.filter(s => s !== service);
+      } else {
+        newServices = [...currentServices, service];
+      }
+      return { ...r, services: newServices.join(", "), status: undefined, errorMsg: undefined };
+    }));
   };
 
   const removeRow = (index: number) => {
@@ -264,9 +289,14 @@ export default function AdminBulkFirmTab() {
               onChange={handleFileUpload}
               className="max-w-sm"
             />
-            <p className="text-xs text-muted-foreground mt-2">
-              Sütunlar: firma_adi, telefon, email, il, ilce, adres, website, aciklama, hizmetler, instagram, facebook, twitter, linkedin, youtube
-            </p>
+            <div className="space-y-1 mt-3">
+              <p className="text-xs text-muted-foreground">
+                Sütunlar: <span className="font-mono">firma_adi;telefon;email;il;ilce;adres;website;aciklama;hizmetler;instagram;facebook;twitter;linkedin;youtube</span>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                * <span className="font-semibold">Hizmetler</span> sütununa sistemdeki tam adları virgülle ayırarak yazın (Örn: <span className="italic">Peyzaj Mimarlığı, Çim Serme & Çim Bakımı</span>). Eşleşmeyenler yoksayılır.
+              </p>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -322,6 +352,8 @@ export default function AdminBulkFirmTab() {
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">İlçe</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[160px]">Adres</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[120px]">Website</th>
+                    <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[160px]">Açıklama</th>
+                    <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[160px]">Hizmetler</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">Instagram</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">Facebook</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">Twitter(X)</th>
@@ -355,6 +387,45 @@ export default function AdminBulkFirmTab() {
                       </td>
                       <td className="px-2 py-1">
                         <Input value={row.website} onChange={(e) => updateRow(idx, "website", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input value={row.description} onChange={(e) => updateRow(idx, "description", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" role="combobox" className="w-full h-7 text-xs justify-between px-2 font-normal">
+                              <span className="truncate">
+                                {row.services ? row.services : "Hizmet Seç..."}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[300px] p-0" align="start">
+                            <Command>
+                              <CommandInput placeholder="Hizmet ara..." className="h-8 text-xs" />
+                              <CommandList>
+                                <CommandEmpty>Hizmet bulunamadı.</CommandEmpty>
+                                <CommandGroup className="max-h-[200px] overflow-auto">
+                                  {SERVICE_LABELS.map((service) => {
+                                    const isSelected = row.services?.split(",").map(s => s.trim()).includes(service);
+                                    return (
+                                      <CommandItem
+                                        key={service}
+                                        value={service}
+                                        onSelect={() => toggleService(idx, service)}
+                                        className="text-xs"
+                                      >
+                                        <Check className={cn("mr-2 h-3 w-3", isSelected ? "opacity-100" : "opacity-0")} />
+                                        {service}
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                       </td>
                       <td className="px-2 py-1">
                         <Input value={row.instagram} onChange={(e) => updateRow(idx, "instagram", e.target.value)} className="h-7 text-xs" />

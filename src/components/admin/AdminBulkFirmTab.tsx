@@ -190,9 +190,9 @@ export default function AdminBulkFirmTab() {
   };
 
   const handleBulkInsert = async () => {
-    const validRows = rows.filter(r => r.company_name && r.phone && r.email && r.city);
+    const validRows = rows.filter(r => r.company_name && r.phone && r.city);
     if (validRows.length === 0) {
-      toast({ title: "Eklenecek geçerli firma yok", description: "Firma adı, telefon, email ve il zorunludur.", variant: "destructive" });
+      toast({ title: "Eklenecek geçerli firma yok", description: "Firma adı, telefon ve il zorunludur.", variant: "destructive" });
       return;
     }
 
@@ -205,8 +205,8 @@ export default function AdminBulkFirmTab() {
 
     for (let i = 0; i < updatedRows.length; i++) {
       const r = updatedRows[i];
-      if (!r.company_name || !r.phone || !r.email || !r.city) {
-        updatedRows[i] = { ...r, status: "error", errorMsg: "Zorunlu alan eksik" };
+      if (!r.company_name || !r.phone || !r.city) {
+        updatedRows[i] = { ...r, status: "error", errorMsg: "Zorunlu alan eksik (ad, telefon, il)" };
         continue;
       }
 
@@ -215,7 +215,7 @@ export default function AdminBulkFirmTab() {
           ? r.services.split(",").map(s => s.trim()).filter(Boolean)
           : [];
 
-        const cleanEmail = r.email ? r.email.trim().replace(/^https?:\/\//, "") : "";
+        const cleanEmail = r.email ? r.email.trim().replace(/^https?:\/\//, "") : null;
 
         const { data: inserted, error } = await supabase.from("firms").insert({
           user_id: user.id,

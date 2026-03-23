@@ -270,7 +270,7 @@ export type Database = {
           description: string | null
           detailed_services: Json | null
           district: string | null
-          email: string
+          email: string | null
           google_maps_url: string | null
           id: string
           is_active: boolean
@@ -307,7 +307,7 @@ export type Database = {
           description?: string | null
           detailed_services?: Json | null
           district?: string | null
-          email: string
+          email?: string | null
           google_maps_url?: string | null
           id?: string
           is_active?: boolean
@@ -344,7 +344,7 @@ export type Database = {
           description?: string | null
           detailed_services?: Json | null
           district?: string | null
-          email?: string
+          email?: string | null
           google_maps_url?: string | null
           id?: string
           is_active?: boolean

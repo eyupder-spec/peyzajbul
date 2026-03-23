@@ -15,7 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Eye,
   Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
-  LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon, Upload, FolderKanban
+  LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon, Upload, FolderKanban,
+  Search, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
@@ -182,6 +183,11 @@ const AdminPanel = () => {
   const [galleryCaption, setGalleryCaption] = useState("");
   const [selectedLeadForDetail, setSelectedLeadForDetail] = useState<Lead | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+
+  // Firm pagination & search
+  const [firmSearch, setFirmSearch] = useState("");
+  const [firmPage, setFirmPage] = useState(1);
+  const FIRMS_PER_PAGE = 20;
 
   // Filters
   const [filterCity, setFilterCity] = useState("");
@@ -469,6 +475,26 @@ const AdminPanel = () => {
     return true;
   });
 
+  const filteredApprovedFirms = firmsData.filter((f) => {
+    if (!f.is_approved) return false;
+    if (firmSearch) {
+      const search = firmSearch.toLowerCase();
+      return (
+        f.company_name?.toLowerCase().includes(search) ||
+        f.email?.toLowerCase().includes(search) ||
+        f.phone?.toLowerCase().includes(search) ||
+        f.city?.toLowerCase().includes(search)
+      );
+    }
+    return true;
+  });
+
+  const totalFirmPages = Math.ceil(filteredApprovedFirms.length / FIRMS_PER_PAGE);
+  const paginatedFirms = filteredApprovedFirms.slice(
+    (firmPage - 1) * FIRMS_PER_PAGE,
+    firmPage * FIRMS_PER_PAGE
+  );
+
   return (
     <TooltipProvider>
       <SidebarProvider>
@@ -594,7 +620,7 @@ const AdminPanel = () => {
             {tab === "leads" && (
               <div className="space-y-6">
                 <div className="flex flex-wrap gap-4">
-                  <Input placeholder="İl filtrele..." value={filterCity} onChange={(e) => setFilterCity(e.target.value)} className="w-48" />
+                  <Input placeholder="İl filtrele..." value={filterCity || ""} onChange={(e) => setFilterCity(e.target.value)} className="w-48" />
                   <Select value={filterStatus} onValueChange={setFilterStatus}>
                     <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -856,7 +882,18 @@ const AdminPanel = () => {
             {tab === "firms" && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <div />
+                  <div className="flex-1 max-w-sm relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      placeholder="Firma adı, e-posta veya il ile ara..." 
+                      className="pl-9" 
+                      value={firmSearch || ""}
+                      onChange={(e) => {
+                        setFirmSearch(e.target.value);
+                        setFirmPage(1);
+                      }}
+                    />
+                  </div>
                   <div className="flex items-center gap-3">
                     {pendingFirmCount > 0 && (
                       <Badge variant="destructive">{pendingFirmCount} onay bekliyor</Badge>
@@ -921,7 +958,7 @@ const AdminPanel = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {firmsData.filter((f) => f.is_approved).map((firm) => (
+                      {paginatedFirms.map((firm) => (
                         <tr key={firm.id} className="hover:bg-muted/50">
                           <td className="px-3 py-2 text-foreground font-medium">{firm.company_name}</td>
                           <td className="px-3 py-2 text-foreground">{firm.city}</td>
@@ -992,10 +1029,51 @@ const AdminPanel = () => {
                       ))}
                     </tbody>
                   </table>
-                  {firmsData.filter((f) => f.is_approved).length === 0 && (
+                  {filteredApprovedFirms.length === 0 && (
                     <div className="text-center py-8 text-muted-foreground">Henüz onaylı firma yok.</div>
                   )}
                 </div>
+
+                {totalFirmPages > 1 && (
+                  <div className="flex items-center justify-between px-2 py-4">
+                    <p className="text-sm text-muted-foreground">
+                      Toplam <span className="font-medium">{filteredApprovedFirms.length}</span> firmadan 
+                      <span className="font-medium mx-1">{(firmPage - 1) * FIRMS_PER_PAGE + 1} - {Math.min(firmPage * FIRMS_PER_PAGE, filteredApprovedFirms.length)}</span> 
+                      arası gösteriliyor
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setFirmPage(p => Math.max(1, p - 1))}
+                        disabled={firmPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" /> Önceki
+                      </Button>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalFirmPages }).map((_, i) => (
+                          <Button
+                            key={i}
+                            variant={firmPage === i + 1 ? "default" : "outline"}
+                            size="sm"
+                            className="w-8 h-8 p-0"
+                            onClick={() => setFirmPage(i + 1)}
+                          >
+                            {i + 1}
+                          </Button>
+                        ))}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setFirmPage(p => Math.min(totalFirmPages, p + 1))}
+                        disabled={firmPage === totalFirmPages}
+                      >
+                        Sonraki <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

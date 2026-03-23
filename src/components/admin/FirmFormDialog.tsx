@@ -269,22 +269,22 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Firma Adı *</Label>
-              <Input value={form.company_name} onChange={(e) => update({ company_name: e.target.value })} />
+              <Input value={form.company_name || ""} onChange={(e) => update({ company_name: e.target.value })} />
             </div>
             <div className="space-y-1.5">
               <Label>E-posta *</Label>
-              <Input type="email" value={form.email} onChange={(e) => update({ email: e.target.value })} />
+              <Input type="email" value={form.email || ""} onChange={(e) => update({ email: e.target.value })} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Telefon *</Label>
-              <Input value={form.phone} onChange={(e) => update({ phone: e.target.value })} />
+              <Input value={form.phone || ""} onChange={(e) => update({ phone: e.target.value })} />
             </div>
             <div className="space-y-1.5">
               <Label>Web Sitesi</Label>
-              <Input placeholder="https://firma.com" value={form.website} onChange={(e) => update({ website: e.target.value })} />
+              <Input placeholder="https://firma.com" value={form.website || ""} onChange={(e) => update({ website: e.target.value })} />
             </div>
           </div>
 
@@ -315,14 +315,14 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
 
           <div className="space-y-1.5">
             <Label>Adres</Label>
-            <Input value={form.address} onChange={(e) => update({ address: e.target.value })} />
+            <Input value={form.address || ""} onChange={(e) => update({ address: e.target.value })} />
           </div>
 
           {isEdit && (
             <div className="space-y-1.5">
               <Label>Slug (URL yolu)</Label>
               <Input
-                value={form.slug}
+                value={form.slug || ""}
                 onChange={(e) => update({ slug: e.target.value })}
                 placeholder="firma-adi-12345678"
               />
@@ -332,7 +332,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
 
           <div className="space-y-1.5">
             <Label>Açıklama</Label>
-            <Textarea value={form.description} onChange={(e) => update({ description: e.target.value })} rows={3} />
+            <Textarea value={form.description || ""} onChange={(e) => update({ description: e.target.value })} rows={3} />
           </div>
 
           <div className="space-y-1.5">
@@ -394,7 +394,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                     <div className="flex-1 space-y-1">
                       <Input
                         placeholder="Hizmet başlığı"
-                        value={ds.title}
+                        value={ds.title || ""}
                         onChange={(e) => {
                           const updated = [...(form.detailed_services || [])];
                           updated[i] = { ...updated[i], title: e.target.value };
@@ -403,7 +403,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                       />
                       <Textarea
                         placeholder="Açıklama"
-                        value={ds.description}
+                        value={ds.description || ""}
                         rows={2}
                         onChange={(e) => {
                           const updated = [...(form.detailed_services || [])];
@@ -472,7 +472,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                     <div key={i} className="flex gap-2">
                       <Input
                         placeholder="Emoji"
-                        value={b.icon}
+                        value={b.icon || ""}
                         onChange={(e) => {
                           const updated = [...(form.trust_badges || [])];
                           updated[i] = { ...updated[i], icon: e.target.value };
@@ -482,7 +482,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                       />
                       <Input
                         placeholder="Rozet metni"
-                        value={b.label}
+                        value={b.label || ""}
                         onChange={(e) => {
                           const updated = [...(form.trust_badges || [])];
                           updated[i] = { ...updated[i], label: e.target.value };
@@ -532,7 +532,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                       </Button>
                       <Input
                         placeholder="Soru"
-                        value={faq.question}
+                        value={faq.question || ""}
                         onChange={(e) => {
                           const updated = [...(form.faq_items || [])];
                           updated[i] = { ...updated[i], question: e.target.value };
@@ -542,7 +542,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                       />
                       <Textarea
                         placeholder="Cevap"
-                        value={faq.answer}
+                        value={faq.answer || ""}
                         rows={2}
                         onChange={(e) => {
                           const updated = [...(form.faq_items || [])];

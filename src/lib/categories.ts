@@ -28,7 +28,7 @@ Peyzaj mimarlığı, dış mekanların sadece estetik değil, aynı zamanda ekol
 4. **Bitkilendirme Planı**: Bölge iklimine en uygun floral türlerin seçimi ve konumlandırılması.
 
 Peyzaj mimarları, sürdürülebilir bir gelecek için biyoçeşitliliği koruyan ve su tasarrufunu ön plana çıkaran projeler üretir. Türkiye'nin en iyi peyzaj mimarlık ofislerini rehberimizde bulabilir, projeleriniz için profesyonel danışmanlık alabilirsiniz.`,
-    imageUrl: "https://images.unsplash.com/photo-1558904541-efa843a96f0f?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/peyzaj-mimarligi-hero.jpg",
   },
   {
     slug: "bahce-tasarimi",
@@ -47,7 +47,7 @@ Bahçe tasarımı, hayalinizdeki dış mekanı gerçeğe dönüştüren yaratıc
 - **Mevsimsel Denge**: Bahçenizin sadece baharda değil, kış aylarında da estetik görünmesini sağlayan bitki seçimi.
 
 Hayalinizdeki bahçeyi oluşturmak için uzman tasarımcılarımız ve profesyonel peyzaj firmalarımızdan ücretsiz teklif alabilir, mekanınıza değer katacak projeleri keşfedebilirsiniz.`,
-    imageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/bahce-tasarimi-hero.jpg",
   },
   {
     slug: "bahce-bakimi",
@@ -67,7 +67,7 @@ Düzenli bir bakım takvimi şu işlemleri içermelidir:
 - **Teknik Kontrol**: Sulama kanallarının ve peyzaj aydınlatma sistemlerinin gözden geçirilmesi.
 
 Yaz-kış canlı ve nefes alan bir bahçe için deneyimli ekiplerden periyodik bakım hizmeti alabilir, bitkilerinizin ömrünü uzatabilirsiniz.`,
-    imageUrl: "https://images.unsplash.com/photo-1416879598555-520eed53bfb8?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/bahce-bakimi-bahcivan-hero.jpg",
   },
   {
     slug: "cim-serme",
@@ -86,7 +86,7 @@ Yaz-kış canlı ve nefes alan bir bahçe için deneyimli ekiplerden periyodik b
 - **Hastalık ve Zararlı Kontrolü**: Mantar ve böcek zararlılarına karşı bitki pasaportlu, onaylı ilaçlama çözümleri.
 
 Profesyonel bir çim serme hizmeti, sadece görsel bir şölen değil, aynı zamanda mülkünüzün değerini artıran bir yatırımdır. Uzman ekiplerimizden destek alarak uzun yıllar formunu koruyan yeşil alanlara sahip olabilirsiniz.`,
-    imageUrl: "https://images.unsplash.com/photo-1592424001802-bd9280453303?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/cim-serme-bakim-hero.jpg",
   },
   {
     slug: "agaclandirma",
@@ -96,7 +96,7 @@ Profesyonel bir çim serme hizmeti, sadece görsel bir şölen değil, aynı zam
     seoTitle: "Ağaçlandırma & Fidan Firmaları | Peyzajbul",
     seoDescription: "Ağaçlandırma ve fidan dikimi firmaları. Profesyonel ağaç dikimi ve fidanlık hizmetleri.",
     seoArticle: `Ağaçlandırma, hem estetik hem de çevresel açıdan büyük öneme sahip bir peyzaj hizmetidir. Doğru ağaç türlerinin seçimi, dikim tekniği ve bakım programı ile uzun ömürlü, sağlıklı ağaçlar yetiştirilir. Fidanlık hizmetleri ise süs bitkilerinden meyve ağaçlarına kadar geniş bir yelpazede fidan temini sağlar.`,
-    imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/agac-fidan-hero.jpg",
   },
   {
     slug: "agac-budama",
@@ -106,7 +106,7 @@ Profesyonel bir çim serme hizmeti, sadece görsel bir şölen değil, aynı zam
     seoTitle: "Ağaç Budama & Kesim Firmaları | Peyzajbul",
     seoDescription: "Ağaç budama ve kesim firmaları. Güvenli budama, şekillendirme ve ağaç kaldırma hizmetleri.",
     seoArticle: `Ağaç budama, ağaçların sağlıklı büyümesini destekleyen ve estetik görünümünü koruyan önemli bir bakım işlemidir. Profesyonel budama teknikleri ile ağaçların şekli düzenlenir, hastalıklı dallar temizlenir ve güvenlik riskleri ortadan kaldırılır. Tehlikeli veya kurumuş ağaçların güvenli şekilde kesilmesi de uzman ekipler tarafından gerçekleştirilir.`,
-    imageUrl: "https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/agac-budama-kesim-hero.jpg",
   },
   {
     slug: "sulama-sistemleri",
@@ -125,7 +125,7 @@ Modern peyzaj tasarımlarının en kritik bileşeni olan otomatik sulama sisteml
 - **Sensör Entegrasyonu**: Yağmur ve toprak nem sensörleri ile gereksiz sulamanın tamamen önlenmesi.
 
 Doğru bir sulama projesi ile %50'ye varan su tasarrufu sağlayabilir, bahçenizin her mevsim canlı kalmasını garanti altına alabilirsiniz. Profesyonel kurulum ve bakım hizmetleri için uzman ekiplerimize danışın.`,
-    imageUrl: "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/otomatik-sulama-sistemleri-hero.jpg",
   },
   {
     slug: "sert-zemin",
@@ -144,7 +144,7 @@ Sert zemin (hardscape), bir bahçenin iskeletini oluşturan en kritik yapısal u
 - **Sınır Belirleyiciler**: Bahçe bölümlerini birbirinden ayıran estetik bordür ve çit temelleri.
 
 Kaliteli bir sert zemin işçiliği, bahçenizin değerini artırırken bakım ihtiyacını minimize eder. Profesyonel ekiplerimizden malzeme seçimi ve uygulama desteği alabilirsiniz.`,
-    imageUrl: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/yapisal-peyzaj-hardscape-hero.jpg",
   },
   {
     slug: "peyzaj-aydinlatma",
@@ -154,7 +154,7 @@ Kaliteli bir sert zemin işçiliği, bahçenizin değerini artırırken bakım i
     seoTitle: "Peyzaj Aydınlatma Firmaları | Peyzajbul",
     seoDescription: "Peyzaj aydınlatma firmaları. Bahçe aydınlatma tasarımı, LED sistemler ve dış mekan aydınlatma çözümleri.",
     seoArticle: `Peyzaj aydınlatma, bahçe ve dış mekanlarınızı gece saatlerinde de etkileyici kılan önemli bir tasarım öğesidir. Yol aydınlatma, spot ışıklar, dekoratif fenerler ve LED şerit uygulamaları ile bahçeniz geceleri de büyüleyici bir atmosfere bürünür. Enerji verimli aydınlatma çözümleri hem güvenliği artırır hem de estetik değer katar.`,
-    imageUrl: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/peyzaj-aydinlatma-hero.jpg",
   },
   {
     slug: "havuz-yapimi",
@@ -173,7 +173,7 @@ Yüzme havuzu yapımı, bir bahçeyi lüks bir yaşam alanına ve kişisel bir t
 4. **Çevre Düzenleme**: Havuz çevresi için kaymaz güneşlenme alanları ve uygun bitkilendirme.
 
 Deneyimli havuz firmalarımız, projenizin başından sonuna kadar tüm teknik detayları yöneterek size uzun yıllar güvenle kullanabileceğiniz havuzlar sunar.`,
-    imageUrl: "https://images.unsplash.com/photo-1576013551627-142f77eec821?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/havuz-yapimi-cevre-duzenleme-hero.jpg",
   },
   {
     slug: "sus-havuzu",
@@ -183,7 +183,7 @@ Deneyimli havuz firmalarımız, projenizin başından sonuna kadar tüm teknik d
     seoTitle: "Süs Havuzu & Şelale Firmaları | Peyzajbul",
     seoDescription: "Süs havuzu ve şelale yapım firmaları. Dekoratif su öğeleri, çeşme ve gölet tasarımı.",
     seoArticle: `Süs havuzları ve şelaleler, bahçe ve dış mekanlara huzur veren su sesleri ve görsel zenginlik katar. Dekoratif göletler, duvar şelaleleri, fıskiyeler ve modern su öğeleri ile mekanlarınıza doğal bir atmosfer yaratabilirsiniz. Profesyonel firmalar, pompa sistemlerinden aydınlatmaya kadar tüm detayları tasarlar.`,
-    imageUrl: "https://images.unsplash.com/photo-1545638515-05d8f6ccfc92?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/sus-havuzu-hero.jpg",
   },
   {
     slug: "cati-bahcesi",
@@ -193,7 +193,7 @@ Deneyimli havuz firmalarımız, projenizin başından sonuna kadar tüm teknik d
     seoTitle: "Çatı Bahçesi & Teras Peyzajı Firmaları | Peyzajbul",
     seoDescription: "Çatı bahçesi ve teras peyzaj firmaları. Yeşil çatı uygulamaları, teras bitkilendirme ve drenaj sistemleri.",
     seoArticle: `Çatı bahçeleri ve teras peyzajı, kentsel alanlarda yeşil alanları artırmanın etkili bir yoludur. Su yalıtımı, drenaj sistemi, hafif toprak karışımları ve uygun bitki seçimi ile çatı ve teraslarınızı yaşayan yeşil alanlara dönüştürebilirsiniz. Yeşil çatılar ısı yalıtımına katkı sağlar ve kent ısı adası etkisini azaltır.`,
-    imageUrl: "https://images.unsplash.com/photo-1540306173004-9a4c0eb500f1?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/cati-bahcesi-teras-hero.jpg",
   },
   {
     slug: "dikey-bahce",
@@ -212,7 +212,7 @@ Dikey bahçeler (yeşil duvarlar), sınırlı alanda maksimum yeşil alan yaratm
 - **Psikolojik ve Çevresel Etki**: İç mekanlarda stresi azaltırken, dış mekanlarda bina cephesini korur.
 
 Otomatik sulama ve besleme üniteleri ile entegre dikey bahçe projeleri için uzman firmalarımızdan keşif ve projelendirme desteği alabilirsiniz.`,
-    imageUrl: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/dikey-bahce-hero.jpg",
   },
   {
     slug: "kentsel-peyzaj",
@@ -231,7 +231,7 @@ Kentsel peyzaj, şehirlerin yaşanabilirliğini, estetiğini ve ekolojik dengesi
 4. **Altyapı Entegrasyonu**: Yağmur suyu yönetimi (yağmur bahçeleri) ve sürdürülebilir drenaj çözümleri.
 
 Büyük ölçekli kentsel projeler için deneyimli peyzaj ofisleri ve uygulama firmalarımızla iletişime geçebilirsiniz.`,
-    imageUrl: "https://images.unsplash.com/photo-1496851473196-e26508c21494?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/kentsel-peyzaj-hero.jpg",
   },
   {
     slug: "park-oyun-alani",
@@ -241,7 +241,7 @@ Büyük ölçekli kentsel projeler için deneyimli peyzaj ofisleri ve uygulama f
     seoTitle: "Park & Oyun Alanı Firmaları | Peyzajbul",
     seoDescription: "Park ve oyun alanı firmaları. Çocuk parkı ekipmanları, spor alanları ve açık alan fitness alanı yapımı.",
     seoArticle: `Park ve oyun alanları, çocukların güvenli bir şekilde oynayabileceği ve ailelerin vakit geçirebileceği açık mekanlardır. Modern oyun ekipmanları, güvenlik zemin kaplamaları, spor alanları ve fitness parkurları bu kategorideki başlıca hizmetlerdir. Firmalar, güvenlik standartlarına uygun ekipman temini ve montaj hizmeti sunar.`,
-    imageUrl: "https://images.unsplash.com/photo-1603517436065-27663e803fb9?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/park-oyun-alani-hero.jpg",
   },
   {
     slug: "cit-pergola",
@@ -251,7 +251,7 @@ Büyük ölçekli kentsel projeler için deneyimli peyzaj ofisleri ve uygulama f
     seoTitle: "Çit & Pergola Firmaları | Peyzajbul",
     seoDescription: "Çit ve pergola firmaları. Ahşap, metal ve PVC çit sistemleri, pergola ve kameriye yapımı.",
     seoArticle: `Çit ve pergola uygulamaları, bahçenize mahremiyet, güvenlik ve estetik değer katan yapısal elemanlardır. Ahşap, metal, PVC ve kompozit malzemelerden üretilen çit sistemleri ile bahçenizi sınırlayabilirsiniz. Pergolalar ise gölgelik alan yaratarak dış mekan yaşam kalitenizi artırır. Kamerayeler ve çardaklar da bu kategorideki popüler uygulamalardır.`,
-    imageUrl: "https://images.unsplash.com/photo-1601625906233-f661cc3bb3f7?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/pergola-cit-hero.jpg",
   },
   {
     slug: "peyzaj-malzemeleri",
@@ -270,7 +270,7 @@ Kaliteli peyzaj uygulamalarının temelinde doğru ve dayanıklı malzeme seçim
 - **Aydınlatma ve Sulama**: Solar lambalar, pop-up fıskiyeler, damlama hortumları ve kontrol üniteleri.
 
 Projeniz için ihtiyacınız olan tüm malzemeleri toptan veya perakende olarak temin edebileceğiniz güvenilir tedarikçileri listemizde bulabilirsiniz.`,
-    imageUrl: "https://images.unsplash.com/photo-1416879598555-520eed53bfb8?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/peyzaj-malzemeleri-hero.jpg",
   },
   {
     slug: "dogal-tas",
@@ -280,7 +280,7 @@ Projeniz için ihtiyacınız olan tüm malzemeleri toptan veya perakende olarak 
     seoTitle: "Doğal Taş & Kaplama Firmaları | Peyzajbul",
     seoDescription: "Doğal taş ve kaplama firmaları. Taş döşeme, duvar kaplama, mermer ve granit işçiliği.",
     seoArticle: `Doğal taş uygulamaları, dış mekanlara zamansız bir güzellik ve dayanıklılık kazandırır. Mermer, granit, travertan, bazalt ve arduvaz gibi doğal taşlar; yürüyüş yolları, teraslar, duvar kaplamaları ve merdiven basamaklarında kullanılır. Her taş türünün kendine özgü dokusu ve rengi, mekanlarınıza doğal ve sofistike bir görünüm katar.`,
-    imageUrl: "https://images.unsplash.com/photo-1590487332857-4b711e51b635?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/dogal-tas-kaplama-hero.jpg",
   },
   {
     slug: "bitki-satisi",
@@ -290,7 +290,7 @@ Projeniz için ihtiyacınız olan tüm malzemeleri toptan veya perakende olarak 
     seoTitle: "Bitki Satışı & Fidanlık Firmaları | Peyzajbul",
     seoDescription: "Bitki satışı ve fidanlık firmaları. Süs bitkileri, mevsimlik çiçekler, iç mekan bitkileri ve fidan satışı.",
     seoArticle: `Bitki satışı ve fidanlık hizmetleri, peyzaj projeleriniz için gereken tüm bitki materyallerini temin etmenizi sağlar. Süs bitkileri, çalılar, mevsimlik çiçekler, yer örtücüler ve iç mekan bitkileri geniş ürün yelpazesinin parçasıdır. Kaliteli fidanlıklar, sağlıklı ve bölge iklimine uygun bitki türleri sunar.`,
-    imageUrl: "https://images.unsplash.com/photo-1459156212016-c812468e2115?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/bitki-satisi-fidanlik-hero.jpg",
   },
   {
     slug: "toprak-gubre",
@@ -300,7 +300,7 @@ Projeniz için ihtiyacınız olan tüm malzemeleri toptan veya perakende olarak 
     seoTitle: "Toprak & Gübre Hizmetleri Firmaları | Peyzajbul",
     seoDescription: "Toprak ve gübre hizmetleri sunan firmalar. Toprak analizi, gübreleme programları, kompost ve toprak ıslahı.",
     seoArticle: `Toprak ve gübre hizmetleri, sağlıklı bitki gelişiminin temelini oluşturur. Toprak analizi ile pH, besin değerleri ve yapı tespit edilir; buna göre uygun gübreleme programları oluşturulur. Organik ve kimyasal gübreler, kompost, torf ve toprak ıslah malzemeleri bu kategorideki başlıca ürünlerdir. Doğru toprak yönetimi ile bitkileriniz daha sağlıklı ve verimli büyür.`,
-    imageUrl: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=2000&auto=format&fit=crop", // Replaced below
+    imageUrl: "/images/categories/toprak-gubre-hero.jpg",
   },
 ];
 

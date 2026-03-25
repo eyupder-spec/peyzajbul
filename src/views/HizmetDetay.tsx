@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { featuredCities, seoDistricts } from "@/lib/seo-data";
 import { Sparkles } from "lucide-react";
 import LeadFormBanner from "@/components/lead-form/LeadFormBanner";
+import Image from "next/image";
 
 interface HizmetDetayProps {
   slug: string;
@@ -44,6 +45,7 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
         "@type": "Service",
         "name": category.label,
         "description": category.seoDescription,
+        "image": `https://www.peyzajbul.com${category.imageUrl}`,
         "areaServed": { "@type": "Country", "name": "Türkiye" },
         "provider": {
           "@type": "Organization",
@@ -54,12 +56,14 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="relative bg-primary py-24 overflow-hidden">
-          {/* Background Image */}
-          <div
-            className="absolute inset-0 bg-cover bg-center z-0"
-            style={{
-              backgroundImage: `url(${category.imageUrl})`,
-            }}
+          {/* Background Image - Optimized for SEO */}
+          <Image
+            src={category.imageUrl}
+            alt={`${category.label} Hizmeti - Peyzajbul`}
+            fill
+            priority
+            className="object-cover object-center z-0"
+            sizes="100vw"
           />
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-black/60 z-10" />

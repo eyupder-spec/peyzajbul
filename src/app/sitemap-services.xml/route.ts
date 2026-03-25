@@ -6,7 +6,7 @@ export async function GET() {
   const categories = getAllCategories();
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <!-- Ana Hizmetler Sayfası -->
   <url>
     <loc>${baseUrl}/hizmetler</loc>
@@ -22,6 +22,11 @@ export async function GET() {
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>${baseUrl}${cat.imageUrl}</image:loc>
+      <image:title>${cat.label} - Peyzajbul</image:title>
+      <image:caption>${cat.shortDescription}</image:caption>
+    </image:image>
   </url>`).join('')}
 </urlset>`;
 

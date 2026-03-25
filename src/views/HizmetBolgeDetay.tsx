@@ -12,6 +12,7 @@ import LeadFormModal from "@/components/lead-form/LeadFormModal";
 import LeadFormWidget from "@/components/lead-form/LeadFormWidget";
 import { useApprovedFirms } from "@/hooks/useFirms";
 import { Category } from "@/lib/categories";
+import Image from "next/image";
 
 interface HizmetBolgeDetayProps {
   category: Category;
@@ -61,14 +62,34 @@ const HizmetBolgeDetay = ({
 
   return (
     <div className="min-h-screen flex flex-col">
+      <script type="application/ld+json">{JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": `${districtName || cityName} ${category.label}`,
+        "description": `${fullLocation} bölgesinde profesyonel ${category.label.toLowerCase()} hizmeti.`,
+        "image": `https://www.peyzajbul.com${category.imageUrl}`,
+        "areaServed": {
+          "@type": "City",
+          "name": cityName
+        },
+        "provider": {
+          "@type": "Organization",
+          "name": "Peyzajbul"
+        },
+        "url": `https://www.peyzajbul.com/hizmet/${category.slug}/${il}/${ilce || ''}`.replace(/\/$/, '')
+      })}</script>
       <Navbar />
       <main className="flex-1 pb-16">
         {/* BREADCRUMB & HERO STACKED WITH BACKGROUND */}
         <section className="relative w-full overflow-hidden bg-black pb-12 pt-28">
-          {/* Background Image */}
-          <div
-            className="absolute inset-0 bg-cover bg-center z-0 opacity-40"
-            style={{ backgroundImage: `url(${category.imageUrl})` }}
+          {/* Background Image - Optimized for SEO */}
+          <Image
+            src={category.imageUrl}
+            alt={`${districtName || cityName} ${category.label} Hizmeti - Peyzajbul`}
+            fill
+            priority
+            className="object-cover object-center z-0 opacity-40"
+            sizes="100vw"
           />
           {/* Gradient Overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-background z-10" />
@@ -104,7 +125,12 @@ const HizmetBolgeDetay = ({
                 <Button size="lg" className="text-base h-12 px-8 shadow-lg" onClick={() => setFormOpen(true)}>
                   Ücretsiz Teklif Al
                 </Button>
-                <Button size="lg" variant="secondary" className="text-base h-12 px-8 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm" onClick={scrollToFirms}>
+                <Button 
+                  size="lg" 
+                  variant="secondary" 
+                  className="text-base h-12 px-8 bg-white/20 hover:bg-white/30 border-white/40 text-white backdrop-blur-md shadow-lg transition-all" 
+                  onClick={scrollToFirms}
+                >
                   Firmaları İncele
                 </Button>
               </div>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const DijitalAjansClient = () => {
   return (
-    <div className="min-h-screen bg-background font-body flex flex-col selection:bg-primary/20">
+    <div className="min-h-screen bg-background font-body flex flex-col selection:bg-primary/20 overflow-x-hidden">
       {/* HEADER (Simplified for Landing Page) */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -202,7 +202,7 @@ const DijitalAjansClient = () => {
         </section>
 
         {/* PRICING WITH OFFER */}
-        <section id="paketler" className="py-24 relative">
+        <section id="paketler" className="py-24 relative overflow-hidden">
           {/* Background blob for highlight */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
@@ -242,9 +242,9 @@ const DijitalAjansClient = () => {
                   <div className="absolute -top-4 -right-2 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded-md transform rotate-6">
                     %50 İNDİRİM
                   </div>
-                  <span className="text-xl text-muted-foreground line-through decoration-destructive decoration-2">15.800 TL</span>
+                  <span className="text-xl text-muted-foreground line-through decoration-destructive decoration-2">21.800 TL</span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-4xl font-extrabold text-foreground">7.900 TL</span>
+                    <span className="text-4xl font-extrabold text-foreground">10.900 TL</span>
                   </div>
                 </div>
                 <ul className="space-y-4 mb-8 flex-1">
@@ -285,11 +285,11 @@ const DijitalAjansClient = () => {
                   <div className="absolute -top-4 -right-2 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded-md transform rotate-6">
                     %50 İNDİRİM
                   </div>
-                  <span className="text-xl text-primary-foreground/60 line-through decoration-destructive decoration-2">25.800 TL</span>
+                  <span className="text-xl text-primary-foreground/60 line-through decoration-destructive decoration-2">29.800 TL</span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-4xl font-extrabold text-white">12.900 TL</span>
+                    <span className="text-4xl font-extrabold text-white">14.900 TL</span>
                   </div>
-                  <span className="text-sm text-primary-foreground/80 block mt-2">+ Aylık 3.500₺ <span className="text-xs opacity-75">(Hizmet Bedeli)</span></span>
+                  <span className="text-sm text-primary-foreground/80 block mt-2">+ Aylık 4.900₺ <span className="text-xs opacity-75">(Hizmet Bedeli)</span></span>
                 </div>
                 <ul className="space-y-4 mb-8 flex-1">
                   {[
@@ -327,11 +327,11 @@ const DijitalAjansClient = () => {
                   <div className="absolute -top-4 -right-2 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded-md transform rotate-6">
                     %50 İNDİRİM
                   </div>
-                  <span className="text-xl text-muted-foreground line-through decoration-destructive decoration-2">39.800 TL</span>
+                  <span className="text-xl text-muted-foreground line-through decoration-destructive decoration-2">49.800 TL</span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-4xl font-extrabold text-foreground">19.900 TL</span>
+                    <span className="text-4xl font-extrabold text-foreground">24.900 TL</span>
                   </div>
-                  <span className="text-sm text-muted-foreground block mt-2">+ Aylık 8.000₺ <span className="text-xs opacity-75">(Hizmet Bedeli)</span></span>
+                  <span className="text-sm text-muted-foreground block mt-2">+ Aylık 8.900₺ <span className="text-xs opacity-75">(Hizmet Bedeli)</span></span>
                 </div>
                 <ul className="space-y-4 mb-8 flex-1">
                   {[

@@ -43,7 +43,7 @@ const FirmaKayitLanding = () => {
         {/* HERO SECTION - REIMAGINED */}
         <section className="relative pt-20 pb-32 overflow-hidden bg-white">
           <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-emerald-50/50 to-transparent"></div>
-          
+
           <div className="container mx-auto px-4 max-w-7xl relative z-10">
             <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 font-medium text-sm animate-fade-in">
@@ -57,7 +57,7 @@ const FirmaKayitLanding = () => {
               </h1>
 
               <p className="text-xl md:text-2xl text-slate-600 max-w-2xl leading-relaxed">
-                Her ay 50.000'den fazla villa sahibi ve kurum, peyzaj projeleri için bizi ziyaret ediyor. Onların karşısına çıkan ilk firma siz olun.
+                Her ay 1000'den fazla villa sahibi ve kurum, peyzaj projeleri için bizi ziyaret ediyor. Onların karşısına çıkan ilk firma siz olun.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto">
@@ -96,7 +96,7 @@ const FirmaKayitLanding = () => {
                     </div>
                     <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
                       <span className="font-bold text-slate-800">Tahmini Bütçe:</span>
-                      <span className="font-bold text-emerald-600">High-end</span>
+                      <span className="font-bold text-emerald-600">250.000₺</span>
                     </div>
                   </div>
 
@@ -134,11 +134,11 @@ const FirmaKayitLanding = () => {
           <div className="container mx-auto px-4 text-center">
             <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-6">Türkiye'nin En İyi Peyzaj Firmaları Bizi Tercih Ediyor</p>
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale">
-               {/* Güven simgeleri / Sembolik logolar */}
-               <div className="flex items-center gap-2 text-xl font-bold font-serif"><LeafIcon /> Doğa Mimarlık</div>
-               <div className="flex items-center gap-2 text-xl font-bold"><ShieldCheck /> Güven Peyzaj</div>
-               <div className="flex items-center gap-2 text-xl font-bold font-sans tracking-tight"><Target /> Vizyon Tasarım</div>
-               <div className="flex items-center gap-2 text-xl font-bold"><Zap /> Elite Bahçe</div>
+              {/* Güven simgeleri / Sembolik logolar */}
+              <div className="flex items-center gap-2 text-xl font-bold font-serif"><LeafIcon /> Doğa Mimarlık</div>
+              <div className="flex items-center gap-2 text-xl font-bold"><ShieldCheck /> Güven Peyzaj</div>
+              <div className="flex items-center gap-2 text-xl font-bold font-sans tracking-tight"><Target /> Vizyon Tasarım</div>
+              <div className="flex items-center gap-2 text-xl font-bold"><Zap /> Elite Bahçe</div>
             </div>
           </div>
         </section>
@@ -157,7 +157,7 @@ const FirmaKayitLanding = () => {
                 <ul className="space-y-4 pt-4">
                   {[
                     "Sıcak müşteri: Size gelen talepler, tam şu an hizmet arayan kişilerden gelir.",
-                    "Sıfır sabit ücret: Aidat yok, komisyon yok. Sadece beğendiğiniz müşterinin iletişim bilgisini almak için jeton harcarsınız.",
+                    "Standart kullanım ücretsiz: Aidat yok, komisyon yok. Sadece beğendiğiniz müşterinin iletişim bilgisini almak için jeton harcarsınız.",
                     "Haksız rekabet yok: Ev sahibi, projesiyle eşleşen en fazla 3 profesyonelden teklif alabilir."
                   ].map((item, i) => (
                     <li key={i} className="flex gap-3 text-slate-700">
@@ -171,15 +171,15 @@ const FirmaKayitLanding = () => {
                 <div className="absolute inset-0 bg-emerald-500 transform rotate-3 rounded-3xl opacity-10"></div>
                 <div className="bg-white border border-slate-200 rounded-3xl p-8 relative shadow-xl">
                   <h3 className="text-xl font-bold text-slate-900 mb-6">Acı Gerçekler vs. Yeni Nesil Model</h3>
-                  
+
                   <div className="space-y-6">
                     <div className="p-4 bg-red-50 rounded-xl border border-red-100">
                       <div className="text-red-800 font-semibold mb-2 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-red-500"></div> Geleneksel Reklamlar</div>
-                      <p className="text-sm text-red-600/80">Yüksek maliyet, "Sadece fiyat soruyorum" diyen alakasız kitle, ölçülemeyen yatırım getirisi.</p>
+                      <p className="text-sm text-red-600/80">Yüksek maliyet, "Sadece fiyat soruyorum" diyen alakasız kitle, ölçülemeyen kazanç.</p>
                     </div>
                     <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
                       <div className="text-emerald-800 font-semibold mb-2 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> Peyzajbul Modeli</div>
-                      <p className="text-sm text-emerald-700/80">Tamamen 무료 profil, sadece detayları verilmiş yüksek niyetli iş taleplerine ödeme, %100 ölçülebilir kazanç.</p>
+                      <p className="text-sm text-emerald-700/80">Tamamen ücretsiz profil, sadece detayları verilmiş yüksek niyetli iş taleplerine ödeme, %100 ölçülebilir kazanç.</p>
                     </div>
                   </div>
                 </div>
@@ -235,11 +235,11 @@ const FirmaKayitLanding = () => {
         {/* PRICING (PAY PER LEAD CONCEPT) */}
         <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/20 rounded-full blur-[120px] pointer-events-none"></div>
-          
+
           <div className="container mx-auto px-4 max-w-4xl relative z-10 text-center">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Sürpriz Ücret Yok. Kayıt Ücreti Yok.</h2>
             <p className="text-xl text-slate-300 md:text-2xl mb-12 font-light">
-              Müşteri getirmezsek, para kazanmıyoruz. <br className="hidden md:block"/> Sadece ilgilendiğiniz projeler için ödeme yaparsınız.
+              Müşteri getirmezsek, para kazanmıyoruz. <br className="hidden md:block" /> Sadece ilgilendiğiniz projeler için ödeme yaparsınız.
             </p>
 
             <div className="grid md:grid-cols-2 gap-8 text-left">
@@ -253,7 +253,7 @@ const FirmaKayitLanding = () => {
                   <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400" /> Talep havuzuna erişim</li>
                 </ul>
                 <Button variant="outline" className="w-full h-12 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300" asChild>
-                   <Link href="/firma/giris?tab=signup">Ücretsiz Katıl</Link>
+                  <Link href="/firma/giris?tab=signup">Ücretsiz Katıl</Link>
                 </Button>
               </div>
 
@@ -268,7 +268,7 @@ const FirmaKayitLanding = () => {
                   <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white" /> Risksiz deneme fırsatı</li>
                 </ul>
                 <Button className="w-full h-12 bg-white text-emerald-700 hover:bg-slate-100 font-bold" asChild>
-                   <Link href="/firma/giris?tab=signup">Hediyeni Al ve Başla</Link>
+                  <Link href="/firma/giris?tab=signup">Hediyeni Al ve Başla</Link>
                 </Button>
               </div>
             </div>
@@ -291,7 +291,7 @@ const FirmaKayitLanding = () => {
                   },
                   {
                     q: "Peki siz nasıl para kazanıyorsunuz?",
-                    a: "Sistem, ön ödemeli 'Jeton' mantığıyla çalışır. Eğer müşteri doğrudan sizi aramaz da sisteme genel bir talep bırakırsa (örn: 'İstanbul'da 200m2 rulo çim yaptırmak istiyorum'), bu talebin telefon numarasına erişmek için ufak bir miktar jeton harcarsınız. İlgilenmediğiniz işlere para ödemezsiniz."
+                    a: "Sistem, ön ödemeli 'Jeton' mantığıyla çalışır. Eğer müşteri doğrudan sizi aramaz da detaylı Teklif Al sayfamız üzerinden bir talep oluşturursa (örn: 'İstanbul'da 200m2 rulo çim yaptırmak istiyorum'), bu talep şehir, ilgili hizmet sağlayıcılarına talebi iletir. Talebe erişmek için ufak bir miktar jeton harcarsınız. İlgilenmediğiniz işlere para ödemezsiniz."
                   },
                   {
                     q: "Kazancımdan komisyon kesiliyor mu?",
@@ -299,7 +299,15 @@ const FirmaKayitLanding = () => {
                   },
                   {
                     q: "Müşterinin numarasını alınca işi kesin almış mı oluyorum?",
-                    a: "Hayır, numarayı alan firma müşteriye teklifini sunar. İşi almak sizin satıcılığınıza, sunduğunuz projeye ve fiyatlandırmanıza bağlıdır. Ancak biz sadece doğrulanmış ve yüksek niyetli talepleri sisteme düşürüyoruz."
+                    a: "Hayır, biz müşterinin taleplerini en doğru şekilde almaya çalışıyoruz ve size iletiyoruz. İşi almak sizin iletişim becerinize, yetkinliğinize, sunduğunuz projeye ve fiyatlandırmanıza bağlıdır. Ancak biz sadece doğrulanmış ve yüksek niyetli talepleri sisteme düşürüyoruz."
+                  },
+                  {
+                    q: "Diğer sitelerden farkınız ne?",
+                    a: "Peyzajbul, jenerik platformların aksine sadece peyzaj ve dış mekan tasarımına odaklanır. Bizde 'temizlik' veya 'nakliye' talepleri arasında kaybolmazsınız; sadece bahçesiyle ilgilenen, yüksek bütçeli ve mülk sahibi kitleye ulaşırsınız. Ayrıca komisyon almıyor, sadece ilgilendiğiniz talebin detaylarını görmeniz için şeffaf bir jeton modeli sunuyoruz. Bununla birlikte müşteri taleplerini detaylıca inceliyor ve adil bir fiyat politikası belirliyoruz"
+                  },
+                  {
+                    q: "İade var mı?",
+                    a: "Biz attığımız tüm adımlarda Peyzaj Firmalarının hakkını göz etmeye çalıştığımız için eğer bir talebe jeton harcadıysanız ve o müşteriye ulaşamadıysanız bunun ispatı karşılığında jeton iadesi yapıyoruz. Ancak bunun dışında yüklenen jetonların iadesi ürünün doğası gereği mümkün değildir."
                   }
                 ].map((item, i) => (
                   <AccordionItem key={i} value={`faq-${i}`} className="bg-white border-none rounded-2xl shadow-sm px-6">
@@ -318,15 +326,15 @@ const FirmaKayitLanding = () => {
 
         {/* BOTTOM CTA */}
         <section className="py-20 px-4 bg-white border-t border-slate-100">
-           <div className="container mx-auto max-w-4xl text-center">
-             <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">Bölgenizdeki projeleri rakiplerinize kaptırmayın.</h2>
-             <p className="text-xl text-slate-600 mb-10">2 dakikada profilinizi oluşturun, yeni müşterilerle tanışın.</p>
-             <Button size="lg" className="h-16 px-12 text-xl rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 transition-transform hover:scale-105" asChild>
-               <Link href="/firma/giris?tab=signup">
-                 Hemen Profilinizi Oluşturun
-               </Link>
-             </Button>
-           </div>
+          <div className="container mx-auto max-w-4xl text-center">
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">Bölgenizdeki projeleri rakiplerinize kaptırmayın.</h2>
+            <p className="text-xl text-slate-600 mb-10">2 dakikada profilinizi oluşturun, yeni müşterilerle tanışın.</p>
+            <Button size="lg" className="h-16 px-12 text-xl rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 transition-transform hover:scale-105" asChild>
+              <Link href="/firma/giris?tab=signup">
+                Hemen Profilinizi Oluşturun
+              </Link>
+            </Button>
+          </div>
         </section>
       </main>
 
@@ -337,7 +345,7 @@ const FirmaKayitLanding = () => {
 
 // Generic Leaf Icon for logo cloud
 const LeafIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" /><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /></svg>
 );
 
 export default FirmaKayitLanding;

@@ -28,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body className={`${inter.variable} ${nunito.variable} ${playfair.variable} font-body`} suppressHydrationWarning>
+      <body className={`${inter.variable} ${nunito.variable} ${playfair.variable} font-body overflow-x-hidden`} suppressHydrationWarning>
         <Providers>
           {children}
           <Toaster />

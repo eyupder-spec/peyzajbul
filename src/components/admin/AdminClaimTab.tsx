@@ -12,7 +12,7 @@ type ClaimRequest = {
   user_id: string;
   status: string;
   phone: string;
-  tax_number: string | null;
+  email?: string | null;
   note: string | null;
   created_at: string;
 };
@@ -136,12 +136,9 @@ const AdminClaimTab = () => {
                           </div>
                         </div>
 
-                        {claim.tax_number && (
+                        {claim.email && (
                           <p className="text-sm text-muted-foreground">
-                            Vergi No: <span className="text-foreground">{claim.tax_number}</span>
-                            {firm?.tax_number && firm.tax_number === claim.tax_number && (
-                              <Badge className="ml-2 bg-green-500/10 text-green-600 text-xs">Eşleşiyor ✓</Badge>
-                            )}
+                            E-posta: <span className="text-foreground">{claim.email}</span>
                           </p>
                         )}
 

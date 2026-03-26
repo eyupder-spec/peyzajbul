@@ -34,7 +34,7 @@ const FirmaSahiplen = () => {
 
   // Claim form
   const [phone, setPhone] = useState("");
-  const [taxNumber, setTaxNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
 
   useEffect(() => {
@@ -116,6 +116,10 @@ const FirmaSahiplen = () => {
       toast({ title: "Telefon numarası zorunludur", variant: "destructive" });
       return;
     }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      toast({ title: "Geçerli bir e-posta adresi zorunludur", variant: "destructive" });
+      return;
+    }
 
     setLoading(true);
     try {
@@ -123,7 +127,7 @@ const FirmaSahiplen = () => {
         firm_id: firmId,
         user_id: user.id,
         phone: phone.trim(),
-        tax_number: taxNumber.trim() || null,
+        email: email.trim(),
         note: note.trim() || null,
       });
       if (error) throw error;
@@ -294,12 +298,15 @@ const FirmaSahiplen = () => {
                     <p className="text-xs text-muted-foreground">Firmanızda kayıtlı telefon numarasını girin</p>
                   </div>
                   <div className="space-y-2">
-                    <Label>Vergi Numarası</Label>
+                    <Label>Resmî E-posta Adresi *</Label>
                     <Input
-                      placeholder="Opsiyonel"
-                      value={taxNumber}
-                      onChange={(e) => setTaxNumber(e.target.value)}
+                      type="email"
+                      placeholder="iletisim@firmaniz.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
                     />
+                    <p className="text-xs text-muted-foreground">Firmanıza ait resmî e-posta adresini girin</p>
                   </div>
                   <div className="space-y-2">
                     <Label>Ek Açıklama</Label>

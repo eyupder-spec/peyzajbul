@@ -97,8 +97,16 @@ Deno.serve(async (req) => {
       console.error("Failed to fetch claimant user details:", claimantError);
     }
     
-    const updatePayload: any = { user_id: claim.user_id, is_claimed: true };
-    if (claimantData?.user?.email) {
+    const updatePayload: any = { 
+      user_id: claim.user_id, 
+      is_claimed: true,
+      phone: claim.phone // Onaylanan numarayı firmaya işle
+    };
+
+    // Eğer talep formunda e-posta varsa onu kullan, yoksa kullanıcı hesabındakini kullan
+    if (claim.email) {
+      updatePayload.email = claim.email;
+    } else if (claimantData?.user?.email) {
       updatePayload.email = claimantData.user.email;
     }
 

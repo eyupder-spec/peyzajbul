@@ -26,6 +26,7 @@ import AdminClaimTab from "@/components/admin/AdminClaimTab";
 import AdminBulkFirmTab from "@/components/admin/AdminBulkFirmTab";
 import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
 import AdminTasksTab from "@/components/admin/AdminTasksTab";
+import AdminBannersTab from "@/components/admin/AdminBannersTab";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
@@ -120,6 +121,7 @@ const SIDEBAR_ITEMS = [
   { title: "Blog", key: "blog", icon: BookOpen },
   { title: "Görevler", key: "tasks", icon: CheckCircle },
   { title: "Changelog", key: "changelog", icon: Rocket },
+  { title: "Reklamlar", key: "banners", icon: Image },
 ];
 
 function AdminSidebar({ tab, setTab, pendingFirmCount }: { tab: string; setTab: (t: any) => void; pendingFirmCount: number }) {
@@ -172,7 +174,7 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog" | "tasks">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog" | "tasks" | "banners">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
   const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
@@ -1079,6 +1081,9 @@ const AdminPanel = () => {
 
             {/* Projects */}
             {tab === "projects" && <AdminProjectsTab />}
+
+            {/* Banners */}
+            {tab === "banners" && <AdminBannersTab />}
 
             {/* Claims */}
             {tab === "claims" && <AdminClaimTab />}

@@ -5,7 +5,7 @@ const PopularCategories = () => {
   const categories = getAllCategories().slice(0, 8);
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-16 bg-muted/50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
           <h2 className="font-heading text-3xl font-bold text-foreground mb-3">

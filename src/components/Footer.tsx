@@ -66,6 +66,7 @@ const Footer = () => {
           <div>
             <h4 className="font-heading font-semibold mb-4 text-accent">Firmalar İçin</h4>
             <div className="space-y-2.5">
+              <Link href="/isletme-ekle" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İşletme Ekle</Link>
               <Link href="/firma/giris" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Firma Giriş</Link>
               <a href="#nasil-calisir" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Nasıl Çalışır</a>
               <Link href="/iller" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İller</Link>

@@ -13,6 +13,7 @@ import { useFirmGallery, useFirmReviews, useFirmProjects } from "@/hooks/useFirm
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
 import FirmCard from "@/components/FirmCard";
+import BannerAd from "@/components/BannerAd";
 import { getCitySlug } from "@/lib/cities";
 import { useState, useRef, useCallback, use } from "react";
 
@@ -105,7 +106,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
         .neq("id", firm.id)
         .order("is_premium", { ascending: false })
         .limit(20);
-        
+
       if (!data) return [];
       return data.sort(() => 0.5 - Math.random()).slice(0, 4); // Pick 4 random
     }
@@ -506,8 +507,8 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                     urlObj.searchParams.set("utm_medium", "rehber");
                     urlObj.searchParams.set("utm_campaign", "profil_sayfasi");
                     utmUrl = urlObj.toString();
-                  } catch (e) {}
-                  
+                  } catch (e) { }
+
                   return (
                     <a href={utmUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
                       <Globe className="h-4 w-4 text-primary" /> {firm.website.replace(/^https?:\/\//, "")}
@@ -574,6 +575,12 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                 </Link>
               </div>
             )}
+
+            {/* Reklam Alanı: Profil Sağ Kolon Kare (300x250 vb.) */}
+            <div className="mt-6">
+              <BannerAd placement="sidebar_right" className="w-[300px] min-h-[250px] mx-auto xl:w-[336px] xl:min-h-[280px] rounded-2xl shadow-sm border border-border" />
+            </div>
+
           </div>
         </div>
       </div>

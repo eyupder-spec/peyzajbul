@@ -2,8 +2,8 @@ import { useApprovedFirms } from "@/hooks/useFirms";
 import FirmCard from "@/components/FirmCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
 import { Sparkles, Star } from "lucide-react";
+import BannerAd from "@/components/BannerAd";
 
 const FeaturedFirms = () => {
   const { data: firms, isLoading } = useApprovedFirms();
@@ -13,12 +13,23 @@ const FeaturedFirms = () => {
   const newFirms = firms?.filter((f) => !f.is_premium).slice(0, 6) || [];
 
   return (
-    <section className="py-20 bg-muted/10">
+    <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {isLoading ? (
           <p className="text-center text-muted-foreground">Yükleniyor...</p>
         ) : (
-          <div className="space-y-20">
+          <div className="flex gap-6 justify-center">
+            
+            {/* Sol Reklam Alanı (Skyscraper - Sadece Masaüstü) */}
+            <div className="hidden xl:block w-[160px] shrink-0 pt-28">
+              <div className="sticky top-24">
+                <BannerAd placement="home_left" className="w-[160px] h-[600px] rounded-lg shadow-sm" />
+              </div>
+            </div>
+
+            {/* Orta İçerik (Firmalar Grid'i) */}
+            <div className="flex-1 max-w-5xl">
+              <div className="space-y-20">
             {/* VIP Premium Firms Section */}
             {premiumFirms.length > 0 && (
               <div>
@@ -85,8 +96,18 @@ const FeaturedFirms = () => {
             )}
             
             {firms?.length === 0 && (
-              <p className="text-center text-muted-foreground">Henüz kayıtlı firma bulunmuyor.</p>
-            )}
+                  <p className="text-center text-muted-foreground">Henüz kayıtlı firma bulunmuyor.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Sağ Reklam Alanı (Skyscraper - Sadece Masaüstü) */}
+            <div className="hidden xl:block w-[160px] shrink-0 pt-28">
+              <div className="sticky top-24">
+                <BannerAd placement="home_right" className="w-[160px] h-[600px] rounded-lg shadow-sm" />
+              </div>
+            </div>
+
           </div>
         )}
 

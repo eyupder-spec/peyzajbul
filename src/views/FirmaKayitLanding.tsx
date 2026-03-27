@@ -232,46 +232,85 @@ const FirmaKayitLanding = () => {
           </div>
         </section>
 
-        {/* PRICING (PAY PER LEAD CONCEPT) */}
+        {/* PRICING */}
         <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-          <div className="container mx-auto px-4 max-w-4xl relative z-10 text-center">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">Sürpriz Ücret Yok. Kayıt Ücreti Yok.</h2>
-            <p className="text-xl text-slate-300 md:text-2xl mb-12 font-light">
-              Müşteri getirmezsek, para kazanmıyoruz. <br className="hidden md:block" /> Sadece ilgilendiğiniz projeler için ödeme yaparsınız.
-            </p>
+          <div className="container mx-auto px-4 max-w-6xl relative z-10">
+            <div className="text-center mb-14">
+              <h2 className="text-3xl md:text-5xl font-bold mb-4">Sürpriz Ücret Yok. Kayıt Ücreti Yok.</h2>
+              <p className="text-xl text-slate-300 font-light">
+                Size en uygun planı seçin ve büyümeye başlayın.
+              </p>
+            </div>
 
-            <div className="grid md:grid-cols-2 gap-8 text-left">
+            <div className="grid md:grid-cols-2 gap-6 items-start text-left">
+
+              {/* Standart */}
               <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-8 flex flex-col">
-                <h3 className="text-2xl font-bold mb-2">Standart Profil</h3>
+                <h3 className="text-2xl font-bold mb-1">Standart Profil</h3>
+                <p className="text-slate-400 text-sm mb-4">Temel görünürlük için</p>
                 <div className="text-4xl font-black text-emerald-400 mb-6 flex items-baseline gap-1">0₺ <span className="text-base text-slate-400 font-normal">/ay</span></div>
                 <ul className="space-y-3 mb-8 flex-1">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400" /> Şehir rehberinde listelenme</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400" /> Sınırsız proje (portfolyo) yükleme</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400" /> Müşteri yorumları alma</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400" /> Talep havuzuna erişim</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" /> Şehir rehberinde listelenme</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" /> Sınırsız portfolyo yükleme</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" /> Müşteri yorumları alma</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" /> Talep havuzuna erişim</li>
                 </ul>
                 <Button variant="outline" className="w-full h-12 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300" asChild>
                   <Link href="/firma/giris?tab=signup">Ücretsiz Katıl</Link>
                 </Button>
               </div>
 
+              {/* Premium */}
               <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl border border-emerald-400 p-8 shadow-2xl flex flex-col transform md:-translate-y-4 relative">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-950 text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full">Yeni Firmalara Özel</div>
-                <h3 className="text-2xl font-bold mb-2">Başlangıç Hediyesi</h3>
-                <div className="text-4xl font-black text-white mb-6">Bedava <span className="text-base text-emerald-100 font-normal">jetonlar</span></div>
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-950 text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full whitespace-nowrap">
+                  ⭐ En Çok Tercih Edilen
+                </div>
+                <h3 className="text-2xl font-bold mb-1">Premium</h3>
+                <p className="text-emerald-100 text-sm mb-4">Rakiplerinizin önüne geçin</p>
+                <div className="text-3xl font-black text-white mb-6">Premium <span className="text-sm text-emerald-100 font-normal">üyelik</span></div>
                 <ul className="space-y-3 mb-8 flex-1 text-emerald-50">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white" /> Sisteme kayıt olan tüm firmalara</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white" /> İlk müşterilerini bulmaları için</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white" /> Hoş geldin jeton bakiyesi tanımlanır</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white" /> Risksiz deneme fırsatı</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white shrink-0" /> Arama sonuçlarında üst sıra</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white shrink-0" /> Ana sayfada «Öne Çıkan» rozeti</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white shrink-0" /> Aday Müşterilerde Öncelik</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white shrink-0" /> Öncelikli destek hattı</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-white shrink-0" /> Detaylı istatistik paneli</li>
                 </ul>
                 <Button className="w-full h-12 bg-white text-emerald-700 hover:bg-slate-100 font-bold" asChild>
-                  <Link href="/firma/giris?tab=signup">Hediyeni Al ve Başla</Link>
+                  <Link href="/firma/giris?tab=signup">Premium'u Keşfet →</Link>
+                </Button>
+              </div>
+
+            </div>
+
+            {/* Firmanı Sahiplen - Yatay Kutu */}
+            <div className="mt-6 bg-white/10 backdrop-blur-md rounded-2xl border border-amber-400/30 p-6 md:p-8 relative">
+              <div className="absolute -top-4 left-6 bg-amber-400 text-amber-950 text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full whitespace-nowrap">
+                🔍 Rehberde Zaten Var mısınız?
+              </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-6 mt-2">
+                <div className="flex items-center gap-4 shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-amber-400/20 flex items-center justify-center">
+                    <ShieldCheck className="h-6 w-6 text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">Firmanı Sahiplen</h3>
+                    <p className="text-amber-400 font-black text-lg">Ücretsiz başvuru</p>
+                  </div>
+                </div>
+                <div className="flex-1 grid sm:grid-cols-2 gap-2 text-sm">
+                  <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" /> Sisteme eklenmiş firmanızı sahiplenin</span>
+                  <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" /> Yaşayan bir dijital varlığa sahip olun</span>
+                  <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" /> Bilgilerinizi ve iletişim bilgilerini güncelleyin</span>
+                  <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" /> Moderatör onayıyla anında aktif</span>
+                </div>
+                <Button variant="outline" className="shrink-0 h-12 px-8 border-amber-400/50 text-amber-400 hover:bg-amber-500/10 hover:text-amber-300" asChild>
+                  <Link href="/firma-sahiplen">Firmamı Sahipleneyim →</Link>
                 </Button>
               </div>
             </div>
+
           </div>
         </section>
 

@@ -24,6 +24,7 @@ export const FIRMA_MENU = [
   { title: "Premium", key: "premium", icon: Crown, path: "/firma/premium" },
   { title: "Galeri", key: "galeri", icon: Image, path: "/firma/galeri" },
   { title: "Projeler", key: "projeler", icon: FolderKanban, path: "/firma/projeler" },
+  { title: "Reklam Ver", key: "reklam", icon: Crown, path: "/firma/reklam" },
 ];
 
 export function FirmaSidebar({ isPremium }: { isPremium?: boolean }) {

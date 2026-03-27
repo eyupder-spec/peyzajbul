@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import FirmCard from "@/components/FirmCard";
 import Image from "next/image";
 import LeadFormModal from "@/components/lead-form/LeadFormModal";
+import BannerAd from "@/components/BannerAd";
 import {
   ArrowLeft,
   Calendar,
@@ -322,6 +323,11 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                 }}
               />
 
+              {/* 3. Reklam Alanı: Blog İçi (Yazı Sonu) */}
+              <div className="my-10">
+                <BannerAd placement="blog_inline" className="w-full max-w-3xl mx-auto h-[90px] md:h-[120px] rounded-xl shadow-sm" />
+              </div>
+
               <div className="mt-12 pt-8 border-t border-border flex items-center justify-between gap-4">
                 <span className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Share2 className="h-4 w-4" /> Yazıyı Paylaş
@@ -358,6 +364,9 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                     </Button>
                   </div>
                 </div>
+
+                {/* 4. Reklam Alanı: Sağ Sidebar (Kare/Dikey) */}
+                <BannerAd placement="sidebar_right" className="w-full min-h-[300px] rounded-[2rem] shadow-2xl mb-8 overflow-hidden" />
 
                 {/* Diğer Yazılar (Son Paylaşımlar) */}
                 {recentPosts && recentPosts.length > 0 && (

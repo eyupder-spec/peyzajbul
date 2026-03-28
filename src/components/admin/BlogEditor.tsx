@@ -30,6 +30,8 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
+        // @ts-ignore - Some versions of StarterKit might include link by default
+        link: false,
       }),
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary underline" } }),

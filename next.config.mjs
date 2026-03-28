@@ -15,6 +15,7 @@ const nextConfig = {
     ],
     minimumCacheTTL: 86400,
     formats: ['image/avif', 'image/webp'],
+    qualities: [75, 80, 85],
   },
   // In Next.js, we don't need the componentTagger from lovable-tagger for production
   async redirects() {

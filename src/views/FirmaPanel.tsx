@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { Users, ShoppingCart, Coins, TrendingUp, Crown, Image, FileText, LogOut, Eye, Bell, FolderKanban } from "lucide-react";
@@ -584,6 +584,9 @@ const FirmaPanel = () => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
           <DialogHeader>
             <DialogTitle>Lead Önizleme</DialogTitle>
+            <DialogDescription className="sr-only">
+              Müşteri talebinin detaylarını ve skorunu inceleyin.
+            </DialogDescription>
           </DialogHeader>
           {selectedLead && (
             <div className="space-y-4">
@@ -733,6 +736,7 @@ const FirmaPanel = () => {
       <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
         <DialogContent className="max-w-4xl p-1 bg-transparent border-none shadow-none flex justify-center items-center [&>button]:text-white [&>button]:bg-black/50 hover:[&>button]:bg-black/70 [&>button]:rounded-full [&>button]:p-2 max-h-[95vh] w-[95vw]">
           <DialogTitle className="sr-only">Görsel İnceleme</DialogTitle>
+          <DialogDescription className="sr-only">Büyütülmüş fotoğraf görünümü.</DialogDescription>
           {selectedPhoto && (
             <img src={selectedPhoto} alt="Detaylı Görsel" className="max-w-full max-h-[85vh] object-contain rounded-md shadow-2xl" />
           )}

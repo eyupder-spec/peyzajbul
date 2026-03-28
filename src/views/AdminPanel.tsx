@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Eye,
@@ -700,6 +700,9 @@ const AdminPanel = () => {
                                   <DialogContent className="max-w-md">
                                     <DialogHeader>
                                       <DialogTitle>Bildirim Gönderilen Firmalar ({new Set(lead.assigned_firms).size})</DialogTitle>
+                                      <DialogDescription className="sr-only">
+                                        Bu leade dair bildirim gönderilen firmaların listesi.
+                                      </DialogDescription>
                                     </DialogHeader>
                                     <div className="max-h-[60vh] overflow-y-auto space-y-2 pr-2">
                                       {Array.from(new Set(lead.assigned_firms)).map(fid => {
@@ -1106,7 +1109,12 @@ const AdminPanel = () => {
       {/* Delete confirmation */}
       <Dialog open={!!deletingLead} onOpenChange={() => setDeletingLead(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
-          <DialogHeader><DialogTitle>Lead'i silmek istediğinize emin misiniz?</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Lead'i silmek istediğinize emin misiniz?</DialogTitle>
+            <DialogDescription className="sr-only">
+              Bu işlem geri alınamaz. Lead kalıcı olarak silinecektir.
+            </DialogDescription>
+          </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletingLead(null)}>İptal</Button>
             <Button variant="destructive" onClick={() => deletingLead && handleDeleteLead(deletingLead)}>Sil</Button>
@@ -1117,7 +1125,12 @@ const AdminPanel = () => {
       {/* Status edit */}
       <Dialog open={!!editingStatus} onOpenChange={() => setEditingStatus(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
-          <DialogHeader><DialogTitle>Durum Güncelle</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Durum Güncelle</DialogTitle>
+            <DialogDescription className="sr-only">
+              Leadin mevcut durumunu (Aktif, Satın Alındı, Süresi Doldu) değiştirmek için bir seçenek belirleyin.
+            </DialogDescription>
+          </DialogHeader>
           <Select value={editingStatus?.status || ""} onValueChange={(val) => setEditingStatus((prev) => prev ? { ...prev, status: val } : null)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -1140,6 +1153,9 @@ const AdminPanel = () => {
             <DialogTitle className="flex items-center gap-2">
               <Coins className="h-5 w-5 text-primary" /> Manuel Jeton Ekle
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Belirtilen firmaya manuel olarak jeton ekleme formu.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
@@ -1187,6 +1203,9 @@ const AdminPanel = () => {
             <DialogTitle className="flex items-center gap-2">
               <Image className="h-5 w-5 text-primary" /> Galeri Yönetimi - {firmsData.find(f => f.id === adminGalleryFirmId)?.company_name}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Firmanın galeri fotoğraflarını yükleyin, silin veya açıklamalarını düzenleyin.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -1231,6 +1250,9 @@ const AdminPanel = () => {
             <DialogTitle className="flex items-center gap-2">
               <Star className="h-5 w-5 text-yellow-500" /> Yorum Yönetimi - {firmsData.find(f => f.id === adminReviewsFirmId)?.company_name}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Müşteri yorumlarını onaylayın, gizleyin veya silin.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             {adminReviews.length > 0 ? adminReviews.map((review) => (
@@ -1273,6 +1295,9 @@ const AdminPanel = () => {
             <DialogTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-primary" /> Lead Detayları
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Leadin tüm detaylarını, müşteri bilgilerini ve skor dökümünü inceleyin.
+            </DialogDescription>
           </DialogHeader>
           {selectedLeadForDetail && (
             <div className="space-y-6">
@@ -1423,6 +1448,7 @@ const AdminPanel = () => {
       <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
         <DialogContent className="max-w-4xl p-1 bg-transparent border-none shadow-none flex justify-center items-center [&>button]:text-white [&>button]:bg-black/50 hover:[&>button]:bg-black/70 [&>button]:rounded-full [&>button]:p-2 max-h-[95vh] w-[95vw]">
           <DialogTitle className="sr-only">Görsel İnceleme</DialogTitle>
+          <DialogDescription className="sr-only">Büyütülmüş fotoğraf görünümü.</DialogDescription>
           {selectedPhoto && (
             <img src={selectedPhoto} alt="Detaylı Görsel" className="max-w-full max-h-[85vh] object-contain rounded-md shadow-2xl" />
           )}

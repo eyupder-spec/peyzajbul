@@ -21,7 +21,7 @@ import {
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
 } from "@/components/ui/sidebar";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 
 const FIRMA_MENU = [
@@ -510,6 +510,9 @@ const FirmaProfil = () => {
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-accent" /> Değişiklikleri Onaylayın
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Değişikliklerin admin onayına gönderileceğine dair bilgilendirme ve onay.
+            </DialogDescription>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
             Bilgilerinizi güncelledikten sonra firmanız admin onayına gönderilecektir. Onaylandıktan sonra firmanız görüntülenmeye devam edecektir. Devam etmek istiyor musunuz?

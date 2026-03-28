@@ -1,0 +1,23 @@
+﻿node.exe : Invalid proj
+ect directory provided,
+ no such directory: D:\
+peyzajlovable\lint
+At line:1 char:1
++ & "C:\Program Files\n
+odejs/node.exe" "C:\Use
+rs\eyupd\AppData\Roamin
+g\ ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (Invalid proje   
+ ct...zajlovable\li    
+nt:String) [], Rem    o
+teException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 

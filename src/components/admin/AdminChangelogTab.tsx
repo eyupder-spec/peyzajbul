@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2 } from "lucide-react";
 
@@ -165,6 +165,9 @@ const AdminChangelogTab = () => {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{editing ? "Düzenle" : "Yeni Changelog Kaydı"}</DialogTitle>
+            <DialogDescription className="sr-only">
+              Uygulama sürüm bilgilerini, başlığını ve değişiklik detaylarını yönetin.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

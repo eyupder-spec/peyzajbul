@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { MapPin, Phone, Mail, ArrowLeft, Building2, Crown, Star, Image as ImageIcon, Globe, Eye, MessageCircle, Instagram, Facebook, Youtube, Linkedin, Twitter, Shield, Award, CheckCircle, Zap, Clock, X } from "lucide-react";
 import { extractFirmIdFromSlug, getSocialUrl, generateFirmSlug } from "@/lib/firmUtils";
 import { useFirmGallery, useFirmReviews, useFirmProjects } from "@/hooks/useFirms";
@@ -338,10 +338,13 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                           <span className="text-[10px]">Daha Fazla</span>
                         </button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle>{firm.company_name} Galeri</DialogTitle>
-                        </DialogHeader>
+                        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle>{firm.company_name} Galeri</DialogTitle>
+                            <DialogDescription className="sr-only">
+                              Firmanın tüm fotoğraflarını içeren galeri görünümü.
+                            </DialogDescription>
+                          </DialogHeader>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
                           {gallery.map((img) => (
                             <button

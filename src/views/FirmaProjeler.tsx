@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Plus, Edit, Trash2, Image, Eye, EyeOff, Loader2, Upload } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { FirmaSidebar } from "@/components/firma/FirmaSidebar";
@@ -356,6 +356,9 @@ const FirmaProjeler = () => {
             <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{form.id ? "Proje Düzenle" : "Yeni Proje"}</DialogTitle>
+                <DialogDescription className="sr-only">
+                  Proje başlığı, bütçe, hizmet türü ve görsellerini eklemek için bu formu kullanabilirsiniz.
+                </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4">
                 <div className="space-y-1.5">
@@ -468,7 +471,12 @@ const FirmaProjeler = () => {
           {/* Delete Confirm */}
           <Dialog open={!!deletingId} onOpenChange={() => setDeletingId(null)}>
             <DialogContent>
-              <DialogHeader><DialogTitle>Projeyi Sil</DialogTitle></DialogHeader>
+              <DialogHeader>
+                <DialogTitle>Projeyi Sil</DialogTitle>
+                <DialogDescription className="sr-only">
+                  Bu projeyi ve tüm görsellerini kalıcı olarak silme onayı.
+                </DialogDescription>
+              </DialogHeader>
               <p className="text-muted-foreground">Bu projeyi ve tüm görsellerini kalıcı olarak silmek istediğinize emin misiniz?</p>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setDeletingId(null)}>İptal</Button>

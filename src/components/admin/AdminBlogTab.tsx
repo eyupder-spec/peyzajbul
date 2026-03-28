@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { compressAndConvertToWebP } from "@/lib/imageUtils";
 import { Plus, Edit, Trash2, Eye, EyeOff, Loader2 } from "lucide-react";
@@ -242,6 +242,9 @@ const AdminBlogTab = () => {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingPost ? "Yazıyı Düzenle" : "Yeni Blog Yazısı"}</DialogTitle>
+            <DialogDescription className="sr-only">
+              Blog yazısı başlığı, özet, kategori, şehir ve ana metin içeriğini yönetin.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

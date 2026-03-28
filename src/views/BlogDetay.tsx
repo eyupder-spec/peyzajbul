@@ -307,6 +307,11 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                   )}
                 </div>
               )}
+              
+              {/* Reklam Alanı: Blog İçi (TOC Sonrası) */}
+              <div className="mb-12">
+                <BannerAd placement="blog_inline" className="w-full max-w-3xl mx-auto h-[90px] md:h-[120px] rounded-xl shadow-sm" />
+              </div>
 
               <article
                 className="prose prose-base md:prose-lg max-w-none text-foreground/90 
@@ -322,11 +327,6 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                   __html: sanitizedContent
                 }}
               />
-
-              {/* 3. Reklam Alanı: Blog İçi (Yazı Sonu) */}
-              <div className="my-10">
-                <BannerAd placement="blog_inline" className="w-full max-w-3xl mx-auto h-[90px] md:h-[120px] rounded-xl shadow-sm" />
-              </div>
 
               <div className="mt-12 pt-8 border-t border-border flex items-center justify-between gap-4">
                 <span className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -365,8 +365,11 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                   </div>
                 </div>
 
-                {/* 4. Reklam Alanı: Sağ Sidebar (Kare/Dikey) */}
-                <BannerAd placement="sidebar_right" className="w-full min-h-[300px] rounded-[2rem] shadow-2xl mb-8 overflow-hidden" />
+                {/* 4. Reklam Alanı: Sağ Sidebar (Blog Özel Dikey) */}
+                <BannerAd 
+                  placement="blog_sidebar" 
+                  className="w-full min-h-[600px] rounded-3xl shadow-2xl mb-8 overflow-hidden" 
+                />
 
                 {/* Diğer Yazılar (Son Paylaşımlar) */}
                 {recentPosts && recentPosts.length > 0 && (

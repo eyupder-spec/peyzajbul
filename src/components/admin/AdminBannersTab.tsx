@@ -268,6 +268,7 @@ export default function AdminBannersTab() {
                   <SelectItem value="home_right">Ana Sayfa Sağ Dikey (Skyscraper)</SelectItem>
                   <SelectItem value="sidebar_right">Sağ Kolon (Kare / Dikey)</SelectItem>
                   <SelectItem value="blog_inline">Blog Yazı İçi</SelectItem>
+                  <SelectItem value="blog_sidebar">Blog Sağ Kolon (Dikey)</SelectItem>
                   <SelectItem value="firm_list_top">Firma Listesi Üstü</SelectItem>
                 </SelectContent>
               </Select>

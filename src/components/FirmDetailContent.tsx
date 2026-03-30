@@ -5,18 +5,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { MapPin, Phone, Mail, ArrowLeft, Building2, Crown, Star, Image as ImageIcon, Globe, Eye, MessageCircle, Instagram, Facebook, Youtube, Linkedin, Twitter, Shield, Award, CheckCircle, Zap, Clock, X } from "lucide-react";
+import { MapPin, Phone, Mail, ArrowLeft, Building2, Crown, Star, Image as ImageIcon, Globe, Eye, MessageCircle, Instagram, Facebook, Youtube, Linkedin, Twitter, Shield, Award, CheckCircle, Zap, Clock, X, Camera, Send } from "lucide-react";
 import { extractFirmIdFromSlug, getSocialUrl, generateFirmSlug } from "@/lib/firmUtils";
 import { useFirmGallery, useFirmReviews, useFirmProjects } from "@/hooks/useFirms";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
 import FirmCard from "@/components/FirmCard";
 import BannerAd from "@/components/BannerAd";
 import { getCitySlug } from "@/lib/cities";
 import { useState, useRef, useCallback, use } from "react";
 import LeadFormModal from "@/components/lead-form/LeadFormModal";
+import { useToast } from "@/hooks/use-toast";
 
 interface FirmDetailContentProps {
   isModal?: boolean;
@@ -25,6 +29,8 @@ interface FirmDetailContentProps {
 
 const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailContentProps) => {
   const params = useParams();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // React 19 / Next.js 15 async params unwrapping logic
   // If slug is passed as prop (from page.tsx), use it. Try to unwrap from params safely if not.
@@ -36,6 +42,18 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
   const [showEmail, setShowEmail] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
+
+  // Review form state
+  const [reviewName, setReviewName] = useState("");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewHoverRating, setReviewHoverRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewPhoto, setReviewPhoto] = useState<File | null>(null);
+  const [reviewPhotoPreview, setReviewPhotoPreview] = useState<string | null>(null);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewFormOpen, setReviewFormOpen] = useState(false);
+  const reviewFileRef = useRef<HTMLInputElement>(null);
 
   // Before/After slider
   const [sliderPos, setSliderPos] = useState(50);
@@ -140,6 +158,52 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
   const avgRating = reviews && reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : null;
+
+  const handleReviewPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setReviewPhoto(file);
+      const reader = new FileReader();
+      reader.onload = () => setReviewPhotoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!firm || !reviewName.trim() || reviewRating === 0) return;
+    setReviewSubmitting(true);
+    try {
+      let photoUrl: string | null = null;
+      if (reviewPhoto) {
+        const ext = reviewPhoto.name.split(".").pop();
+        const path = `${firm.id}/${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from("firm-reviews")
+          .upload(path, reviewPhoto);
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from("firm-reviews").getPublicUrl(path);
+          photoUrl = urlData.publicUrl;
+        }
+      }
+      const { error } = await supabase.from("firm_reviews").insert({
+        firm_id: firm.id,
+        reviewer_name: reviewName.trim(),
+        rating: reviewRating,
+        comment: reviewComment.trim() || null,
+        photo_url: photoUrl,
+      });
+      if (error) throw error;
+      setReviewSuccess(true);
+      setReviewName(""); setReviewRating(0); setReviewComment("");
+      setReviewPhoto(null); setReviewPhotoPreview(null);
+      toast({ title: "Yorumunuz gönderildi!", description: "Admin onayından sonra yayınlanacaktır." });
+      queryClient.invalidateQueries({ queryKey: ["firm-reviews", firm.id] });
+    } catch {
+      toast({ title: "Hata", description: "Yorum gönderilemedi, tekrar deneyin.", variant: "destructive" });
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
 
   return (
     <main className={isModal ? "" : "flex-1 pt-16"}>
@@ -400,13 +464,18 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
             )}
 
             {/* Reviews */}
-            {reviews && reviews.length > 0 && (
-              <div className="bg-card rounded-lg border border-border p-6">
-                <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Star className="h-5 w-5 text-yellow-500" /> Müşteri Değerlendirmeleri
-                </h2>
-                <div className="space-y-4">
-                  {reviews.map((review) => (
+            <div className="bg-card rounded-lg border border-border p-6">
+              <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Star className="h-5 w-5 text-yellow-500" /> Müşteri Değerlendirmeleri
+                {reviews && reviews.length > 0 && (
+                  <Badge variant="outline" className="font-normal text-[10px] ml-auto">{reviews.length} Yorum</Badge>
+                )}
+              </h2>
+
+              {/* Existing Reviews */}
+              {reviews && reviews.length > 0 && (
+                <div className="space-y-4 mb-6">
+                  {reviews.map((review: any) => (
                     <div key={review.id} className="border-b border-border last:border-0 pb-4 last:pb-0">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-semibold text-foreground">{review.reviewer_name}</span>
@@ -417,10 +486,137 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                         </div>
                       </div>
                       {review.comment && <p className="text-sm text-muted-foreground">{review.comment}</p>}
+                      {review.photo_url && (
+                        <button onClick={() => setSelectedImage(review.photo_url)} className="mt-2 rounded-lg overflow-hidden border border-border/50 hover:opacity-90 transition-opacity">
+                          <img src={review.photo_url} alt="Yorum fotoğrafı" className="h-24 w-auto object-cover rounded-lg" />
+                        </button>
+                      )}
+                      <p className="text-[10px] text-muted-foreground/60 mt-1">{new Date(review.created_at).toLocaleDateString("tr-TR")}</p>
                     </div>
                   ))}
                 </div>
-              </div>
+              )}
+
+              {/* Yorum Yap Button + Collapsible Form */}
+              {!reviewFormOpen && !reviewSuccess && (
+                <div className="border-t border-border pt-4">
+                  <Button variant="outline" className="gap-2 w-full sm:w-auto" onClick={() => setReviewFormOpen(true)}>
+                    <MessageCircle className="h-4 w-4" /> Yorum Yap
+                  </Button>
+                </div>
+              )}
+
+              {reviewFormOpen && !reviewSuccess && (
+                <div className="border-t border-border pt-6 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-heading text-base font-semibold text-foreground">Yorum Bırakın</h3>
+                    <button onClick={() => setReviewFormOpen(false)} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="review-name" className="text-sm">Adınız *</Label>
+                      <Input id="review-name" placeholder="Ad Soyad" value={reviewName} onChange={(e) => setReviewName(e.target.value)} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-sm">Puanınız *</Label>
+                      <div className="flex items-center gap-1 h-9">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onMouseEnter={() => setReviewHoverRating(i + 1)}
+                            onMouseLeave={() => setReviewHoverRating(0)}
+                            onClick={() => setReviewRating(i + 1)}
+                            className="transition-transform hover:scale-125"
+                          >
+                            <Star className={`h-6 w-6 ${i < (reviewHoverRating || reviewRating) ? "text-yellow-500 fill-current" : "text-muted-foreground/30"}`} />
+                          </button>
+                        ))}
+                        {reviewRating > 0 && <span className="text-sm text-muted-foreground ml-2">{reviewRating}/5</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="review-comment" className="text-sm">Yorumunuz</Label>
+                    <Textarea id="review-comment" placeholder="Deneyiminizi paylaşın..." value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} rows={3} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-sm">Fotoğraf (Opsiyonel)</Label>
+                    <div className="flex items-center gap-3">
+                      <input ref={reviewFileRef} type="file" accept="image/*" onChange={handleReviewPhotoChange} className="hidden" />
+                      <Button type="button" variant="outline" size="sm" onClick={() => reviewFileRef.current?.click()} className="gap-1.5">
+                        <Camera className="h-4 w-4" /> Fotoğraf Ekle
+                      </Button>
+                      {reviewPhotoPreview && (
+                        <div className="relative">
+                          <img src={reviewPhotoPreview} alt="Önizleme" className="h-14 w-14 object-cover rounded-lg border border-border" />
+                          <button onClick={() => { setReviewPhoto(null); setReviewPhotoPreview(null); }} className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <Button onClick={handleSubmitReview} disabled={reviewSubmitting || !reviewName.trim() || reviewRating === 0} className="gap-2">
+                    {reviewSubmitting ? (
+                      <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Gönderiliyor...</>
+                    ) : (
+                      <><Send className="h-4 w-4" /> Yorum Gönder</>
+                    )}
+                  </Button>
+                </div>
+              )}
+
+              {reviewSuccess && (
+                <div className="border-t border-border pt-6 text-center py-8">
+                  <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <CheckCircle className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <p className="font-semibold text-foreground">Yorumunuz başarıyla gönderildi!</p>
+                  <p className="text-sm text-muted-foreground mt-1">Admin onayından sonra burada görünecektir.</p>
+                  <Button variant="outline" size="sm" className="mt-4" onClick={() => { setReviewSuccess(false); setReviewFormOpen(false); }}>Tamam</Button>
+                </div>
+              )}
+            </div>
+
+            {/* Schema Markup: AggregateRating + Reviews */}
+            {reviews && reviews.length > 0 && (
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "LocalBusiness",
+                    "name": firm.company_name,
+                    "address": {
+                      "@type": "PostalAddress",
+                      "addressLocality": firm.city,
+                      ...(firm.district ? { "addressRegion": firm.district } : {}),
+                    },
+                    ...(firm.logo_url ? { "image": firm.logo_url } : {}),
+                    "aggregateRating": {
+                      "@type": "AggregateRating",
+                      "ratingValue": avgRating,
+                      "reviewCount": reviews.length,
+                      "bestRating": "5",
+                      "worstRating": "1",
+                    },
+                    "review": reviews.map((r: any) => ({
+                      "@type": "Review",
+                      "author": { "@type": "Person", "name": r.reviewer_name },
+                      "reviewRating": {
+                        "@type": "Rating",
+                        "ratingValue": r.rating,
+                        "bestRating": "5",
+                        "worstRating": "1",
+                      },
+                      ...(r.comment ? { "reviewBody": r.comment } : {}),
+                      ...(r.photo_url ? { "image": r.photo_url } : {}),
+                      "datePublished": r.created_at?.split("T")[0],
+                    })),
+                  }),
+                }}
+              />
             )}
 
             {/* F.A.Q. */}

@@ -229,6 +229,7 @@ export type Database = {
           firm_id: string
           id: string
           is_approved: boolean
+          photo_url: string | null
           rating: number
           reviewer_name: string
         }
@@ -238,6 +239,7 @@ export type Database = {
           firm_id: string
           id?: string
           is_approved?: boolean
+          photo_url?: string | null
           rating: number
           reviewer_name: string
         }
@@ -247,6 +249,7 @@ export type Database = {
           firm_id?: string
           id?: string
           is_approved?: boolean
+          photo_url?: string | null
           rating?: number
           reviewer_name?: string
         }

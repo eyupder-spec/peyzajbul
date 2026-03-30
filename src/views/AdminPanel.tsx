@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
@@ -16,7 +17,7 @@ import {
   Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Eye,
   Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
   LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon, Upload, FolderKanban,
-  Search, ChevronLeft, ChevronRight
+  Search, ChevronLeft, ChevronRight, Sparkles
 } from "lucide-react";
 import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
@@ -187,6 +188,14 @@ const AdminPanel = () => {
   const [selectedLeadForDetail, setSelectedLeadForDetail] = useState<Lead | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
+  // Admin review form state
+  const [adminReviewName, setAdminReviewName] = useState("");
+  const [adminReviewRating, setAdminReviewRating] = useState(5);
+  const [adminReviewComment, setAdminReviewComment] = useState("");
+  const [adminReviewPhoto, setAdminReviewPhoto] = useState<File | null>(null);
+  const [adminReviewPhotoPreview, setAdminReviewPhotoPreview] = useState<string | null>(null);
+  const [adminReviewSubmitting, setAdminReviewSubmitting] = useState(false);
+
   // Firm pagination & search
   const [firmSearch, setFirmSearch] = useState("");
   const [firmPage, setFirmPage] = useState(1);
@@ -205,6 +214,9 @@ const AdminPanel = () => {
   // Firm form dialog
   const [firmFormOpen, setFirmFormOpen] = useState(false);
   const [editingFirm, setEditingFirm] = useState<FirmFormData | null>(null);
+
+  // AI Enrichment state
+  const [enrichingFirmId, setEnrichingFirmId] = useState<string | null>(null);
 
   // Manual coin add
   const [addCoinFirmId, setAddCoinFirmId] = useState<string | null>(null);
@@ -277,6 +289,31 @@ const AdminPanel = () => {
       toast({ title: "Lead silindi" });
     }
     setDeletingLead(null);
+  };
+
+  const handleEnrichFirm = async (firmId: string) => {
+    try {
+      setEnrichingFirmId(firmId);
+      const { data, error } = await supabase.functions.invoke('enrich-firm-profile', {
+        body: { firmId }
+      });
+
+      if (error) {
+        throw new Error(error.message || `İşlem Hatası`);
+      }
+
+      if (data?.success && data?.description) {
+        toast({ title: "Başarılı", description: "Firma açıklaması YZ ile dolduruldu." });
+        // Update local state to reflect the new description
+        setFirmsData(prev => prev.map(f => f.id === firmId ? { ...f, description: data.description } : f));
+      } else {
+        throw new Error(data?.error || "Beklenmeyen bir hata oluştu.");
+      }
+    } catch (err: any) {
+      toast({ title: "Hata", description: err.message, variant: "destructive" });
+    } finally {
+      setEnrichingFirmId(null);
+    }
   };
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
@@ -438,6 +475,50 @@ const AdminPanel = () => {
     await supabase.from("firm_reviews").delete().eq("id", reviewId);
     if (adminReviewsFirmId) loadAdminReviews(adminReviewsFirmId);
     toast({ title: "Yorum silindi" });
+  };
+
+  const handleAdminReviewPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAdminReviewPhoto(file);
+      const reader = new FileReader();
+      reader.onload = () => setAdminReviewPhotoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAdminAddReview = async () => {
+    if (!adminReviewsFirmId || !adminReviewName.trim()) return;
+    setAdminReviewSubmitting(true);
+    try {
+      let photoUrl: string | null = null;
+      if (adminReviewPhoto) {
+        const ext = adminReviewPhoto.name.split(".").pop();
+        const path = `${adminReviewsFirmId}/${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage.from("firm-reviews").upload(path, adminReviewPhoto);
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from("firm-reviews").getPublicUrl(path);
+          photoUrl = urlData.publicUrl;
+        }
+      }
+      const { error } = await supabase.from("firm_reviews").insert({
+        firm_id: adminReviewsFirmId,
+        reviewer_name: adminReviewName.trim(),
+        rating: adminReviewRating,
+        comment: adminReviewComment.trim() || null,
+        photo_url: photoUrl,
+        is_approved: true,
+      });
+      if (error) throw error;
+      setAdminReviewName(""); setAdminReviewRating(5); setAdminReviewComment("");
+      setAdminReviewPhoto(null); setAdminReviewPhotoPreview(null);
+      loadAdminReviews(adminReviewsFirmId);
+      toast({ title: "Yorum eklendi (onaylı)" });
+    } catch {
+      toast({ title: "Hata", description: "Yorum eklenemedi", variant: "destructive" });
+    } finally {
+      setAdminReviewSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -996,6 +1077,20 @@ const AdminPanel = () => {
                           </td>
                           <td className="px-3 py-2">
                             <div className="flex gap-1 flex-wrap">
+                              <Button
+                                size="sm" 
+                                variant="outline" 
+                                title="YZ Açıklama Yaz" 
+                                onClick={() => handleEnrichFirm(firm.id)}
+                                disabled={enrichingFirmId === firm.id || !!(firm.description && firm.description.trim().length > 0)}
+                                className={firm.description && firm.description.trim().length > 0 ? "opacity-50" : "bg-purple-50 hover:bg-purple-100 text-purple-700 hover:text-purple-800 border-purple-200"}
+                              >
+                                {enrichingFirmId === firm.id ? (
+                                  <span className="animate-spin text-sm">⏳</span>
+                                ) : (
+                                  <Sparkles className="h-3 w-3" />
+                                )}
+                              </Button>
                               <Button size="sm" variant="ghost" title="Düzenle" onClick={() => {
                                 setEditingFirm({
                                   id: firm.id,
@@ -1261,9 +1356,41 @@ const AdminPanel = () => {
               <Star className="h-5 w-5 text-yellow-500" /> Yorum Yönetimi - {firmsData.find(f => f.id === adminReviewsFirmId)?.company_name}
             </DialogTitle>
             <DialogDescription className="sr-only">
-              Müşteri yorumlarını onaylayın, gizleyin veya silin.
+              Müşteri yorumlarını onayla, gizle, sil veya yeni yorum ekle.
             </DialogDescription>
           </DialogHeader>
+
+          {/* Add Review Form */}
+          <div className="border border-dashed border-border rounded-lg p-4 space-y-3 bg-muted/30">
+            <p className="text-sm font-semibold text-foreground">Manuel Yorum Ekle</p>
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="Müşteri Adı" value={adminReviewName} onChange={(e) => setAdminReviewName(e.target.value)} />
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <button key={i} type="button" onClick={() => setAdminReviewRating(i + 1)}>
+                    <Star className={`h-5 w-5 ${i < adminReviewRating ? "text-yellow-500 fill-current" : "text-muted"}`} />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <Textarea placeholder="Yorum metni (opsiyonel)" value={adminReviewComment} onChange={(e) => setAdminReviewComment(e.target.value)} rows={2} />
+            <div className="flex items-center gap-3">
+              <label className="cursor-pointer">
+                <input type="file" accept="image/*" onChange={handleAdminReviewPhotoChange} className="hidden" />
+                <Button asChild variant="outline" size="sm"><span>Fotoğraf Ekle</span></Button>
+              </label>
+              {adminReviewPhotoPreview && (
+                <div className="relative">
+                  <img src={adminReviewPhotoPreview} alt="Önizleme" className="h-10 w-10 object-cover rounded border" />
+                  <button onClick={() => { setAdminReviewPhoto(null); setAdminReviewPhotoPreview(null); }} className="absolute -top-1 -right-1 bg-destructive text-white rounded-full w-3.5 h-3.5 flex items-center justify-center text-[8px]">✕</button>
+                </div>
+              )}
+              <Button size="sm" onClick={handleAdminAddReview} disabled={adminReviewSubmitting || !adminReviewName.trim()} className="ml-auto">
+                {adminReviewSubmitting ? "Ekleniyor..." : "Ekle (Onaylı)"}
+              </Button>
+            </div>
+          </div>
+
           <div className="space-y-3">
             {adminReviews.length > 0 ? adminReviews.map((review) => (
               <div key={review.id} className="border border-border rounded-lg p-3 space-y-2">
@@ -1281,13 +1408,21 @@ const AdminPanel = () => {
                   </Badge>
                 </div>
                 {review.comment && <p className="text-sm text-muted-foreground">{review.comment}</p>}
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => handleToggleReviewApproval(review.id, review.is_approved)}>
-                    {review.is_approved ? "Gizle" : "Onayla"}
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDeleteReview(review.id)}>
-                    <Trash2 className="h-3 w-3 mr-1" /> Sil
-                  </Button>
+                {review.photo_url && (
+                  <button onClick={() => setSelectedPhoto(review.photo_url)} className="block">
+                    <img src={review.photo_url} alt="Yorum fotoğrafı" className="h-20 w-auto object-cover rounded-lg border border-border/50 hover:opacity-80 transition-opacity" />
+                  </button>
+                )}
+                <div className="flex items-center gap-2">
+                  <p className="text-[10px] text-muted-foreground">{new Date(review.created_at).toLocaleDateString("tr-TR")}</p>
+                  <div className="flex gap-2 ml-auto">
+                    <Button size="sm" variant="outline" onClick={() => handleToggleReviewApproval(review.id, review.is_approved)}>
+                      {review.is_approved ? "Gizle" : "Onayla"}
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => handleDeleteReview(review.id)}>
+                      <Trash2 className="h-3 w-3 mr-1" /> Sil
+                    </Button>
+                  </div>
                 </div>
               </div>
             )) : (

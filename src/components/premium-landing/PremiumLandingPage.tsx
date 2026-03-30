@@ -5,15 +5,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Crown, Star, Globe, Eye, Instagram, Facebook, Youtube, Linkedin, Twitter, Building2, ArrowLeft, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { MapPin, Phone, Mail, Crown, Star, Globe, Eye, Instagram, Facebook, Youtube, Linkedin, Twitter, Building2, ArrowLeft, X, Camera, Send, CheckCircle, MessageCircle } from "lucide-react";
 import { extractFirmIdFromSlug, getSocialUrl } from "@/lib/firmUtils";
 import { useFirmGallery, useFirmReviews, useFirmProjects } from "@/hooks/useFirms";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
 import { getCitySlug } from "@/lib/cities";
 import { useState, useRef, useCallback } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import LeadFormModal from "@/components/lead-form/LeadFormModal";
+import { useToast } from "@/hooks/use-toast";
 
 /* ─────────────────────────────────────────────
    TYPES
@@ -69,6 +73,20 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
   const [showEmail, setShowEmail] = useState(false);
   const [showAllServices, setShowAllServices] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Review form state
+  const [reviewName, setReviewName] = useState("");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewHoverRating, setReviewHoverRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewPhoto, setReviewPhoto] = useState<File | null>(null);
+  const [reviewPhotoPreview, setReviewPhotoPreview] = useState<string | null>(null);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewFormOpen, setReviewFormOpen] = useState(false);
+  const reviewFileRef = useRef<HTMLInputElement>(null);
 
   // Before/After slider
   const [sliderPos, setSliderPos] = useState(50);
@@ -146,6 +164,52 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
   const hasGallery = gallery && gallery.length > 0;
   const hasReviews = reviews && reviews.length > 0;
   const hasSocial = firm.social_instagram || firm.social_facebook || firm.social_x || firm.social_youtube || firm.social_linkedin;
+
+  const handleReviewPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setReviewPhoto(file);
+      const reader = new FileReader();
+      reader.onload = () => setReviewPhotoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!firm || !reviewName.trim() || reviewRating === 0) return;
+    setReviewSubmitting(true);
+    try {
+      let photoUrl: string | null = null;
+      if (reviewPhoto) {
+        const ext = reviewPhoto.name.split(".").pop();
+        const path = `${firm.id}/${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from("firm-reviews")
+          .upload(path, reviewPhoto);
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from("firm-reviews").getPublicUrl(path);
+          photoUrl = urlData.publicUrl;
+        }
+      }
+      const { error } = await supabase.from("firm_reviews").insert({
+        firm_id: firm.id,
+        reviewer_name: reviewName.trim(),
+        rating: reviewRating,
+        comment: reviewComment.trim() || null,
+        photo_url: photoUrl,
+      });
+      if (error) throw error;
+      setReviewSuccess(true);
+      setReviewName(""); setReviewRating(0); setReviewComment("");
+      setReviewPhoto(null); setReviewPhotoPreview(null);
+      toast({ title: "Yorumunuz gönderildi!", description: "Admin onayından sonra yayınlanacaktır." });
+      queryClient.invalidateQueries({ queryKey: ["firm-reviews", firm.id] });
+    } catch {
+      toast({ title: "Hata", description: "Yorum gönderilemedi, tekrar deneyin.", variant: "destructive" });
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
 
   return (
     <main className="flex-1 pt-16">
@@ -406,12 +470,17 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
           )}
 
           {/* ═══════════════ REVIEWS ═══════════════ */}
-          {sections.reviews && hasReviews && (
-            <section>
-              <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <Star className="h-6 w-6 text-yellow-500" /> Müşteri Değerlendirmeleri
-              </h2>
-              <div className="grid md:grid-cols-2 gap-4">
+          <section>
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <Star className="h-6 w-6 text-yellow-500" /> Müşteri Değerlendirmeleri
+              {hasReviews && (
+                <Badge variant="outline" className="font-normal ml-auto">{reviews!.length} Yorum</Badge>
+              )}
+            </h2>
+
+            {/* Existing Reviews */}
+            {hasReviews && (
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
                 {reviews!.map((review: any) => (
                   <div key={review.id} className="bg-card rounded-xl border border-border p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
@@ -423,11 +492,140 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                       </div>
                     </div>
                     {review.comment && <p className="text-sm text-muted-foreground leading-relaxed">{review.comment}</p>}
+                    {review.photo_url && (
+                      <button onClick={() => setSelectedImage(review.photo_url)} className="mt-3 rounded-lg overflow-hidden border border-border/50 hover:opacity-90 transition-opacity">
+                        <img src={review.photo_url} alt="Yorum fotoğrafı" className="h-28 w-auto object-cover rounded-lg" />
+                      </button>
+                    )}
+                    <p className="text-[10px] text-muted-foreground/60 mt-2">{new Date(review.created_at).toLocaleDateString("tr-TR")}</p>
                   </div>
                 ))}
               </div>
-            </section>
-          )}
+            )}
+
+            {/* Yorum Yap Button + Collapsible Form */}
+            {!reviewFormOpen && !reviewSuccess && (
+              <div className="pt-2">
+                <Button variant="outline" className="gap-2 w-full sm:w-auto" onClick={() => setReviewFormOpen(true)}>
+                  <MessageCircle className="h-4 w-4" /> Yorum Yap
+                </Button>
+              </div>
+            )}
+
+            {reviewFormOpen && !reviewSuccess && (
+              <div className="bg-card rounded-xl border border-border p-6 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-heading text-lg font-semibold text-foreground">Yorum Bırakın</h3>
+                  <button onClick={() => setReviewFormOpen(false)} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+                </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="premium-review-name" className="text-sm">Adınız *</Label>
+                      <Input id="premium-review-name" placeholder="Ad Soyad" value={reviewName} onChange={(e) => setReviewName(e.target.value)} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-sm">Puanınız *</Label>
+                      <div className="flex items-center gap-1 h-9">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onMouseEnter={() => setReviewHoverRating(i + 1)}
+                            onMouseLeave={() => setReviewHoverRating(0)}
+                            onClick={() => setReviewRating(i + 1)}
+                            className="transition-transform hover:scale-125"
+                          >
+                            <Star className={`h-6 w-6 ${i < (reviewHoverRating || reviewRating) ? "text-yellow-500 fill-current" : "text-muted-foreground/30"}`} />
+                          </button>
+                        ))}
+                        {reviewRating > 0 && <span className="text-sm text-muted-foreground ml-2">{reviewRating}/5</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="premium-review-comment" className="text-sm">Yorumunuz</Label>
+                    <Textarea id="premium-review-comment" placeholder="Deneyiminizi paylaşın..." value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} rows={3} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-sm">Fotoğraf (Opsiyonel)</Label>
+                    <div className="flex items-center gap-3">
+                      <input ref={reviewFileRef} type="file" accept="image/*" onChange={handleReviewPhotoChange} className="hidden" />
+                      <Button type="button" variant="outline" size="sm" onClick={() => reviewFileRef.current?.click()} className="gap-1.5">
+                        <Camera className="h-4 w-4" /> Fotoğraf Ekle
+                      </Button>
+                      {reviewPhotoPreview && (
+                        <div className="relative">
+                          <img src={reviewPhotoPreview} alt="Önizleme" className="h-14 w-14 object-cover rounded-lg border border-border" />
+                          <button onClick={() => { setReviewPhoto(null); setReviewPhotoPreview(null); }} className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <Button onClick={handleSubmitReview} disabled={reviewSubmitting || !reviewName.trim() || reviewRating === 0} className="gap-2">
+                    {reviewSubmitting ? (
+                      <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Gönderiliyor...</>
+                    ) : (
+                      <><Send className="h-4 w-4" /> Yorum Gönder</>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {reviewSuccess && (
+              <div className="bg-card rounded-xl border border-border p-6 text-center py-10 mt-6">
+                <div className="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <p className="font-semibold text-foreground text-lg">Yorumunuz başarıyla gönderildi!</p>
+                <p className="text-sm text-muted-foreground mt-1">Admin onayından sonra burada görünecektir.</p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => { setReviewSuccess(false); setReviewFormOpen(false); }}>Tamam</Button>
+              </div>
+            )}
+
+            {/* Schema Markup: AggregateRating + Reviews */}
+            {hasReviews && (
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "LocalBusiness",
+                    "name": firm.company_name,
+                    "address": {
+                      "@type": "PostalAddress",
+                      "addressLocality": firm.city,
+                      ...(firm.district ? { "addressRegion": firm.district } : {}),
+                    },
+                    ...(firm.logo_url ? { "image": firm.logo_url } : {}),
+                    "aggregateRating": {
+                      "@type": "AggregateRating",
+                      "ratingValue": avgRating,
+                      "reviewCount": reviews.length,
+                      "bestRating": "5",
+                      "worstRating": "1",
+                    },
+                    "review": reviews.map((r: any) => ({
+                      "@type": "Review",
+                      "author": { "@type": "Person", "name": r.reviewer_name },
+                      "reviewRating": {
+                        "@type": "Rating",
+                        "ratingValue": r.rating,
+                        "bestRating": "5",
+                        "worstRating": "1",
+                      },
+                      ...(r.comment ? { "reviewBody": r.comment } : {}),
+                      ...(r.photo_url ? { "image": r.photo_url } : {}),
+                      "datePublished": r.created_at?.split("T")[0],
+                    })),
+                  }),
+                }}
+              />
+            )}
+          </section>
 
           {/* ═══════════════ FAQ ═══════════════ */}
           {sections.faq && hasFaq && (

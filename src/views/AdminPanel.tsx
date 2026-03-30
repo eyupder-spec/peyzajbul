@@ -101,6 +101,7 @@ type Lead = {
   irrigation_system?: string | null;
   water_source?: string | null;
   photo_urls?: string[] | null;
+  target_firm_id?: string | null;
 };
 
 type UserRole = {
@@ -657,7 +658,16 @@ const AdminPanel = () => {
                         return (
                           <tr key={lead.id} className="hover:bg-muted/50">
                             <td className="px-3 py-2 text-foreground">{new Date(lead.created_at).toLocaleDateString("tr-TR")}</td>
-                            <td className="px-3 py-2 text-foreground font-medium">{lead.full_name}</td>
+                            <td className="px-3 py-2 text-foreground font-medium">
+                              <div className="flex flex-col gap-1">
+                                {lead.full_name}
+                                {lead.target_firm_id && (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200 w-fit">
+                                    ⭐ Premium Özel
+                                  </span>
+                                )}
+                              </div>
+                            </td>
                             <td className="px-3 py-2 text-foreground">{lead.phone}</td>
                             <td className="px-3 py-2 text-foreground">{lead.email}</td>
                             <td className="px-3 py-2 text-foreground">{lead.service_type}</td>

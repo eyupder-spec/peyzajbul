@@ -4,9 +4,11 @@ import LeadFormWidget from "./LeadFormWidget";
 interface LeadFormModalProps {
   open: boolean;
   onClose: () => void;
+  targetFirmId?: string;
+  targetFirmName?: string;
 }
 
-const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
+const LeadFormModal = ({ open, onClose, targetFirmId, targetFirmName }: LeadFormModalProps) => {
   if (!open) return null;
 
   return (
@@ -25,7 +27,9 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
       <div className="flex-1 overflow-y-auto">
         <LeadFormWidget 
           onSuccess={onClose} 
-          className="shadow-2xl border-primary/20" 
+          className="shadow-2xl border-primary/20"
+          targetFirmId={targetFirmId}
+          targetFirmName={targetFirmName}
         />
       </div>
     </div>
@@ -33,4 +37,3 @@ const LeadFormModal = ({ open, onClose }: LeadFormModalProps) => {
 };
 
 export default LeadFormModal;
-

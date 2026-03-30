@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LeadFormData, initialFormData, SCOPE_OPTIONS, SERVICE_TYPE_TO_LABEL } from "@/lib/leadFormData";
 import StepProjectType from "./StepProjectType";
@@ -21,9 +21,11 @@ const TOTAL_STEPS = 8;
 interface LeadFormWidgetProps {
   onSuccess?: () => void;
   className?: string;
+  targetFirmId?: string;
+  targetFirmName?: string;
 }
 
-export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWidgetProps) {
+export default function LeadFormWidget({ onSuccess, className = "", targetFirmId, targetFirmName }: LeadFormWidgetProps) {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<LeadFormData>(initialFormData);
   const [loading, setLoading] = useState(false);
@@ -194,6 +196,7 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
           email: data.email,
           user_id: userId,
           status: "active",
+          target_firm_id: targetFirmId || null,
         } as any);
 
         if (leadError) throw leadError;
@@ -271,6 +274,7 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
           phone: data.phone,
           email: data.email,
           status: "unverified",
+          target_firm_id: targetFirmId || null,
         } as any);
         
         if (leadError) {
@@ -310,6 +314,16 @@ export default function LeadFormWidget({ onSuccess, className = "" }: LeadFormWi
   return (
     <div className={`relative bg-card border border-border shadow-md rounded-2xl flex flex-col w-full max-w-xl mx-auto overflow-hidden ${className}`}>
         
+      {/* Firma Özel Banner */}
+      {targetFirmName && (
+        <div className="px-6 py-2.5 bg-accent/10 border-b border-accent/20 flex items-center gap-2 text-sm">
+          <Crown className="h-4 w-4 text-accent shrink-0" />
+          <span className="text-foreground">
+            <span className="font-bold text-accent">{targetFirmName}</span> firmasına özel teklif gönderiyorsunuz
+          </span>
+        </div>
+      )}
+
       {/* Üst Kısım: Progress Bar */}
       <div className="px-6 py-4 border-b border-border bg-muted/30">
         <span className="text-xs font-bold text-accent uppercase tracking-wider mb-0.5">Teklif Talebi</span>

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
-import { Coins, Eye, ArrowLeft } from "lucide-react";
+import { Coins, Eye, ArrowLeft, Crown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
 import {
@@ -53,6 +53,7 @@ type Lead = {
   total_purchases?: number | null;
   token_price?: number;
   admin_approved?: boolean;
+  target_firm_id?: string | null;
 };
 
 const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
@@ -103,6 +104,7 @@ const FirmaLeadlerContent = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [purchasing, setPurchasing] = useState(false);
   const [coinBalance, setCoinBalance] = useState(0);
+  const [firmId, setFirmId] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
@@ -129,10 +131,11 @@ const FirmaLeadlerContent = () => {
 
       const { data: firm } = await supabase
         .from("firms")
-        .select("coin_balance")
+        .select("id, coin_balance")
         .eq("user_id", user.id)
         .single();
       setCoinBalance(firm?.coin_balance || 0);
+      setFirmId(firm?.id || "");
 
       const { data: leadsData } = await supabase
         .from("leads_for_firms" as any)
@@ -301,11 +304,16 @@ const FirmaLeadlerContent = () => {
                             </TooltipContent>
                           </Tooltip>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 text-sm text-foreground">
                           <div className="flex flex-col gap-1">
                             <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
                               {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
                             </Badge>
+                            {lead.target_firm_id && lead.target_firm_id === firmId && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200 w-fit">
+                                <Crown className="h-3 w-3" /> Size Özel Teklif
+                              </span>
+                            )}
                             {!isPurchased && (() => {
                               const fomo = getFomoMessage(leadPurchaseCounts[lead.id] || 0);
                               return (
@@ -349,9 +357,16 @@ const FirmaLeadlerContent = () => {
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">{getLeadLabel(SERVICE_LABELS, lead.service_type)}</CardTitle>
-                      <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
-                        {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
-                      </Badge>
+                      <div className="flex flex-col items-end gap-1">
+                        <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
+                          {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
+                        </Badge>
+                        {lead.target_firm_id && lead.target_firm_id === firmId && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
+                            <Crown className="h-3 w-3" /> Size Özel
+                          </span>
+                        )}
+                      </div>
                     </div>
                     {!isPurchased && (() => {
                       const fomo = getFomoMessage(leadPurchaseCounts[lead.id] || 0);

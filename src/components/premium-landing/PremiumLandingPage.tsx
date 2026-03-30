@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Crown, Star, Globe, Eye, MessageCircle, Instagram, Facebook, Youtube, Linkedin, Twitter, Building2, ArrowLeft, X } from "lucide-react";
+import { MapPin, Phone, Mail, Crown, Star, Globe, Eye, Instagram, Facebook, Youtube, Linkedin, Twitter, Building2, ArrowLeft, X } from "lucide-react";
 import { extractFirmIdFromSlug, getSocialUrl } from "@/lib/firmUtils";
 import { useFirmGallery, useFirmReviews, useFirmProjects } from "@/hooks/useFirms";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase/client";
 import { getCitySlug } from "@/lib/cities";
 import { useState, useRef, useCallback } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import LeadFormModal from "@/components/lead-form/LeadFormModal";
 
 /* ─────────────────────────────────────────────
    TYPES
@@ -67,6 +68,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
   const [showPhone, setShowPhone] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [showAllServices, setShowAllServices] = useState(false);
+  const [showLeadModal, setShowLeadModal] = useState(false);
 
   // Before/After slider
   const [sliderPos, setSliderPos] = useState(50);
@@ -212,11 +214,14 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
 
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-3 mt-8">
-                <a href={`https://wa.me/${firm.phone?.replace(/\D/g, "").replace(/^0/, "90")}`} target="_blank" rel="noopener noreferrer">
-                  <Button size="lg" className="bg-[#25D366] hover:bg-[#1fb855] text-white gap-2 shadow-lg h-12 px-6">
-                    <MessageCircle className="h-5 w-5" /> WhatsApp ile İletişim
-                  </Button>
-                </a>
+                <Button
+                  size="lg"
+                  variant="gold"
+                  className="h-12 px-6 gap-2 shadow-lg"
+                  onClick={() => setShowLeadModal(true)}
+                >
+                  <Crown className="h-5 w-5" /> Teklif Al
+                </Button>
                 <Button size="lg" variant="outline" className="border-white/30 text-white bg-black/20 hover:bg-black/50 hover:text-white gap-2 h-12 px-6" onClick={() => {
                   document.getElementById("landing-contact")?.scrollIntoView({ behavior: "smooth" });
                 }}>
@@ -517,12 +522,15 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                 </div>
 
                 <div className="space-y-4">
-                  {/* WhatsApp CTA */}
-                  <a href={`https://wa.me/${firm.phone?.replace(/\D/g, "").replace(/^0/, "90")}`} target="_blank" rel="noopener noreferrer" className="block">
-                    <Button size="lg" className="w-full bg-[#25D366] hover:bg-[#1fb855] text-white gap-2 h-14 text-lg shadow-md">
-                      <MessageCircle className="h-6 w-6" /> WhatsApp ile İletişim
-                    </Button>
-                  </a>
+                  {/* Direkt Teklif Al CTA */}
+                  <Button
+                    size="lg"
+                    variant="gold"
+                    className="w-full h-14 text-lg gap-2 shadow-md"
+                    onClick={() => setShowLeadModal(true)}
+                  >
+                    <Crown className="h-5 w-5" /> Bu Firmadan Teklif Al
+                  </Button>
 
                   {/* Social Media */}
                   {sections.social_media && hasSocial && (
@@ -572,6 +580,14 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
           <img src={selectedImage} alt="Large" className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" />
         </div>
       )}
+
+      {/* Direkt Teklif Modalı */}
+      <LeadFormModal
+        open={showLeadModal}
+        onClose={() => setShowLeadModal(false)}
+        targetFirmId={firm.id}
+        targetFirmName={firm.company_name}
+      />
     </main>
   );
 };

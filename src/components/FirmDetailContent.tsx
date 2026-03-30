@@ -16,6 +16,7 @@ import FirmCard from "@/components/FirmCard";
 import BannerAd from "@/components/BannerAd";
 import { getCitySlug } from "@/lib/cities";
 import { useState, useRef, useCallback, use } from "react";
+import LeadFormModal from "@/components/lead-form/LeadFormModal";
 
 interface FirmDetailContentProps {
   isModal?: boolean;
@@ -34,6 +35,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
   const [showPhone, setShowPhone] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
+  const [showLeadModal, setShowLeadModal] = useState(false);
 
   // Before/After slider
   const [sliderPos, setSliderPos] = useState(50);
@@ -561,6 +563,17 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                   <MessageCircle className="h-5 w-5" /> WhatsApp ile İletişim
                 </Button>
               </a>
+
+              {/* Premium Firmalara Özel: Direkt Teklif Al Butonu */}
+              {firm.is_premium && (
+                <Button
+                  variant="gold"
+                  className="w-full gap-2"
+                  onClick={() => setShowLeadModal(true)}
+                >
+                  <Crown className="h-4 w-4" /> Bu Firmadan Teklif Al
+                </Button>
+              )}
             </div>
 
             {!firm.is_claimed && (
@@ -594,6 +607,14 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
           <img src={selectedImage} alt="Large" className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" />
         </div>
       )}
+
+      {/* Direkt Teklif Modalı */}
+      <LeadFormModal
+        open={showLeadModal}
+        onClose={() => setShowLeadModal(false)}
+        targetFirmId={firm.id}
+        targetFirmName={firm.company_name}
+      />
     </main>
   );
 };

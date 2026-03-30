@@ -2,6 +2,13 @@ import { getCitySlug } from "./cities";
 
 export function generateFirmSlug(companyName: string, id: string): string {
   const slug = companyName
+    .replace(/İ/g, "i")
+    .replace(/I/g, "i")
+    .replace(/Ş/g, "s")
+    .replace(/Ğ/g, "g")
+    .replace(/Ü/g, "u")
+    .replace(/Ö/g, "o")
+    .replace(/Ç/g, "c")
     .toLowerCase()
     .replace(/ğ/g, "g")
     .replace(/ü/g, "u")
@@ -37,6 +44,13 @@ export function getSocialUrl(platform: 'instagram' | 'facebook' | 'x' | 'youtube
 
 export function generateProjectSlug(title: string, id: string): string {
   const slug = title
+    .replace(/İ/g, "i")
+    .replace(/I/g, "i")
+    .replace(/Ş/g, "s")
+    .replace(/Ğ/g, "g")
+    .replace(/Ü/g, "u")
+    .replace(/Ö/g, "o")
+    .replace(/Ç/g, "c")
     .toLowerCase()
     .replace(/ğ/g, "g")
     .replace(/ü/g, "u")

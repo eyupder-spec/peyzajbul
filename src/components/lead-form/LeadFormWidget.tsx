@@ -132,8 +132,8 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
         }
 
         // Geçersiz/süresi dolmuş kod kontrolü
-        if (errMsg.includes("Geçersiz") || errMsg.includes("süresi dolmuş") || 
-            verifyError.message?.includes("non-2xx")) {
+        if (errMsg.includes("Geçersiz") || errMsg.includes("süresi dolmuş") ||
+          verifyError.message?.includes("non-2xx")) {
           setOtpError("Girdiğiniz kod geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.");
           setOtpCode("");
           toast.error("Geçersiz veya süresi dolmuş kod. Lütfen kontrol edip tekrar deneyin.");
@@ -227,16 +227,16 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
       } catch {
         // E-posta gönderilemese bile formu etkilmesin
       }
-      
+
       setStep(1);
       setData(initialFormData);
       setOtpCode("");
-      
-      if(onSuccess) {
+
+      if (onSuccess) {
         onSuccess();
       }
       router.push("/hesabim");
-      
+
     } catch (err: any) {
       setOtpError("");
       toast.error(err.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
@@ -250,7 +250,7 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
       try {
         setOtpSending(true);
         const generatedLeadId = crypto.randomUUID();
-        
+
         // Try creating unverified lead first (without .select().single() to avoid RLS SELECT issues)
         const { error: leadError } = await supabase.from("leads").insert({
           id: generatedLeadId,
@@ -276,7 +276,7 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
           status: "unverified",
           target_firm_id: targetFirmId || null,
         } as any);
-        
+
         if (leadError) {
           console.error("Unverified lead insert error:", leadError.message || leadError);
         } else {
@@ -287,7 +287,7 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
           body: { email: data.email },
         });
         if (error) throw error;
-        
+
         if (res?.debugCode) {
           setOtpCode(res.debugCode);
           toast.info("Geliştirme Modu: Domain onayı olmadığı için kod otomatik dolduruldu: " + res.debugCode);
@@ -295,7 +295,7 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
           toast.success("Doğrulama kodu e-posta adresinize gönderildi!");
         }
         if (res?.error && !res?.debugCode) throw new Error(res.error);
-        
+
         setStep(8);
       } catch (err: any) {
         toast.error(err.message || "Kod gönderilemedi. Lütfen tekrar deneyin.");
@@ -313,13 +313,13 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
 
   return (
     <div className={`relative bg-card border border-border shadow-md rounded-2xl flex flex-col w-full max-w-xl mx-auto overflow-hidden ${className}`}>
-        
+
       {/* Firma Özel Banner */}
       {targetFirmName && (
         <div className="px-6 py-2.5 bg-accent/10 border-b border-accent/20 flex items-center gap-2 text-sm">
           <Crown className="h-4 w-4 text-accent shrink-0" />
           <span className="text-foreground">
-            <span className="font-bold text-accent">{targetFirmName}</span> firmasına özel teklif gönderiyorsunuz
+            <span className="font-bold text-accent">{targetFirmName}</span> firmasına teklif talebi gönderiyorsunuz
           </span>
         </div>
       )}
@@ -335,39 +335,39 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
 
       {/* Orta Kısım: Form Adımları */}
       <div className="p-6 md:px-8">
-          {step === 1 && <StepProjectType data={data} onChange={updateData} />}
-          {step === 2 && <StepServiceType data={data} onChange={updateData} />}
-          {step === 3 && <StepScope data={data} onChange={updateData} />}
-          {step === 4 && <StepLocationProperty data={data} onChange={updateData} />}
-          {step === 5 && <StepConditionBudget data={data} onChange={updateData} />}
-          {step === 6 && <StepTimelineExtras data={data} onChange={updateData} />}
-          {step === 7 && <StepContact data={data} onChange={updateData} />}
-          {step === 8 && (
-            <StepOtp
-              email={data.email}
-              otpCode={otpCode}
-              onOtpChange={(code) => { setOtpCode(code); setOtpError(""); }}
-              onResend={sendOtp}
-              sending={otpSending}
-              error={otpError}
-            />
-          )}
+        {step === 1 && <StepProjectType data={data} onChange={updateData} />}
+        {step === 2 && <StepServiceType data={data} onChange={updateData} />}
+        {step === 3 && <StepScope data={data} onChange={updateData} />}
+        {step === 4 && <StepLocationProperty data={data} onChange={updateData} />}
+        {step === 5 && <StepConditionBudget data={data} onChange={updateData} />}
+        {step === 6 && <StepTimelineExtras data={data} onChange={updateData} />}
+        {step === 7 && <StepContact data={data} onChange={updateData} />}
+        {step === 8 && (
+          <StepOtp
+            email={data.email}
+            otpCode={otpCode}
+            onOtpChange={(code) => { setOtpCode(code); setOtpError(""); }}
+            onResend={sendOtp}
+            sending={otpSending}
+            error={otpError}
+          />
+        )}
       </div>
 
       {/* Alt Kısım: İleri / Geri Butonları */}
       <div className="border-t border-border px-6 md:px-8 py-4 bg-muted/10 flex gap-4">
-          <Button variant="outline" onClick={() => setStep(s => Math.max(1, s - 1))} disabled={step === 1} className="flex-1">Geri</Button>
-          <Button variant="gold" onClick={handleNext} disabled={!canNext() || loading || (step === 7 && otpSending)} className="flex-[2]">
-            {(loading || (step === 7 && otpSending)) && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            {step === TOTAL_STEPS
-              ? (loading ? "Doğrulanıyor..." : "Doğrula ve Gönder")
-              : step === 7
-                ? (otpSending ? "Lütfen Bekleyin..." : "Ücretsiz Teklif Al")
-                : "Devam Et"}
-            {step < 7 && <ArrowRight className="ml-2 h-4 w-4" />}
-          </Button>
+        <Button variant="outline" onClick={() => setStep(s => Math.max(1, s - 1))} disabled={step === 1} className="flex-1">Geri</Button>
+        <Button variant="gold" onClick={handleNext} disabled={!canNext() || loading || (step === 7 && otpSending)} className="flex-[2]">
+          {(loading || (step === 7 && otpSending)) && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          )}
+          {step === TOTAL_STEPS
+            ? (loading ? "Doğrulanıyor..." : "Doğrula ve Gönder")
+            : step === 7
+              ? (otpSending ? "Lütfen Bekleyin..." : "Ücretsiz Teklif Al")
+              : "Devam Et"}
+          {step < 7 && <ArrowRight className="ml-2 h-4 w-4" />}
+        </Button>
       </div>
     </div>
   );

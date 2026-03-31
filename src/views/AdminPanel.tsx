@@ -28,6 +28,7 @@ import AdminBulkFirmTab from "@/components/admin/AdminBulkFirmTab";
 import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
 import AdminTasksTab from "@/components/admin/AdminTasksTab";
 import AdminBannersTab from "@/components/admin/AdminBannersTab";
+import FirmPhotoCrawler from "@/components/admin/FirmPhotoCrawler";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
@@ -1313,6 +1314,16 @@ const AdminPanel = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            {adminGalleryFirmId && (
+              <FirmPhotoCrawler
+                firmId={adminGalleryFirmId}
+                firmWebsite={firmsData.find(f => f.id === adminGalleryFirmId)?.website || ""}
+                firmName={firmsData.find(f => f.id === adminGalleryFirmId)?.company_name}
+                firmSlug={(firmsData.find(f => f.id === adminGalleryFirmId) as any)?.slug}
+                onUploadSuccess={() => loadAdminGallery(adminGalleryFirmId)}
+                currentGalleryCount={adminGallery.length}
+              />
+            )}
             <div className="flex flex-col sm:flex-row gap-3">
               <Input
                 placeholder="Açıklama (opsiyonel)"

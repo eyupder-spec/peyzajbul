@@ -56,7 +56,7 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="relative bg-primary py-24 overflow-hidden">
-          {/* Background Image - Optimized for SEO */}
+          {/* Background Image - Optimized*/}
           <Image
             src={category.imageUrl}
             alt={`${category.label} Hizmeti - Peyzajbul`}

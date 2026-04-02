@@ -24,7 +24,6 @@ export default function PrivacyPolicyPage() {
                 <li>Ad Soyad</li>
                 <li>E-posta adresi</li>
                 <li>Telefon numarası</li>
-                <li>Konum bilgileri (hizmet bölgesi belirlemek için)</li>
                 <li>Cihaz bilgileri (Push bildirimleri ve kullanıcı deneyimi için)</li>
               </ul>
             </div>

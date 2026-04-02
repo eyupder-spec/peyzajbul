@@ -14,10 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Eye,
   Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
   LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon, Upload, FolderKanban,
-  Search, ChevronLeft, ChevronRight, Sparkles
+  Search, ChevronLeft, ChevronRight, Sparkles, UserX
 } from "lucide-react";
 import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
@@ -28,6 +27,7 @@ import AdminBulkFirmTab from "@/components/admin/AdminBulkFirmTab";
 import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
 import AdminTasksTab from "@/components/admin/AdminTasksTab";
 import AdminBannersTab from "@/components/admin/AdminBannersTab";
+import AdminDeletionTab from "@/components/admin/AdminDeletionTab";
 import FirmPhotoCrawler from "@/components/admin/FirmPhotoCrawler";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -125,6 +125,7 @@ const SIDEBAR_ITEMS = [
   { title: "Görevler", key: "tasks", icon: CheckCircle },
   { title: "Changelog", key: "changelog", icon: Rocket },
   { title: "Reklamlar", key: "banners", icon: Image },
+  { title: "Hesap Silme", key: "deletion", icon: UserX },
 ];
 
 function AdminSidebar({ tab, setTab, pendingFirmCount }: { tab: string; setTab: (t: any) => void; pendingFirmCount: number }) {
@@ -177,7 +178,7 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog" | "tasks" | "banners">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog" | "tasks" | "banners" | "deletion">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
   const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
@@ -1208,6 +1209,9 @@ const AdminPanel = () => {
 
             {/* Changelog */}
             {tab === "changelog" && <AdminChangelogTab />}
+
+            {/* Account Deletion */}
+            {tab === "deletion" && <AdminDeletionTab />}
           </main>
         </div>
       </div>

@@ -57,6 +57,7 @@ const AdminBlogTab = () => {
   const [authorName, setAuthorName] = useState("Peyzaj Rehberi");
   const [saving, setSaving] = useState(false);
   const [coverUploading, setCoverUploading] = useState(false);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
 
   const loadPosts = async () => {
     const { data } = await supabase
@@ -72,7 +73,7 @@ const AdminBlogTab = () => {
   const resetForm = () => {
     setTitle(""); setSlug(""); setExcerpt(""); setContent("");
     setCoverUrl(""); setCoverAlt(""); setCategorySlug(""); setCitySlug("");
-    setAuthorName("Peyzajbul"); setEditingPost(null);
+    setAuthorName("Peyzajbul"); setEditingPost(null); setIsSlugManuallyEdited(false);
   };
 
   const openNew = () => { resetForm(); setFormOpen(true); };
@@ -88,12 +89,13 @@ const AdminBlogTab = () => {
     setCategorySlug(post.category_slug || "");
     setCitySlug(post.city_slug || "");
     setAuthorName(post.author_name);
+    setIsSlugManuallyEdited(true);
     setFormOpen(true);
   };
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
-    if (!editingPost) setSlug(generateSlug(val));
+    if (!editingPost && !isSlugManuallyEdited) setSlug(generateSlug(val));
   };
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,7 +256,10 @@ const AdminBlogTab = () => {
               </div>
               <div className="space-y-1.5">
                 <Label>Slug *</Label>
-                <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="bahce-bakiminda-10-altin-kural" />
+                <div className="flex items-center gap-2">
+                  <Input value={slug} onChange={(e) => { setSlug(e.target.value); setIsSlugManuallyEdited(true); }} placeholder="bahce-bakiminda-10-altin-kural" className="flex-1" />
+                  <Button type="button" variant="outline" size="sm" onClick={() => { setIsSlugManuallyEdited(false); setSlug(generateSlug(title)); }} title="Başlıktan otomatik oluştur" disabled={!isSlugManuallyEdited && !editingPost}>Yenile</Button>
+                </div>
               </div>
             </div>
 

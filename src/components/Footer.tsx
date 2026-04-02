@@ -1,4 +1,4 @@
-import { Leaf, Mail, Phone, MapPin, Instagram, Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
+import { Leaf, Mail, MessageSquare, MapPin, Instagram, Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
 
 const PinterestIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -68,7 +68,8 @@ const Footer = () => {
             <div className="space-y-2.5">
               <Link href="/isletme-ekle" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İşletme Ekle</Link>
               <Link href="/firma/giris" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Firma Giriş</Link>
-              <a href="#nasil-calisir" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Nasıl Çalışır</a>
+              <Link href="/isletme-ekle" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İşletme Ekle</Link>
+              <Link href="/firma/giris" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Firma Giriş</Link>
               <Link href="/iller" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İller</Link>
               <Link href="/changelog" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Yenilikler (Changelog)</Link>
             </div>
@@ -78,12 +79,17 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm text-primary-foreground/70">
                 <Mail className="h-4 w-4 text-accent/70" />
-                info@peyzajbul.com
+                bilgi@peyzajbul.com
               </div>
-              <div className="flex items-center gap-2 text-sm text-primary-foreground/70">
-                <Phone className="h-4 w-4 text-accent/70" />
-                +90 (212) 555 00 00
-              </div>
+              <a 
+                href="https://wa.me/905345957147" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-primary-foreground/70 hover:text-accent transition-colors"
+              >
+                <MessageSquare className="h-4 w-4 text-accent" />
+                WhatsApp Destek
+              </a>
               <div className="flex items-center gap-2 text-sm text-primary-foreground/70">
                 <MapPin className="h-4 w-4 text-accent/70" />
                 İstanbul, Türkiye

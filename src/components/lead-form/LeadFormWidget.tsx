@@ -235,7 +235,7 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
       if (onSuccess) {
         onSuccess();
       }
-      router.push("/hesabim");
+      router.push("/talebiniz-alindi");
 
     } catch (err: any) {
       setOtpError("");

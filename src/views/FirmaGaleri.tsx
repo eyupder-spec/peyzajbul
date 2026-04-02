@@ -30,7 +30,6 @@ const FirmaGaleri = () => {
       .single();
 
     if (!firmData) { router.push("/firma/panel"); return; }
-    if (!firmData.is_premium) { router.push("/firma/premium"); return; }
 
     setFirm(firmData);
 
@@ -47,8 +46,13 @@ const FirmaGaleri = () => {
   useEffect(() => { loadData(); }, [loadData]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!firm) return;
+    if (!firm.is_premium && gallery.length >= 5) {
+      toast.error("Ücretsiz planda maksimum 5 fotoğraf yükleyebilirsiniz.");
+      return;
+    }
     const file = e.target.files?.[0];
-    if (!file || !firm) return;
+    if (!file) return;
 
     setUploading(true);
     try {
@@ -134,26 +138,46 @@ const FirmaGaleri = () => {
               <h2 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2">
                 <Upload className="h-5 w-5 text-primary" /> Yeni Fotoğraf Ekle
               </h2>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Input
-                  placeholder="Açıklama (opsiyonel)"
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                  className="flex-1"
-                />
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleUpload}
-                    className="hidden"
-                    disabled={uploading}
-                  />
-                  <Button asChild disabled={uploading}>
-                    <span>{uploading ? "Yükleniyor..." : "Fotoğraf Seç"}</span>
+
+              {!firm?.is_premium && gallery.length >= 5 ? (
+                <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div>
+                    <h3 className="font-bold text-amber-800 dark:text-amber-300">Fotoğraf Yükleme Limitine Ulaştınız</h3>
+                    <p className="text-amber-700/80 dark:text-amber-400/80 text-sm mt-1">Ücretsiz planda galerinize en fazla 5 fotoğraf ekleyebilirsiniz. Sınırsız galeri ve öne çıkan vitrin için Premium'a geçin.</p>
+                  </div>
+                  <Button variant="gold" onClick={() => router.push("/firma/premium")} className="shrink-0 font-bold px-6">
+                    Premium'a Geçin
                   </Button>
-                </label>
-              </div>
+                </div>
+              ) : (
+                <>
+                  {!firm?.is_premium && (
+                    <p className="text-sm font-medium text-muted-foreground mb-4">
+                      Ücretsiz Fotoğraf Hakkınız: <span className="font-bold text-foreground">{gallery.length}/5</span>
+                    </p>
+                  )}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Input
+                      placeholder="Açıklama (opsiyonel)"
+                      value={caption}
+                      onChange={(e) => setCaption(e.target.value)}
+                      className="flex-1"
+                    />
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleUpload}
+                        className="hidden"
+                        disabled={uploading}
+                      />
+                      <Button asChild disabled={uploading}>
+                        <span>{uploading ? "Yükleniyor..." : "Fotoğraf Seç"}</span>
+                      </Button>
+                    </label>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 

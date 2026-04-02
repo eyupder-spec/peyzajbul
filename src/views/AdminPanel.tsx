@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
+  Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Eye,
   Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
   LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon, Upload, FolderKanban,
   Search, ChevronLeft, ChevronRight, Sparkles, UserX

@@ -392,7 +392,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                       className="aspect-square rounded-lg overflow-hidden group relative border border-border/50"
                       onClick={() => setSelectedImage(img.image_url)}
                     >
-                      <img src={img.image_url} alt={img.caption || ""} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                      <img src={img.image_url} alt={img.caption || `${firm.company_name} peyzaj projesi görseli`} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                     </button>
                   ))}
@@ -421,13 +421,13 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                                 setShowAllPhotos(false);
                               }}
                             >
-                              <Image
-                                src={img.image_url}
-                                alt={img.caption || ""}
-                                fill
-                                sizes="(max-width: 768px) 50vw, 33vw"
-                                className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                              />
+                                <Image
+                                  src={img.image_url}
+                                  alt={img.caption || `${firm.company_name} peyzaj projesi detay görseli`}
+                                  fill
+                                  sizes="(max-width: 768px) 50vw, 33vw"
+                                  className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                                />
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                             </button>
                           ))}
@@ -601,6 +601,9 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                       "bestRating": "5",
                       "worstRating": "1",
                     },
+                    ...(firm.telephone || firm.phone ? { "telephone": firm.phone } : {}),
+                    ...(firm.website ? { "url": firm.website } : {}),
+                    ...(firm.description ? { "description": firm.description.substring(0, 150) } : {}),
                     "review": reviews.map((r: any) => ({
                       "@type": "Review",
                       "author": { "@type": "Person", "name": r.reviewer_name },

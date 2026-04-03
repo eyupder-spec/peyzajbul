@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/sidebar";
 import FirmaTour from "@/components/firma/FirmaTour";
 import { HelpCircle } from "lucide-react";
+import { ProfileCompletionCard } from "@/components/firma/ProfileCompletionCard";
 
 type Lead = {
   id: string;
@@ -129,6 +130,10 @@ const FirmaPanel = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [purchasing, setPurchasing] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  
+  // Gamification Data
+  const [firmDataForCard, setFirmDataForCard] = useState<any>(null);
+  const [galleryCount, setGalleryCount] = useState(0);
 
   // Realtime browser + sound notifications
   useLeadNotifications(firmId || null, () => {
@@ -160,13 +165,22 @@ const FirmaPanel = () => {
 
       const { data: firmData } = await supabase
         .from("firms")
-        .select("id, is_approved, coin_balance, is_premium, premium_until, company_name")
+        .select("id, is_approved, coin_balance, is_premium, premium_until, company_name, logo_url, description, phone, address, social_instagram, social_facebook, social_youtube, social_x, social_linkedin")
         .eq("user_id", user.id)
         .single();
 
       if (!firmData?.is_approved) { router.push("/firma/giris"); return; }
       setFirmId(firmData.id);
       setIsFirmPremium(firmData.is_premium || false);
+      setFirmDataForCard(firmData);
+
+      // Fetch gallery count
+      const { count: gCount } = await supabase
+        .from("firm_gallery")
+        .select("*", { count: 'exact', head: true })
+        .eq("firm_id", firmData.id);
+        
+      setGalleryCount(gCount || 0);
 
       // Fetch leads
       const { data: leadsData } = await supabase
@@ -353,6 +367,9 @@ const FirmaPanel = () => {
                 </div>
               ))}
             </div>
+
+            {/* Profile Completion Gamification */}
+            {firmDataForCard && <ProfileCompletionCard firm={firmDataForCard} galleryCount={galleryCount} />}
 
             {/* Lead List */}
             <h2 className="text-xl font-bold text-foreground mb-4">Lead Listesi</h2>

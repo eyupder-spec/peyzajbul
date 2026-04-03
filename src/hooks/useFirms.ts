@@ -28,7 +28,18 @@ export type PublicFirm = {
   faq_items?: any | null;
   before_after?: any | null;
   portfolio_items?: any | null;
+  gallery_images?: string[];
 };
+
+const FIRM_SELECT = "id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items, firm_gallery(image_url)";
+
+function attachGalleryImages(firms: any[]): PublicFirm[] {
+  return firms.map((firm) => ({
+    ...firm,
+    gallery_images: (firm.firm_gallery ?? []).map((g: any) => g.image_url).filter(Boolean),
+    firm_gallery: undefined,
+  }));
+}
 
 export function useApprovedFirms() {
   return useQuery({
@@ -36,13 +47,13 @@ export function useApprovedFirms() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items")
+        .select(FIRM_SELECT)
         .eq("is_approved", true)
         .eq("is_active", true)
         .order("is_premium", { ascending: false })
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as PublicFirm[];
+      return attachGalleryImages(data ?? []);
     },
   });
 }
@@ -53,14 +64,14 @@ export function useFirmsByCity(city: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items")
+        .select(FIRM_SELECT)
         .eq("is_approved", true)
         .eq("is_active", true)
         .eq("city", city)
         .order("is_premium", { ascending: false })
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as PublicFirm[];
+      return attachGalleryImages(data ?? []);
     },
     enabled: !!city,
   });

@@ -29,6 +29,7 @@ import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
 import AdminTasksTab from "@/components/admin/AdminTasksTab";
 import AdminBannersTab from "@/components/admin/AdminBannersTab";
 import AdminDeletionTab from "@/components/admin/AdminDeletionTab";
+import AdminAnalyticsTab from "@/components/admin/AdminAnalyticsTab";
 import FirmPhotoCrawler from "@/components/admin/FirmPhotoCrawler";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -662,6 +663,10 @@ const AdminPanel = () => {
                       <CardContent><p className="text-2xl font-bold text-foreground">{todayLeadSales} <span className="text-sm font-normal text-amber-600/70">Adet</span></p></CardContent>
                     </Card>
                   </div>
+                </div>
+
+                <div className="mt-8">
+                  <AdminAnalyticsTab />
                 </div>
 
                 {/* Recent Activities */}

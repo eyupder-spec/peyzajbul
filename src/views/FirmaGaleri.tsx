@@ -78,7 +78,7 @@ const FirmaGaleri = () => {
         .insert({
           firm_id: firm.id,
           image_url: publicUrl,
-          caption: caption || null,
+          caption: caption || `${firm.company_name} - Peyzaj Çalışması ${gallery.length + 1}`,
           sort_order: gallery.length,
         });
 

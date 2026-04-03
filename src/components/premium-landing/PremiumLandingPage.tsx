@@ -461,7 +461,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                     className="aspect-square rounded-xl overflow-hidden group relative border border-border/50 shadow-sm hover:shadow-md transition-all"
                     onClick={() => setSelectedImage(img.image_url)}
                   >
-                    <img src={img.image_url} alt={img.caption || ""} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <img src={img.image_url} alt={img.caption || `${firm.company_name} özel peyzaj galerisi`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                   </button>
                 ))}
@@ -608,6 +608,9 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                       "bestRating": "5",
                       "worstRating": "1",
                     },
+                    ...(firm.telephone || firm.phone ? { "telephone": firm.phone } : {}),
+                    ...(firm.website ? { "url": firm.website } : {}),
+                    ...(firm.description ? { "description": firm.description.substring(0, 150) } : {}),
                     "review": reviews.map((r: any) => ({
                       "@type": "Review",
                       "author": { "@type": "Person", "name": r.reviewer_name },

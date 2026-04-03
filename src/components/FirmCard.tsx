@@ -38,38 +38,79 @@ const FirmCard = ({
 }: FirmCardProps) => {
   const slug = dbSlug || generateFirmSlug(company_name, id);
   const previewImages = gallery_images?.slice(0, 3) ?? [];
+  // Kapak fotoğrafı: galeri varsa ilk resim (logo yoksa da varsa da)
+  const coverImage = gallery_images?.[0] ?? null;
 
   return (
     <div
-      className={`rounded-xl border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col relative overflow-hidden
+      className={`rounded-xl border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col relative overflow-hidden
         ${is_premium
           ? "bg-gradient-to-br from-[#fffbf0] to-[#fff9e6] dark:from-[hsl(43_30%_12%)] dark:to-[hsl(43_20%_10%)] premium-card-border"
           : "bg-card border-border"
         }`}
     >
-      {/* Premium mini galeri */}
-      {is_premium && previewImages.length > 0 && (
-        <div className="flex gap-1 mb-4 -mx-6 -mt-6 h-24 overflow-hidden">
+      {/* Kapak + Logo Overlay */}
+      {(is_premium && previewImages.length > 0) ? (
+        <div className="relative flex gap-1 -mx-0 h-28 overflow-hidden">
           {previewImages.map((url, i) => (
-            <div
-              key={i}
-              className="flex-1 overflow-hidden relative group/img"
-            >
+            <div key={i} className="flex-1 overflow-hidden relative">
               <Image
                 src={url}
                 alt={`${company_name} çalışma örneği`}
                 fill
                 sizes="(max-width: 768px) 33vw, 20vw"
-                className="object-cover transition-transform duration-500 group-hover/img:scale-110"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
           ))}
+          {/* Logo overlay sol alta */}
+          <div className="absolute bottom-3 left-3 z-10 w-12 h-12 rounded-lg border-2 border-white/80 overflow-hidden bg-white shadow-md">
+            {logo_url ? (
+              <Image src={logo_url} alt={`${company_name} Logo`} fill sizes="48px" className="object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-accent/10">
+                <span className="font-heading text-base font-bold text-primary">{company_name[0]}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : coverImage ? (
+        <div className="relative h-36 overflow-hidden">
+          <Image
+            src={coverImage}
+            alt={`${company_name} kapak fotoğrafı`}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40" />
+          {/* Logo overlay sol alta */}
+          <div className="absolute bottom-3 left-3 z-10 w-12 h-12 rounded-lg border-2 border-white/80 overflow-hidden bg-white shadow-md">
+            {logo_url ? (
+              <Image src={logo_url} alt={`${company_name} Logo`} fill sizes="48px" className="object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-secondary">
+                <span className="font-heading text-base font-bold text-primary">{company_name[0]}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* Galeri yok, sadece logo kutusu */
+        <div className={`mx-6 mt-6 w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden relative border border-border/50 ${is_premium ? "bg-accent/10" : "bg-secondary"}`}>
+          {logo_url ? (
+            <Image src={logo_url} alt={`${company_name} Logo`} fill sizes="56px" className="object-cover" />
+          ) : (
+            <span className="font-heading text-xl font-bold text-primary">{company_name[0]}</span>
+          )}
         </div>
       )}
+      {/* İçerik Alanı */}
+      <div className="p-6 flex flex-col flex-1 relative">
 
       {/* Rozet grubu */}
       {is_premium && (
-        <div className="absolute top-3 right-3 flex flex-col gap-1 items-end z-10">
+        <div className="absolute -top-8 right-3 flex flex-col gap-1 items-end z-10">
           <Badge className="bg-accent text-white gap-1 text-xs shadow-sm">
             <Crown className="h-3 w-3" /> Premium
           </Badge>
@@ -78,15 +119,6 @@ const FirmCard = ({
           </Badge>
         </div>
       )}
-
-      {/* Logo */}
-      <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 overflow-hidden relative border border-border/50 transition-transform duration-300 group-hover:scale-105 ${is_premium ? "bg-accent/10" : "bg-secondary"}`}>
-        {logo_url ? (
-          <Image src={logo_url} alt={`${company_name} Logo`} fill sizes="56px" className="object-cover" />
-        ) : (
-          <span className="font-heading text-xl font-bold text-primary">{company_name[0]}</span>
-        )}
-      </div>
 
       {/* İsim */}
       <h3 className="font-heading text-lg font-semibold text-foreground mb-1">{company_name}</h3>
@@ -134,6 +166,7 @@ const FirmCard = ({
           </Button>
         </Link>
       </div>
+      </div> {/* close içerik alanı */}
     </div>
   );
 };

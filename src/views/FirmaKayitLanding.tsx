@@ -61,10 +61,10 @@ const FirmaKayitLanding = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto h-16 px-10 text-lg rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 transition-all hover:scale-105 group" asChild>
-                  <Link href="/firma/giris?tab=signup" className="flex items-center gap-2">
+                <Button size="lg" className="w-full sm:w-auto h-auto min-h-[4rem] py-3 px-4 sm:px-10 text-base sm:text-lg rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 transition-all hover:scale-105 group" asChild>
+                  <Link href="/firma/giris?tab=signup" className="flex items-center justify-center gap-2 flex-wrap text-center">
                     Ücretsiz Profilinizi Oluşturun
-                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="h-5 w-5 shrink-0 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
                 <div className="text-sm text-slate-500 font-medium px-4">
@@ -91,11 +91,11 @@ const FirmaKayitLanding = () => {
                       <span className="text-slate-400 text-xs">2 dk önce</span>
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-800">Villa Bahçesi Tasarımı</h4>
-                      <p className="text-sm text-slate-500 mt-1 flex items-center gap-1"><MapPin className="h-3 w-3" /> İstanbul, Beykoz (450m²)</p>
+                      <h4 className="font-bold text-slate-800 leading-tight">Villa Bahçesi Tasarımı</h4>
+                      <p className="text-sm text-slate-500 mt-1.5 flex items-start gap-1"><MapPin className="h-4 w-4 shrink-0 mt-0.5 text-slate-400" /> <span className="line-clamp-2">İstanbul, Beykoz (450m²)</span></p>
                     </div>
-                    <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
-                      <span className="font-bold text-slate-800">Tahmini Bütçe:</span>
+                    <div className="mt-auto pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-1">
+                      <span className="font-bold text-slate-800 text-sm">Tahmini Bütçe:</span>
                       <span className="font-bold text-emerald-600">250.000₺</span>
                     </div>
                   </div>
@@ -368,8 +368,8 @@ const FirmaKayitLanding = () => {
           <div className="container mx-auto max-w-4xl text-center">
             <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">Bölgenizdeki projeleri rakiplerinize kaptırmayın.</h2>
             <p className="text-xl text-slate-600 mb-10">2 dakikada profilinizi oluşturun, yeni müşterilerle tanışın.</p>
-            <Button size="lg" className="h-16 px-12 text-xl rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 transition-transform hover:scale-105" asChild>
-              <Link href="/firma/giris?tab=signup">
+            <Button size="lg" className="w-full sm:w-auto h-auto min-h-[4rem] py-3 px-6 sm:px-12 text-base sm:text-xl rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 transition-transform hover:scale-105" asChild>
+              <Link href="/firma/giris?tab=signup" className="flex items-center justify-center text-center flex-wrap">
                 Hemen Profilinizi Oluşturun
               </Link>
             </Button>

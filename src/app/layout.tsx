@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Providers } from "@/components/Providers";
+import { SocialProof } from "@/components/SocialProof";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${nunito.variable} ${playfair.variable} font-body overflow-x-hidden`} suppressHydrationWarning>
         <Providers>
           {children}
+          <SocialProof />
           <Toaster />
           <Sonner />
         </Providers>

@@ -71,10 +71,13 @@ const Footer = () => {
             <div className="space-y-2.5">
               <Link href="/isletme-ekle" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İşletme Ekle</Link>
               <Link href="/firma/giris" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Firma Giriş</Link>
-              <Link href="/isletme-ekle" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İşletme Ekle</Link>
-              <Link href="/firma/giris" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Firma Giriş</Link>
               <Link href="/iller" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İller</Link>
               <Link href="/changelog" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Yenilikler (Changelog)</Link>
+              <div className="pt-2">
+                <a href="https://play.google.com/store/apps/details?id=com.peyzajbul.firma" target="_blank" rel="noopener noreferrer" className="block transition-transform hover:scale-105">
+                  <img src="https://play.google.com/intl/en_us/badges/static/images/badges/tr_badge_web_generic.png" alt="Google Play'den alın" className="h-[52px] w-auto -ml-3" />
+                </a>
+              </div>
             </div>
           </div>
           <div>

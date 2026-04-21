@@ -311,6 +311,37 @@ const FirmaKayitLanding = () => {
               </div>
             </div>
 
+            {/* Dijital Ajans - Yatay Kutu */}
+            <div className="mt-8 bg-slate-900 text-white rounded-2xl border border-white/10 p-6 md:p-8 relative overflow-hidden group shadow-2xl">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -z-0 translate-x-32 -translate-y-32 group-hover:bg-emerald-500/20 transition-colors"></div>
+              <div className="absolute -top-4 left-6 bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full whitespace-nowrap z-10">
+                🚀 Yeni: Dijital Büyüme Paketi
+              </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-6 mt-2 relative z-10 text-left">
+                <div className="flex items-center gap-4 shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
+                    <Globe className="h-6 w-6 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">Peyzaj Dijital Ajans</h3>
+                    <p className="text-emerald-400 font-black text-lg">Web Tasarım & SEO</p>
+                  </div>
+                </div>
+                <div className="flex-1 text-sm text-slate-300">
+                  <p className="mb-2 font-medium text-white italic">"Bahçeleri siz güzelleştirin, işinizi de biz güzelleştirelim."</p>
+                  <div className="grid sm:grid-cols-2 gap-x-4 gap-y-2">
+                    <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Modern & Mobil Uyumlu Tasarım</span>
+                    <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Google Aramalarında Üst Sıralar</span>
+                    <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> WhatsApp & Teklif Yönetimi</span>
+                    <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> 3 Aylık Premium Hediye!</span>
+                  </div>
+                </div>
+                <Button className="shrink-0 h-12 px-8 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-900/20" asChild>
+                  <Link href="/peyzaj-dijital-ajans">Hemen İncele →</Link>
+                </Button>
+              </div>
+            </div>
+
           </div>
         </section>
 

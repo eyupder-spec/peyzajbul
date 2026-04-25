@@ -175,15 +175,31 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
         // Dinamik import: Sadece tarayıcıda çalışır ve sunucunun jsdom yüklemesini engeller
         const DOMPurify = (await import("isomorphic-dompurify")).default;
         const sanitizeFn = (DOMPurify as any).sanitize || DOMPurify;
-        
+
         if (typeof sanitizeFn === 'function') {
-          setSanitizedContent(sanitizeFn(contentWithIds));
+          // YouTube ve güvenli embed iframe'lerine izin ver
+          const clean = sanitizeFn(contentWithIds, {
+            ADD_TAGS: ["iframe"],
+            ADD_ATTR: [
+              "allow",
+              "allowfullscreen",
+              "frameborder",
+              "scrolling",
+              "src",
+              "width",
+              "height",
+              "title",
+              "loading",
+              "class"
+            ],
+          });
+          setSanitizedContent(clean);
         }
       } catch (e) {
         console.error("Client-side Sanitization Error:", e);
       }
     };
-    
+
     sanitize();
   }, [contentWithIds]);
 

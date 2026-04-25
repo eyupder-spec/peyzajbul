@@ -6,6 +6,7 @@ import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
 import { TableCell } from "@tiptap/extension-table-cell";
 import { TableHeader } from "@tiptap/extension-table-header";
+import Youtube from "@tiptap/extension-youtube";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -13,7 +14,7 @@ import { compressAndConvertToWebP } from "@/lib/imageUtils";
 import {
   Bold, Italic, Heading1, Heading2, Heading3, List, ListOrdered,
   Link as LinkIcon, ImageIcon, Undo, Redo, Quote,
-  Table as TableIcon, Columns, Rows, Trash2, Plus
+  Table as TableIcon, Columns, Rows, Trash2, Plus, YoutubeIcon
 } from "lucide-react";
 import { useRef } from "react";
 
@@ -39,6 +40,14 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
       TableRow,
       TableHeader,
       TableCell,
+      Youtube.configure({
+        width: 720,
+        height: 405,
+        allowFullscreen: true,
+        HTMLAttributes: {
+          class: "rounded-xl overflow-hidden w-full aspect-video",
+        },
+      }),
     ],
     content,
     immediatelyRender: false,
@@ -144,6 +153,17 @@ const BlogEditor = ({ content, onChange }: BlogEditorProps) => {
         </ToolButton>
         <ToolButton onClick={() => fileInputRef.current?.click()} title="Görsel Ekle">
           <ImageIcon className="h-4 w-4" />
+        </ToolButton>
+        <ToolButton
+          onClick={() => {
+            const url = window.prompt("YouTube Video URL veya ID:");
+            if (url) {
+              editor.chain().focus().setYoutubeVideo({ src: url }).run();
+            }
+          }}
+          title="YouTube Video Ekle"
+        >
+          <YoutubeIcon className="h-4 w-4" />
         </ToolButton>
         <div className="w-px bg-border mx-1" />
         <ToolButton onClick={() => editor.chain().focus().undo().run()} title="Geri Al">

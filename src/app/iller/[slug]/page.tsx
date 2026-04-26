@@ -9,11 +9,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const cityName = citySlug.charAt(0).toUpperCase() + citySlug.slice(1);
   const seo = generateCitySeoContent(cityName);
 
+  const url = `https://www.peyzajbul.com/iller/${slug}`;
+
   return {
     title: seo.title,
     description: seo.description,
     alternates: {
-      canonical: `https://www.peyzajbul.com/iller/${slug}`,
+      canonical: url,
+    },
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: url,
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title: seo.title,
+      description: seo.description,
+    },
+    other: {
+      "geo.region": "TR",
+      "geo.placename": cityName,
     },
   };
 }

@@ -139,7 +139,7 @@ const AdminBlogTab = () => {
         city_slug: citySlug || null,
         author_name: authorName,
         is_published: publish,
-        published_at: publish ? new Date().toISOString() : null,
+        published_at: publish ? (editingPost?.published_at || new Date().toISOString()) : (editingPost?.published_at || null),
       };
 
       if (editingPost) {
@@ -165,7 +165,7 @@ const AdminBlogTab = () => {
     const newPublished = !post.is_published;
     await supabase.from("blog_posts").update({
       is_published: newPublished,
-      published_at: newPublished ? new Date().toISOString() : null,
+      published_at: newPublished ? (post.published_at || new Date().toISOString()) : post.published_at,
     }).eq("id", post.id);
     toast({ title: newPublished ? "Yayınlandı" : "Taslağa alındı" });
     loadPosts();

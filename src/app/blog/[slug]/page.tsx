@@ -67,8 +67,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     "headline": post.title || "Başlıksız Yazı",
     "description": post.excerpt || "",
     "image": post.cover_image_url ? [post.cover_image_url] : [],
-    "datePublished": post.created_at || new Date().toISOString(),
-    "dateModified": post.updated_at || post.created_at || new Date().toISOString(),
+    "datePublished": post.published_at || post.created_at || new Date().toISOString(),
+    "dateModified": post.updated_at || post.published_at || post.created_at || new Date().toISOString(),
     "author": post.author_name ? [
       {
         "@type": "Person",

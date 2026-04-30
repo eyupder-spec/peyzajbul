@@ -22,8 +22,8 @@ const Index = () => {
       <Hero onTeklifAl={() => setFormOpen(true)} />
       
       {/* 1. Reklam Alanı: Hero Altı (Leaderboard) */}
-      <div className="container mx-auto px-4 mt-8">
-        <BannerAd placement="home_top" className="h-[90px] md:h-[120px] w-full max-w-5xl mx-auto rounded-xl shadow-sm" />
+      <div className="container mx-auto px-4">
+        <BannerAd placement="home_top" className="mt-8 h-[90px] md:h-[120px] w-full max-w-5xl mx-auto rounded-xl shadow-sm" />
       </div>
 
       <FeaturedFirms />
@@ -31,8 +31,8 @@ const Index = () => {
       <PopularCategories />
 
       {/* 2. Reklam Alanı: Kategoriler ve Blog Arası (Leaderboard) */}
-      <div className="container mx-auto px-4 my-8">
-        <BannerAd placement="home_middle" className="h-[90px] md:h-[120px] w-full max-w-5xl mx-auto rounded-xl shadow-sm" />
+      <div className="container mx-auto px-4">
+        <BannerAd placement="home_middle" className="my-8 h-[90px] md:h-[120px] w-full max-w-5xl mx-auto rounded-xl shadow-sm" />
       </div>
 
       <HomeBlogSection />

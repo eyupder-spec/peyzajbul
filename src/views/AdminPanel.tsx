@@ -1067,11 +1067,19 @@ const AdminPanel = () => {
                           <td className="px-3 py-2 text-foreground font-medium">{firm.company_name}</td>
                           <td className="px-3 py-2 text-foreground">{firm.city}</td>
                           <td className="px-3 py-2">
-                            {firm.is_premium ? (
-                              <Badge className="bg-yellow-500/90 text-white gap-1"><Crown className="h-3 w-3" /> Premium</Badge>
-                            ) : (
-                              <Badge variant="outline">Standart</Badge>
-                            )}
+                            {(() => {
+                              const now = new Date();
+                              const isPremiumActive = firm.is_premium && firm.premium_until && new Date(firm.premium_until) > now;
+                              const isPremiumExpired = firm.is_premium && (!firm.premium_until || new Date(firm.premium_until) <= now);
+                              
+                              if (isPremiumActive) {
+                                return <Badge className="bg-yellow-500/90 text-white gap-1"><Crown className="h-3 w-3" /> Premium</Badge>;
+                              } else if (isPremiumExpired) {
+                                return <Badge variant="destructive" className="gap-1"><Crown className="h-3 w-3" /> Süresi Dolmuş</Badge>;
+                              } else {
+                                return <Badge variant="outline">Standart</Badge>;
+                              }
+                            })()}
                           </td>
                           <td className="px-3 py-2">
                             <Badge variant={firm.coin_balance > 0 ? "default" : "secondary"}>

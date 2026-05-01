@@ -24,38 +24,43 @@ import { useToast } from "@/hooks/use-toast";
 
 // ---- Firma Ürünler Bölümü ----
 function FirmProductsSection({ firmId }: { firmId: string }) {
-  const { data: firmPlants } = useQuery({
+  const { data: firmPlants, isLoading: loadingPlants } = useQuery({
     queryKey: ["firm-plants-public", firmId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("firm_plants")
         .select("id, plant_id, show_price, price_display, stock_status, notes, plants(id, slug, name, scientific_name, plant_categories(name, icon))")
         .eq("firm_id", firmId)
         .neq("stock_status", "unavailable");
+      if (error) console.error("Error fetching firm plants:", error);
       return data || [];
     },
     enabled: !!firmId,
   });
 
 
-  const { data: firmProducts } = useQuery({
+  const { data: firmProducts, isLoading: loadingProducts } = useQuery({
     queryKey: ["firm-products-public", firmId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("firm_products")
         .select("*")
         .eq("firm_id", firmId)
         .eq("is_active", true)
         .order("sort_order");
+      if (error) console.error("Error fetching firm products:", error);
       return data || [];
     },
     enabled: !!firmId,
   });
 
+  if (loadingPlants || loadingProducts) {
+    return <div className="animate-pulse h-40 bg-card rounded-lg border border-border"></div>;
+  }
+
   const hasPlants = firmPlants && firmPlants.length > 0;
   const hasProducts = firmProducts && firmProducts.length > 0;
   if (!hasPlants && !hasProducts) return null;
-
   return (
     <div className="bg-card rounded-lg border border-border p-6">
       <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">

@@ -55,12 +55,40 @@ function FirmProductsSection({ firmId }: { firmId: string }) {
   });
 
   if (loadingPlants || loadingProducts) {
-    return <div className="animate-pulse h-40 bg-card rounded-lg border border-border"></div>;
+    return (
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+          <div className="w-6 h-6 rounded-md bg-muted animate-pulse"></div>
+          <div className="w-48 h-6 bg-muted rounded animate-pulse"></div>
+        </h2>
+        <div className="mb-6">
+          <div className="w-32 h-4 bg-muted rounded animate-pulse mb-3"></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="p-3 rounded-xl border border-border h-[88px] bg-muted/40 animate-pulse"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const hasPlants = firmPlants && firmPlants.length > 0;
   const hasProducts = firmProducts && firmProducts.length > 0;
-  if (!hasPlants && !hasProducts) return null;
+  
+  if (!hasPlants && !hasProducts) {
+    return (
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+          🛒 Ürünler & Bitkiler
+        </h2>
+        <div className="text-center py-8 border border-dashed rounded-xl bg-muted/10">
+          <p className="text-muted-foreground text-sm">Bu firmanın henüz eklenmiş bir ürünü bulunmuyor.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-card rounded-lg border border-border p-6">
       <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">

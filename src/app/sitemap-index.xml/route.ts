@@ -29,6 +29,11 @@ export async function GET() {
   <sitemap>
     <loc>${baseUrl}/sitemap-blog.xml</loc>
   </sitemap>
+  
+  <!-- Bitki Rehberi -->
+  <sitemap>
+    <loc>${baseUrl}/sitemap-plants.xml</loc>
+  </sitemap>
 </sitemapindex>`;
 
   return new NextResponse(xml, {

@@ -18,6 +18,7 @@ import { useState, useRef, useCallback } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import LeadFormModal from "@/components/lead-form/LeadFormModal";
 import { useToast } from "@/hooks/use-toast";
+import FirmProductsSection from "@/components/FirmProductsSection";
 
 /* ─────────────────────────────────────────────
    TYPES
@@ -36,6 +37,7 @@ type LandingSections = {
   contact: boolean;
   social_media: boolean;
   reviews: boolean;
+  products: boolean;
 };
 
 type LandingConfig = {
@@ -58,6 +60,7 @@ const DEFAULT_SECTIONS: LandingSections = {
   contact: true,
   social_media: true,
   reviews: true,
+  products: true,
 };
 
 /* ─────────────────────────────────────────────
@@ -358,6 +361,11 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                 </div>
               )}
             </section>
+          )}
+
+          {/* ═══════════════ PRODUCTS ═══════════════ */}
+          {sections.products && (
+            <FirmProductsSection firmId={firm.id} />
           )}
 
           {/* ═══════════════ BEFORE/AFTER ═══════════════ */}

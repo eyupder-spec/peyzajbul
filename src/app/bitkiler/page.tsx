@@ -29,7 +29,7 @@ export default async function BitkilerPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
         {/* Hero */}
         <section className="bg-primary/5 border-b border-border py-16 px-4">
           <div className="max-w-5xl mx-auto text-center space-y-4">

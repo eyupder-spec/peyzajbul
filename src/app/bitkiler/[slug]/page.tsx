@@ -53,7 +53,7 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
       {/* Breadcrumb */}
       <div className="bg-muted/50 border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-2 text-sm text-muted-foreground">
@@ -81,14 +81,29 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
             )}
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">{plant.name}</h1>
             <p className="text-lg text-muted-foreground italic">{plant.scientific_name}</p>
-            {plant.description && (
-              <p className="text-foreground/80 leading-relaxed">{plant.description}</p>
-            )}
           </div>
         </div>
 
-        {/* Bakım Bilgileri */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Bakım Rehberi (Description) */}
+        {plant.description && (
+          <section className="bg-card rounded-2xl border border-border p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+              📖 Bakım Rehberi
+            </h2>
+            <div className="prose prose-emerald dark:prose-invert max-w-none">
+              <p className="text-foreground/80 leading-relaxed text-lg whitespace-pre-wrap">
+                {plant.description}
+              </p>
+            </div>
+          </section>
+        )}
+
+        {/* Genel Özellikler */}
+        <section>
+          <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+            🌱 Genel Özellikler
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {plant.watering && (
             <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 rounded-xl p-4 text-center space-y-1">
               <div className="text-2xl">{WATERING_ICON[plant.watering]}</div>
@@ -124,6 +139,7 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
               <p className="text-sm font-bold text-foreground">{plant.soil_type}</p>
             </div>
           )}
+          </div>
         </section>
 
         {/* Bu bitkiyi satan firmalar */}

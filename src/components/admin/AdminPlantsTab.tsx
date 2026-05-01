@@ -18,14 +18,14 @@ type Plant = {
   id: string; slug: string; name: string; scientific_name: string;
   category_id: string; description: string; watering: string;
   sunlight: string; growth_speed: string; soil_type: string;
-  climate_zones: string; is_published: boolean;
+  climate_zones: string; is_published: boolean; image_url: string;
   plant_categories?: Category;
 };
 
 const emptyPlant = {
   slug: "", name: "", scientific_name: "", category_id: "",
   description: "", watering: "orta", sunlight: "tam_gunes",
-  growth_speed: "orta", soil_type: "", climate_zones: "", is_published: true,
+  growth_speed: "orta", soil_type: "", climate_zones: "", is_published: true, image_url: "",
 };
 
 export default function AdminPlantsTab() {
@@ -67,10 +67,40 @@ export default function AdminPlantsTab() {
       category_id: p.category_id || "", description: p.description || "",
       watering: p.watering || "orta", sunlight: p.sunlight || "tam_gunes",
       growth_speed: p.growth_speed || "orta", soil_type: p.soil_type || "",
-      climate_zones: p.climate_zones || "", is_published: p.is_published,
+      climate_zones: p.climate_zones || "", is_published: p.is_published, image_url: p.image_url || "",
     });
     setPlantDialogOpen(true);
   };
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      setUploadingImage(true);
+      const ext = file.name.split(".").pop();
+      const path = `${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("plants")
+        .upload(path, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("plants")
+        .getPublicUrl(path);
+
+      setPlantForm(p => ({ ...p, image_url: publicUrl }));
+      toast.success("Görsel yüklendi");
+    } catch (error: any) {
+      toast.error("Görsel yüklenirken hata oluştu: " + error.message);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
 
   const savePlant = async () => {
     if (!plantForm.name || !plantForm.slug) { toast.error("Ad ve slug zorunlu"); return; }
@@ -195,7 +225,13 @@ export default function AdminPlantsTab() {
                 <tr key={plant.id} className="hover:bg-muted/50">
                   <td className="px-4 py-2 font-medium text-foreground">
                     <div className="flex items-center gap-2">
-                      <span>{(plant.plant_categories as any)?.icon || "🌿"}</span>
+                      {plant.image_url ? (
+                        <img src={plant.image_url} alt={plant.name} className="w-8 h-8 rounded-md object-cover border border-border" />
+                      ) : (
+                        <div className="w-8 h-8 flex items-center justify-center rounded-md bg-muted text-lg border border-border">
+                          {(plant.plant_categories as any)?.icon || "🌿"}
+                        </div>
+                      )}
                       {plant.name}
                     </div>
                   </td>
@@ -258,6 +294,19 @@ export default function AdminPlantsTab() {
             <div className="space-y-1.5">
               <Label>Latince Adı</Label>
               <Input value={plantForm.scientific_name} onChange={e => setPlantForm(p => ({ ...p, scientific_name: e.target.value }))} placeholder="Lavandula angustifolia" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Görsel Yükle veya URL Gir</Label>
+              <div className="flex items-center gap-2">
+                <Input type="file" accept="image/*" onChange={uploadImage} disabled={uploadingImage} className="flex-1" />
+                {uploadingImage && <span className="text-sm text-muted-foreground animate-pulse">Yükleniyor...</span>}
+              </div>
+              <Input value={plantForm.image_url} onChange={e => setPlantForm(p => ({ ...p, image_url: e.target.value }))} placeholder="https://ornek.com/gorsel.jpg" />
+              {plantForm.image_url && (
+                <div className="mt-2 relative w-32 h-32 rounded-lg border border-border overflow-hidden">
+                  <img src={plantForm.image_url} alt="Önizleme" className="w-full h-full object-cover" />
+                </div>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label>Kategori</Label>

@@ -3,8 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export default function FirmProductsSection({ firmId }: { firmId: string }) {
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const { data: firmPlants, isLoading: loadingPlants } = useQuery({
     queryKey: ["firm-plants-public", firmId],
     queryFn: async () => {
@@ -105,7 +109,11 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
           <p className="text-sm font-semibold text-muted-foreground mb-4">📦 Diğer Ürünler</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {(firmProducts as any[]).map((product: any) => (
-              <div key={product.id} className="flex flex-col rounded-xl border border-border overflow-hidden bg-card hover:shadow-md transition-shadow group">
+              <div 
+                key={product.id} 
+                onClick={() => { setSelectedProduct(product); setModalOpen(true); }}
+                className="flex flex-col rounded-xl border border-border overflow-hidden bg-card hover:shadow-md transition-shadow group cursor-pointer"
+              >
                 {product.image_url ? (
                   <div className="aspect-[4/3] w-full relative overflow-hidden bg-muted">
                     <img src={product.image_url} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -133,6 +141,57 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
           </div>
         </div>
       )}
+
+      {/* Product Details Modal */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden bg-card rounded-2xl border-none">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{selectedProduct?.title}</DialogTitle>
+            <DialogDescription>Ürün detayları</DialogDescription>
+          </DialogHeader>
+          {selectedProduct && (
+            <div className="flex flex-col md:flex-row h-full max-h-[85vh]">
+              {/* Sol: Görsel */}
+              <div className="w-full md:w-1/2 bg-muted relative">
+                {selectedProduct.image_url ? (
+                  <img 
+                    src={selectedProduct.image_url} 
+                    alt={selectedProduct.title} 
+                    className="w-full h-64 md:h-full object-cover" 
+                  />
+                ) : (
+                  <div className="w-full h-64 md:h-full flex items-center justify-center text-6xl opacity-20">📦</div>
+                )}
+              </div>
+              
+              {/* Sağ: Detaylar */}
+              <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
+                {selectedProduct.category && (
+                  <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                    {selectedProduct.category}
+                  </p>
+                )}
+                <h2 className="text-2xl font-bold text-foreground mb-4">{selectedProduct.title}</h2>
+                
+                <div className="prose prose-sm dark:prose-invert mb-6 flex-1">
+                  <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                    {selectedProduct.description || "Açıklama bulunmuyor."}
+                  </p>
+                </div>
+
+                <div className="mt-auto pt-6 border-t border-border">
+                  <p className="text-sm text-muted-foreground mb-1">Fiyat Bilgisi</p>
+                  {selectedProduct.show_price && selectedProduct.price_display ? (
+                    <p className="text-2xl font-bold text-primary">{selectedProduct.price_display}</p>
+                  ) : (
+                    <p className="text-sm font-medium text-muted-foreground italic">Fiyat bilgisi için iletişime geçin</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

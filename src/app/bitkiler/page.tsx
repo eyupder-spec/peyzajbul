@@ -88,9 +88,15 @@ export default async function BitkilerPage() {
                     href={`/bitkiler/${plant.slug}`}
                     className="group flex flex-col gap-2 p-3 rounded-xl border border-border bg-card hover:border-emerald-400 hover:shadow-sm transition-all duration-200"
                   >
-                    <div className="w-full aspect-[4/3] rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-4xl">
-                      {cat.icon}
-                    </div>
+                    {plant.image_url ? (
+                      <div className="w-full aspect-[4/3] rounded-lg overflow-hidden relative bg-muted">
+                        <img src={plant.image_url} alt={plant.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      </div>
+                    ) : (
+                      <div className="w-full aspect-[4/3] rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-4xl">
+                        {cat.icon}
+                      </div>
+                    )}
                     <div>
                       <p className="text-sm font-semibold text-foreground group-hover:text-emerald-600 leading-tight">{plant.name}</p>
                       <p className="text-xs text-muted-foreground italic truncate">{plant.scientific_name}</p>

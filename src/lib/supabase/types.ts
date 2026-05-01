@@ -150,6 +150,7 @@ export type Database = {
           description: string | null
           growth_speed: string | null
           id: string
+          image_url: string | null
           is_published: boolean
           name: string
           scientific_name: string | null
@@ -166,6 +167,7 @@ export type Database = {
           description?: string | null
           growth_speed?: string | null
           id?: string
+          image_url?: string | null
           is_published?: boolean
           name: string
           scientific_name?: string | null
@@ -182,6 +184,7 @@ export type Database = {
           description?: string | null
           growth_speed?: string | null
           id?: string
+          image_url?: string | null
           is_published?: boolean
           name?: string
           scientific_name?: string | null

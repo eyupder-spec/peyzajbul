@@ -70,9 +70,15 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-10">
         {/* Başlık */}
         <div className="flex flex-col md:flex-row gap-8 items-start">
-          <div className="w-full md:w-48 h-48 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-8xl border border-emerald-100 dark:border-emerald-900 shrink-0">
-            {cat?.icon || "🌿"}
-          </div>
+          {plant.image_url ? (
+            <div className="w-full md:w-64 h-64 rounded-2xl border border-border overflow-hidden shrink-0 relative bg-muted shadow-sm">
+              <img src={plant.image_url} alt={plant.name} className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="w-full md:w-48 h-48 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-8xl border border-emerald-100 dark:border-emerald-900 shrink-0">
+              {cat?.icon || "🌿"}
+            </div>
+          )}
           <div className="flex-1 space-y-3">
             {cat && (
               <Link href={`/bitkiler#${cat.slug}`} className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full hover:bg-emerald-200 transition-colors">

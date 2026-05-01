@@ -22,6 +22,107 @@ import { useState, useRef, useCallback, use } from "react";
 import LeadFormModal from "@/components/lead-form/LeadFormModal";
 import { useToast } from "@/hooks/use-toast";
 
+// ---- Firma Ürünler Bölümü ----
+function FirmProductsSection({ firmId }: { firmId: string }) {
+  const { data: firmPlants } = useQuery({
+    queryKey: ["firm-plants-public", firmId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("firm_plants")
+        .select("id, plant_id, show_price, price_display, stock_status, notes, plants(id, slug, name, scientific_name, plant_categories(name, icon))")
+        .eq("firm_id", firmId)
+        .neq("stock_status", "unavailable");
+      return data || [];
+    },
+    enabled: !!firmId,
+  });
+
+
+  const { data: firmProducts } = useQuery({
+    queryKey: ["firm-products-public", firmId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("firm_products")
+        .select("*")
+        .eq("firm_id", firmId)
+        .eq("is_active", true)
+        .order("sort_order");
+      return data || [];
+    },
+    enabled: !!firmId,
+  });
+
+  const hasPlants = firmPlants && firmPlants.length > 0;
+  const hasProducts = firmProducts && firmProducts.length > 0;
+  if (!hasPlants && !hasProducts) return null;
+
+  return (
+    <div className="bg-card rounded-lg border border-border p-6">
+      <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+        🛒 Ürünler & Bitkiler
+      </h2>
+
+      {hasPlants && (
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-muted-foreground mb-3">🌿 Katalog Bitkiler</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {(firmPlants as any[]).map((fp: any) => {
+              const plant = fp.plants;
+              if (!plant) return null;
+              const cat = plant.plant_categories;
+              return (
+                <Link
+                  key={fp.plant_id || plant.id}
+                  href={`/bitkiler/${plant.slug}`}
+                  className="group flex flex-col gap-2 p-3 rounded-xl border border-border hover:border-emerald-400 hover:shadow-sm transition-all"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{cat?.icon || "🌿"}</span>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground group-hover:text-emerald-600 leading-tight">{plant.name}</p>
+                      <p className="text-xs text-muted-foreground italic">{plant.scientific_name}</p>
+                    </div>
+                  </div>
+                  {fp.show_price && fp.price_display && (
+                    <p className="text-xs font-semibold text-emerald-600">{fp.price_display}</p>
+                  )}
+                  {fp.stock_status === "limited" && (
+                    <span className="text-[10px] text-orange-600 font-medium">⚠️ Sınırlı Stok</span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {hasProducts && (
+        <div>
+          <p className="text-sm font-semibold text-muted-foreground mb-3">📦 Diğer Ürünler</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {(firmProducts as any[]).map((product: any) => (
+              <div key={product.id} className="flex flex-col gap-2 p-3 rounded-xl border border-border bg-muted/20">
+                {product.image_url && (
+                  <img src={product.image_url} alt={product.title} className="w-full aspect-[4/3] object-cover rounded-lg" />
+                )}
+                <div>
+                  <p className="text-sm font-semibold text-foreground leading-tight">{product.title}</p>
+                  {product.category && <p className="text-xs text-muted-foreground">{product.category}</p>}
+                  {product.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{product.description}</p>}
+                  {product.show_price && product.price_display && (
+                    <p className="text-xs font-semibold text-emerald-600 mt-1">{product.price_display}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 interface FirmDetailContentProps {
   isModal?: boolean;
   slug?: string;
@@ -462,6 +563,10 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
                 </div>
               </div>
             )}
+
+            {/* ===== ÜRÜNLER (Bitkiler + Serbest Ürünler) ===== */}
+            {firm.is_premium && <FirmProductsSection firmId={firm.id} />}
+
 
             {/* Reviews */}
             <div className="bg-card rounded-lg border border-border p-6">

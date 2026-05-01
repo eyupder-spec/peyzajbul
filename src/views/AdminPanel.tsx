@@ -15,9 +15,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { useToast } from "@/hooks/use-toast";
 import {
   Shield, Users, CreditCard, TrendingUp, FileText, Trash2, Edit, LogOut, Eye,
-  Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star,
+  Building2, CheckCircle, XCircle, Plus, Coins, Crown, Image, Star, Box,
   LayoutDashboard, Menu, BookOpen, Rocket, HandshakeIcon, Upload, FolderKanban,
-  Search, ChevronLeft, ChevronRight, Sparkles, UserX
+  Search, ChevronLeft, ChevronRight, Sparkles, UserX, Leaf
 } from "lucide-react";
 import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
 import FirmFormDialog, { type FirmFormData } from "@/components/admin/FirmFormDialog";
@@ -31,6 +31,9 @@ import AdminBannersTab from "@/components/admin/AdminBannersTab";
 import AdminDeletionTab from "@/components/admin/AdminDeletionTab";
 import AdminAnalyticsTab from "@/components/admin/AdminAnalyticsTab";
 import FirmPhotoCrawler from "@/components/admin/FirmPhotoCrawler";
+import AdminPremiumTab from "@/components/admin/AdminPremiumTab";
+import AdminPlantsTab from "@/components/admin/AdminPlantsTab";
+import AdminFirmProductsDialog from "@/components/admin/AdminFirmProductsDialog";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
@@ -119,6 +122,8 @@ const SIDEBAR_ITEMS = [
   { title: "Dashboard", key: "dashboard", icon: LayoutDashboard },
   { title: "Leadler", key: "leads", icon: FileText },
   { title: "Firmalar", key: "firms", icon: Building2 },
+  { title: "Premium", key: "premium", icon: Crown },
+  { title: "Bitkiler", key: "plants", icon: Leaf },
   { title: "Toplu Ekle", key: "bulk", icon: Upload },
   { title: "Sahiplenme", key: "claims", icon: HandshakeIcon },
   { title: "Jetonlar", key: "jetonlar", icon: Coins },
@@ -180,7 +185,7 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog" | "tasks" | "banners" | "deletion">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "premium" | "plants" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog" | "tasks" | "banners" | "deletion">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
   const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
@@ -191,6 +196,7 @@ const AdminPanel = () => {
   const [galleryCaption, setGalleryCaption] = useState("");
   const [selectedLeadForDetail, setSelectedLeadForDetail] = useState<Lead | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [adminProductsFirmId, setAdminProductsFirmId] = useState<string | null>(null);
 
   // Admin review form state
   const [adminReviewName, setAdminReviewName] = useState("");
@@ -1123,7 +1129,8 @@ const AdminPanel = () => {
                                   services: firm.services,
                                   is_approved: firm.is_approved,
                                   is_active: firm.is_active,
-                                  is_premium: firm.is_premium,
+                                  // Süresi dolmuşsa is_premium=false olarak göster (DB henüz güncellenmemiş olabilir)
+                                  is_premium: firm.is_premium && !!firm.premium_until && new Date(firm.premium_until) > new Date(),
                                   premium_until: firm.premium_until || "",
                                   google_maps_url: firm.google_maps_url || "",
                                   detailed_services: firm.detailed_services || [],
@@ -1142,6 +1149,9 @@ const AdminPanel = () => {
                               </Button>
                               <Button size="sm" variant="ghost" title="Yorumlar" onClick={() => loadAdminReviews(firm.id)}>
                                 <Star className="h-3 w-3" />
+                              </Button>
+                              <Button size="sm" variant="ghost" title="Ürünler" onClick={() => setAdminProductsFirmId(firm.id)}>
+                                <Box className="h-3 w-3" />
                               </Button>
                               <Button size="sm" variant="ghost" title="Jeton Ekle" onClick={() => { setAddCoinFirmId(firm.id); setAddCoinAmount(""); }}>
                                 <Plus className="h-3 w-3" />
@@ -1202,6 +1212,12 @@ const AdminPanel = () => {
                 )}
               </div>
             )}
+
+            {/* Premium */}
+            {tab === "premium" && <AdminPremiumTab />}
+
+            {/* Bitkiler */}
+            {tab === "plants" && <AdminPlantsTab />}
 
             {/* Projects */}
             {tab === "projects" && <AdminProjectsTab />}
@@ -1628,6 +1644,12 @@ const AdminPanel = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AdminFirmProductsDialog 
+        firmId={adminProductsFirmId} 
+        open={!!adminProductsFirmId} 
+        onOpenChange={(open) => !open && setAdminProductsFirmId(null)} 
+      />
     </TooltipProvider>
   );
 };

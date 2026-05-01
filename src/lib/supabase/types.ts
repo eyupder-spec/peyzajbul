@@ -14,6 +14,193 @@ export type Database = {
   }
   public: {
     Tables: {
+      firm_products: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          firm_id: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          price_display: string | null
+          show_price: boolean
+          sort_order: number | null
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          firm_id: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          price_display?: string | null
+          show_price?: boolean
+          sort_order?: number | null
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          firm_id?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          price_display?: string | null
+          show_price?: boolean
+          sort_order?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "firm_products_firm_id_fkey"
+            columns: ["firm_id"]
+            isOneToOne: false
+            referencedRelation: "firms"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      firm_plants: {
+        Row: {
+          created_at: string
+          firm_id: string
+          id: string
+          notes: string | null
+          plant_id: string
+          price_display: string | null
+          show_price: boolean
+          stock_status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          firm_id: string
+          id?: string
+          notes?: string | null
+          plant_id: string
+          price_display?: string | null
+          show_price?: boolean
+          stock_status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          firm_id?: string
+          id?: string
+          notes?: string | null
+          plant_id?: string
+          price_display?: string | null
+          show_price?: boolean
+          stock_status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "firm_plants_firm_id_fkey"
+            columns: ["firm_id"]
+            isOneToOne: false
+            referencedRelation: "firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "firm_plants_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      plant_categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      plants: {
+        Row: {
+          category_id: string | null
+          climate_zones: string | null
+          created_at: string
+          description: string | null
+          growth_speed: string | null
+          id: string
+          is_published: boolean
+          name: string
+          scientific_name: string | null
+          slug: string
+          soil_type: string | null
+          sunlight: string | null
+          updated_at: string
+          watering: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          climate_zones?: string | null
+          created_at?: string
+          description?: string | null
+          growth_speed?: string | null
+          id?: string
+          is_published?: boolean
+          name: string
+          scientific_name?: string | null
+          slug: string
+          soil_type?: string | null
+          sunlight?: string | null
+          updated_at?: string
+          watering?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          climate_zones?: string | null
+          created_at?: string
+          description?: string | null
+          growth_speed?: string | null
+          id?: string
+          is_published?: boolean
+          name?: string
+          scientific_name?: string | null
+          slug?: string
+          soil_type?: string | null
+          sunlight?: string | null
+          updated_at?: string
+          watering?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plants_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "plant_categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       blog_posts: {
         Row: {
           author_name: string

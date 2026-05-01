@@ -13,18 +13,19 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Users, Coins, Crown, Image, FileText, FolderKanban, Layout } from "lucide-react";
+import { Users, Coins, Crown, Image, FileText, FolderKanban, Layout, ShoppingBag } from "lucide-react";
 
 export const FIRMA_MENU = [
-  { title: "Özet", key: "panel", icon: FileText, path: "/firma/panel" },
-  { title: "Profil", key: "profil", icon: FileText, path: "/firma/profil" },
-  { title: "Özel Sayfa", key: "landing", icon: Layout, path: "/firma/landing" },
-  { title: "Leadler", key: "leadler", icon: Users, path: "/firma/leadler" },
-  { title: "Jeton Yükle", key: "jeton", icon: Coins, path: "/firma/jeton" },
-  { title: "Premium", key: "premium", icon: Crown, path: "/firma/premium" },
-  { title: "Galeri", key: "galeri", icon: Image, path: "/firma/galeri" },
-  { title: "Projeler", key: "projeler", icon: FolderKanban, path: "/firma/projeler" },
-  { title: "Reklam Ver", key: "reklam", icon: Crown, path: "/firma/reklam" },
+  { title: "Özet", key: "panel", icon: FileText, path: "/firma/panel", requiresPremium: false },
+  { title: "Profil", key: "profil", icon: FileText, path: "/firma/profil", requiresPremium: false },
+  { title: "Özel Sayfa", key: "landing", icon: Layout, path: "/firma/landing", requiresPremium: false },
+  { title: "Leadler", key: "leadler", icon: Users, path: "/firma/leadler", requiresPremium: false },
+  { title: "Jeton Yükle", key: "jeton", icon: Coins, path: "/firma/jeton", requiresPremium: false },
+  { title: "Premium", key: "premium", icon: Crown, path: "/firma/premium", requiresPremium: false },
+  { title: "Galeri", key: "galeri", icon: Image, path: "/firma/galeri", requiresPremium: false },
+  { title: "Projeler", key: "projeler", icon: FolderKanban, path: "/firma/projeler", requiresPremium: false },
+  { title: "Ürünlerim", key: "urunler", icon: ShoppingBag, path: "/firma/urunler", requiresPremium: true },
+  { title: "Reklam Ver", key: "reklam", icon: Crown, path: "/firma/reklam", requiresPremium: false },
 ];
 
 export function FirmaSidebar({ isPremium }: { isPremium?: boolean }) {
@@ -45,21 +46,42 @@ export function FirmaSidebar({ isPremium }: { isPremium?: boolean }) {
           <SidebarGroupContent id="sidebar-menu">
             <SidebarMenu>
               {FIRMA_MENU.map((item) => {
+                // Premium menü kalemine CTA animasyonu uygula
                 const isPremiumCTA = item.key === "premium" && !isPremium;
-                const isActive = pathname ? (pathname === item.path || pathname.startsWith(`${item.path}/`)) : false;
+                // Premium gerektiren sayfalar için premium olmayan firmayı /firma/premium'a yönlendir
+                const isLocked = item.requiresPremium && !isPremium;
+                const effectivePath = isLocked ? "/firma/premium" : item.path;
+                const isActive = pathname
+                  ? pathname === item.path || pathname.startsWith(`${item.path}/`)
+                  : false;
 
                 return (
                   <SidebarMenuItem key={item.key}>
                     <SidebarMenuButton asChild>
                       <Link
-                        href={item.path}
+                        href={effectivePath}
                         className={`
-                          ${isPremiumCTA ? 'animate-pulse bg-gradient-to-r from-yellow-500/20 to-amber-500/10 border border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)] text-yellow-600 dark:text-yellow-400 font-bold hover:bg-muted/50' : 'hover:bg-muted/50'}
-                          ${isActive ? (isPremiumCTA ? 'bg-gradient-to-r from-yellow-500/30 to-amber-500/20 border-yellow-500 text-yellow-700 dark:text-yellow-300 shadow-[0_0_20px_rgba(234,179,8,0.4)]' : 'bg-primary/10 text-primary font-medium') : ''}
+                          ${isPremiumCTA
+                            ? "animate-pulse bg-gradient-to-r from-yellow-500/20 to-amber-500/10 border border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)] text-yellow-600 dark:text-yellow-400 font-bold hover:bg-muted/50"
+                            : "hover:bg-muted/50"}
+                          ${isLocked ? "opacity-60" : ""}
+                          ${isActive
+                            ? isPremiumCTA
+                              ? "bg-gradient-to-r from-yellow-500/30 to-amber-500/20 border-yellow-500 text-yellow-700 dark:text-yellow-300 shadow-[0_0_20px_rgba(234,179,8,0.4)]"
+                              : "bg-primary/10 text-primary font-medium"
+                            : ""}
                         `}
                       >
-                        <item.icon className={`h-4 w-4 mr-2 ${isPremiumCTA ? 'text-yellow-500 drop-shadow-md' : ''}`} />
-                        {!collapsed && <span>{item.title} {isPremiumCTA && "✨"}</span>}
+                        <item.icon
+                          className={`h-4 w-4 mr-2 ${isPremiumCTA ? "text-yellow-500 drop-shadow-md" : ""}`}
+                        />
+                        {!collapsed && (
+                          <span>
+                            {item.title}
+                            {isPremiumCTA && " ✨"}
+                            {isLocked && " 🔒"}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

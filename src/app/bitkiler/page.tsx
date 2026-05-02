@@ -26,8 +26,29 @@ export default async function BitkilerPage() {
     .eq("is_published", true)
     .order("name");
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Peyzajbul Bitki Rehberi",
+    "description": "100'den fazla peyzaj bitkisinin bakım bilgilerini keşfedin ve yakınınızdaki satan firmaları bulun.",
+    "url": "https://www.peyzajbul.com/bitkiler",
+    "about": {
+      "@type": "ItemList",
+      "itemListElement": plants?.map((p, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `https://www.peyzajbul.com/bitkiler/${p.slug}`,
+        "name": p.name
+      })) || []
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       <Navbar />
       <main className="flex-1 pt-16">
         {/* Hero */}

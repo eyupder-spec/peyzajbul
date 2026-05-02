@@ -101,6 +101,17 @@ interface BlogDetayProps {
 const BlogDetay = ({ post }: BlogDetayProps) => {
   const [isLeadFormOpen, setIsLeadFormOpen] = useState(false);
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const [mentionedPlants, setMentionedPlants] = useState<any[]>([]);
+
+  // Fetch all plants for auto-linking
+  const { data: allPlants } = useQuery({
+    queryKey: ["all-published-plants-for-blog"],
+    queryFn: async () => {
+      const { data } = await supabase.from("plants").select("id, name, slug, image_url").eq("is_published", true);
+      return data || [];
+    },
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+  });
 
   // 3. ANA POST FETCH'İNİ SİLDİK (Gereksizdi, Server'dan geliyor)
 
@@ -178,7 +189,7 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
 
         if (typeof sanitizeFn === 'function') {
           // YouTube ve güvenli embed iframe'lerine izin ver
-          const clean = sanitizeFn(contentWithIds, {
+          let clean = sanitizeFn(contentWithIds, {
             ADD_TAGS: ["iframe"],
             ADD_ATTR: [
               "allow",
@@ -193,6 +204,23 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
               "class"
             ],
           });
+
+          if (allPlants && allPlants.length > 0) {
+            const foundPlants: any[] = [];
+            allPlants.forEach((plant: any) => {
+              // HTML tag'leri içinde olmayan kelimeleri bul
+              // regex escape
+              const escapedName = plant.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const regex = new RegExp(`(?![^<]*>)\\b(${escapedName})\\b`, 'i');
+              if (regex.test(clean)) {
+                foundPlants.push(plant);
+                // Sadece ilk geçen yeri değiştir (global bayrağı 'g' yok)
+                clean = clean.replace(regex, `<a href="/bitkiler/${plant.slug}" class="text-primary font-bold underline decoration-primary/30 underline-offset-4 hover:decoration-primary transition-all" title="${plant.name} Bitkisi">$1</a>`);
+              }
+            });
+            setMentionedPlants(foundPlants);
+          }
+
           setSanitizedContent(clean);
         }
       } catch (e) {
@@ -201,7 +229,7 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
     };
 
     sanitize();
-  }, [contentWithIds]);
+  }, [contentWithIds, allPlants]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -343,6 +371,38 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                   __html: sanitizedContent
                 }}
               />
+
+              {mentionedPlants.length > 0 && (
+                <div className="mt-12 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 rounded-3xl p-8 shadow-sm">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <h3 className="font-heading text-xl font-bold text-foreground">Bu Yazıda Bahsedilen Bitkiler</h3>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {mentionedPlants.map(plant => (
+                      <Link 
+                        key={plant.id} 
+                        href={`/bitkiler/${plant.slug}`}
+                        className="group flex flex-col gap-3 p-3 rounded-2xl bg-card border border-border hover:border-emerald-400 hover:shadow-md transition-all duration-300"
+                      >
+                        {plant.image_url ? (
+                          <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-muted">
+                            <img src={plant.image_url} alt={plant.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          </div>
+                        ) : (
+                          <div className="w-full aspect-[4/3] rounded-xl bg-emerald-50 flex items-center justify-center text-4xl">🌿</div>
+                        )}
+                        <div>
+                          <p className="text-sm font-bold text-foreground group-hover:text-emerald-600 transition-colors leading-tight line-clamp-1">{plant.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Bitki Rehberinde İncele →</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="mt-12 pt-8 border-t border-border flex items-center justify-between gap-4">
                 <span className="text-sm font-semibold text-foreground flex items-center gap-2">

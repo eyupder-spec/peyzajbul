@@ -50,8 +50,34 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
 
   const cat = plant.plant_categories as any;
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": `${plant.name} - Bakım Rehberi`,
+    "description": plant.description || `${plant.name} özellikleri ve bakım rehberi.`,
+    "image": plant.image_url ? [plant.image_url] : [],
+    "url": `https://www.peyzajbul.com/bitkiler/${slug}`,
+    "mainEntity": {
+      "@type": "Product",
+      "name": plant.name,
+      "description": plant.description || plant.scientific_name,
+      "image": plant.image_url || undefined,
+      "category": cat?.name,
+      "offers": {
+        "@type": "AggregateOffer",
+        "offerCount": firmPlants?.length || 0,
+        "availability": firmPlants?.length ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        "priceCurrency": "TRY"
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       <Navbar />
       <main className="flex-1 pt-16">
       {/* Breadcrumb */}

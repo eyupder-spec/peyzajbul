@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +15,9 @@ import { CATEGORIES } from "@/lib/categories";
 import { CITIES } from "@/lib/cities";
 
 const Blog = () => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("all");
@@ -62,24 +65,28 @@ const Blog = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Makale ara..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-48"><SelectValue placeholder="Hizmet Kategorisi" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Hizmetler</SelectItem>
-                {CATEGORIES.map((c) => (
-                  <SelectItem key={c.slug} value={c.slug}>{c.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={cityFilter} onValueChange={setCityFilter}>
-              <SelectTrigger className="w-48"><SelectValue placeholder="Şehir" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Şehirler</SelectItem>
-                {CITIES.map((c) => (
-                  <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {mounted && (
+              <>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-48"><SelectValue placeholder="Hizmet Kategorisi" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tüm Hizmetler</SelectItem>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c.slug} value={c.slug}>{c.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={cityFilter} onValueChange={setCityFilter}>
+                  <SelectTrigger className="w-48"><SelectValue placeholder="Şehir" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tüm Şehirler</SelectItem>
+                    {CITIES.map((c) => (
+                      <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
+            )}
           </div>
 
           {isLoading ? (

@@ -22,7 +22,7 @@ export default async function BitkilerPage() {
 
   const { data: plants } = await supabase
     .from("plants")
-    .select("id, slug, name, scientific_name, category_id, watering, sunlight")
+    .select("id, slug, name, scientific_name, category_id, watering, sunlight, image_url")
     .eq("is_published", true)
     .order("name");
 

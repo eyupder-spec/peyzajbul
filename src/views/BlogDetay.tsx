@@ -102,12 +102,23 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
   const [isLeadFormOpen, setIsLeadFormOpen] = useState(false);
   const [isTocOpen, setIsTocOpen] = useState(false);
   const [mentionedPlants, setMentionedPlants] = useState<any[]>([]);
+  const [mentionedMaterials, setMentionedMaterials] = useState<any[]>([]);
 
   // Fetch all plants for auto-linking
   const { data: allPlants } = useQuery({
     queryKey: ["all-published-plants-for-blog"],
     queryFn: async () => {
       const { data } = await supabase.from("plants").select("id, name, slug, image_url").eq("is_published", true);
+      return data || [];
+    },
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+  });
+
+  // Fetch all materials for auto-linking
+  const { data: allMaterials } = useQuery({
+    queryKey: ["all-published-materials-for-blog"],
+    queryFn: async () => {
+      const { data } = await supabase.from("materials").select("id, name, slug, image_url").eq("is_published", true);
       return data || [];
     },
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
@@ -220,6 +231,18 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
             });
             setMentionedPlants(foundPlants);
           }
+          if (allMaterials && allMaterials.length > 0) {
+            const foundMaterials: any[] = [];
+            allMaterials.forEach((material: any) => {
+              const escapedName = material.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const regex = new RegExp(`(?![^<]*>)\\b(${escapedName})\\b`, 'i');
+              if (regex.test(clean)) {
+                foundMaterials.push(material);
+                clean = clean.replace(regex, `<a href="/malzemeler/${material.slug}" class="text-amber-600 font-bold underline decoration-amber-600/30 underline-offset-4 hover:decoration-amber-600 transition-all" title="${material.name} Malzemesi">$1</a>`);
+              }
+            });
+            setMentionedMaterials(foundMaterials);
+          }
 
           setSanitizedContent(clean);
         }
@@ -229,7 +252,7 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
     };
 
     sanitize();
-  }, [contentWithIds, allPlants]);
+  }, [contentWithIds, allPlants, allMaterials]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -397,6 +420,38 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                         <div>
                           <p className="text-sm font-bold text-foreground group-hover:text-emerald-600 transition-colors leading-tight line-clamp-1">{plant.name}</p>
                           <p className="text-xs text-muted-foreground mt-1">Bitki Rehberinde İncele →</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {mentionedMaterials.length > 0 && (
+                <div className="mt-8 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900 rounded-3xl p-8 shadow-sm">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <h3 className="font-heading text-xl font-bold text-foreground">Bu Yazıda Bahsedilen Malzemeler</h3>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {mentionedMaterials.map(material => (
+                      <Link 
+                        key={material.id} 
+                        href={`/malzemeler/${material.slug}`}
+                        className="group flex flex-col gap-3 p-3 rounded-2xl bg-card border border-border hover:border-amber-400 hover:shadow-md transition-all duration-300"
+                      >
+                        {material.image_url ? (
+                          <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-muted">
+                            <img src={material.image_url} alt={material.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          </div>
+                        ) : (
+                          <div className="w-full aspect-[4/3] rounded-xl bg-amber-50 flex items-center justify-center text-4xl">🪨</div>
+                        )}
+                        <div>
+                          <p className="text-sm font-bold text-foreground group-hover:text-amber-600 transition-colors leading-tight line-clamp-1">{material.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Malzeme Rehberinde İncele →</p>
                         </div>
                       </Link>
                     ))}

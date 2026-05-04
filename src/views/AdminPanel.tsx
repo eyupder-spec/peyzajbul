@@ -33,6 +33,7 @@ import AdminAnalyticsTab from "@/components/admin/AdminAnalyticsTab";
 import FirmPhotoCrawler from "@/components/admin/FirmPhotoCrawler";
 import AdminPremiumTab from "@/components/admin/AdminPremiumTab";
 import AdminPlantsTab from "@/components/admin/AdminPlantsTab";
+import AdminMaterialsTab from "@/components/admin/AdminMaterialsTab";
 import AdminFirmProductsDialog from "@/components/admin/AdminFirmProductsDialog";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -124,6 +125,7 @@ const SIDEBAR_ITEMS = [
   { title: "Firmalar", key: "firms", icon: Building2 },
   { title: "Premium", key: "premium", icon: Crown },
   { title: "Bitkiler", key: "plants", icon: Leaf },
+  { title: "Malzemeler", key: "materials", icon: Box },
   { title: "Toplu Ekle", key: "bulk", icon: Upload },
   { title: "Sahiplenme", key: "claims", icon: HandshakeIcon },
   { title: "Jetonlar", key: "jetonlar", icon: Coins },
@@ -185,7 +187,7 @@ const AdminPanel = () => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [firmsData, setFirmsData] = useState<Firm[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "premium" | "plants" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog" | "tasks" | "banners" | "deletion">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "leads" | "firms" | "premium" | "plants" | "materials" | "bulk" | "claims" | "jetonlar" | "projects" | "blog" | "changelog" | "tasks" | "banners" | "deletion">("dashboard");
   const [coinTransactions, setCoinTransactions] = useState<any[]>([]);
   const [selectedFirmTransactions, setSelectedFirmTransactions] = useState<string | null>(null);
   const [adminGalleryFirmId, setAdminGalleryFirmId] = useState<string | null>(null);
@@ -1218,6 +1220,9 @@ const AdminPanel = () => {
 
             {/* Bitkiler */}
             {tab === "plants" && <AdminPlantsTab />}
+
+            {/* Malzemeler */}
+            {tab === "materials" && <AdminMaterialsTab />}
 
             {/* Projects */}
             {tab === "projects" && <AdminProjectsTab />}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import LightboxGallery from "./LightboxGallery";
 
 export const revalidate = 3600;
 
@@ -50,12 +51,19 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
 
   const cat = plant.plant_categories as any;
 
+  // Galeri için tüm resimleri birleştir (Ana resim + Galeri resimleri)
+  const allImages: string[] = [];
+  if (plant.image_url) allImages.push(plant.image_url);
+  if (plant.gallery_urls && plant.gallery_urls.length > 0) {
+    allImages.push(...plant.gallery_urls);
+  }
+
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": `${plant.name} - Bakım Rehberi`,
     "description": plant.description || `${plant.name} özellikleri ve bakım rehberi.`,
-    "image": plant.image_url ? [plant.image_url] : [],
+    "image": allImages.length > 0 ? allImages : [],
     "url": `https://www.peyzajbul.com/bitkiler/${slug}`,
     "mainEntity": {
       "@type": "Product",
@@ -115,6 +123,11 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
             <p className="text-lg text-muted-foreground italic">{plant.scientific_name}</p>
           </div>
         </div>
+
+        {/* Galeri (Lightbox dahil) */}
+        {allImages.length > 1 && (
+           <LightboxGallery images={allImages} title={plant.name} />
+        )}
 
         {/* Bakım Rehberi (Description) */}
         {plant.description && (

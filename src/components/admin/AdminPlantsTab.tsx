@@ -18,14 +18,14 @@ type Plant = {
   id: string; slug: string; name: string; scientific_name: string;
   category_id: string; description: string; watering: string;
   sunlight: string; growth_speed: string; soil_type: string;
-  climate_zones: string; is_published: boolean; image_url: string;
+  climate_zones: string; is_published: boolean; image_url: string; gallery_urls: string[];
   plant_categories?: Category;
 };
 
 const emptyPlant = {
   slug: "", name: "", scientific_name: "", category_id: "",
   description: "", watering: "orta", sunlight: "tam_gunes",
-  growth_speed: "orta", soil_type: "", climate_zones: "", is_published: true, image_url: "",
+  growth_speed: "orta", soil_type: "", climate_zones: "", is_published: true, image_url: "", gallery_urls: [] as string[],
 };
 
 export default function AdminPlantsTab() {
@@ -67,7 +67,7 @@ export default function AdminPlantsTab() {
       category_id: p.category_id || "", description: p.description || "",
       watering: p.watering || "orta", sunlight: p.sunlight || "tam_gunes",
       growth_speed: p.growth_speed || "orta", soil_type: p.soil_type || "",
-      climate_zones: p.climate_zones || "", is_published: p.is_published, image_url: p.image_url || "",
+      climate_zones: p.climate_zones || "", is_published: p.is_published, image_url: p.image_url || "", gallery_urls: p.gallery_urls || [],
     });
     setPlantDialogOpen(true);
   };
@@ -80,7 +80,8 @@ export default function AdminPlantsTab() {
 
       setUploadingImage(true);
       const ext = file.name.split(".").pop();
-      const path = `${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`;
+      const slug = plantForm.slug || "bitki";
+      const path = `${slug}-${Date.now()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from("plants")
@@ -93,12 +94,57 @@ export default function AdminPlantsTab() {
         .getPublicUrl(path);
 
       setPlantForm(p => ({ ...p, image_url: publicUrl }));
-      toast.success("Görsel yüklendi");
+      toast.success("Ana görsel yüklendi");
     } catch (error: any) {
-      toast.error("Görsel yüklenirken hata oluştu: " + error.message);
+      toast.error("Ana görsel yüklenirken hata oluştu: " + error.message);
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const uploadGallery = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+
+      setUploadingGallery(true);
+      const newUrls: string[] = [];
+      const slug = plantForm.slug || "bitki";
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext = file.name.split(".").pop();
+        const path = `${slug}-galeri-${Date.now()}-${i}.${ext}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("plants")
+          .upload(path, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("plants")
+          .getPublicUrl(path);
+
+        newUrls.push(publicUrl);
+      }
+
+      setPlantForm(p => ({ ...p, gallery_urls: [...(p.gallery_urls || []), ...newUrls] }));
+      toast.success(`${files.length} görsel galeriye eklendi`);
+    } catch (error: any) {
+      toast.error("Galeri yüklenirken hata oluştu: " + error.message);
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
+
+  const removeGalleryImage = (index: number) => {
+    setPlantForm(p => {
+      const newGallery = [...(p.gallery_urls || [])];
+      newGallery.splice(index, 1);
+      return { ...p, gallery_urls: newGallery };
+    });
   };
 
 
@@ -308,7 +354,34 @@ export default function AdminPlantsTab() {
                 </div>
               )}
             </div>
-            <div className="space-y-1.5">
+            
+            <div className="space-y-1.5 border-t border-border pt-4">
+              <Label>Galeri Görselleri (Çoklu Yükleme)</Label>
+              <div className="flex items-center gap-2">
+                <Input type="file" accept="image/*" multiple onChange={uploadGallery} disabled={uploadingGallery} className="flex-1" />
+                {uploadingGallery && <span className="text-sm text-muted-foreground animate-pulse">Yükleniyor...</span>}
+              </div>
+              <p className="text-xs text-muted-foreground">İsteğe bağlı. Çoklu seçim yapabilirsiniz.</p>
+              
+              {plantForm.gallery_urls && plantForm.gallery_urls.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {plantForm.gallery_urls.map((url, i) => (
+                    <div key={i} className="w-16 h-16 relative rounded-md overflow-hidden border border-border group">
+                      <img src={url} alt={`Galeri ${i}`} className="w-full h-full object-cover" />
+                      <button 
+                        onClick={() => removeGalleryImage(i)}
+                        className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Sil"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1.5 border-t border-border pt-4">
               <Label>Kategori</Label>
               <Select value={plantForm.category_id} onValueChange={v => setPlantForm(p => ({ ...p, category_id: v }))}>
                 <SelectTrigger><SelectValue placeholder="Kategori seçin" /></SelectTrigger>

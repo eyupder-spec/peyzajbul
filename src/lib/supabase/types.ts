@@ -142,7 +142,7 @@ export type Database = {
         }
         Relationships: []
       }
-      plants: {
+      plants: { 
         Row: {
           category_id: string | null
           climate_zones: string | null
@@ -151,6 +151,7 @@ export type Database = {
           growth_speed: string | null
           id: string
           image_url: string | null
+          gallery_urls: string[] | null
           is_published: boolean
           name: string
           scientific_name: string | null
@@ -168,6 +169,7 @@ export type Database = {
           growth_speed?: string | null
           id?: string
           image_url?: string | null
+          gallery_urls?: string[] | null
           is_published?: boolean
           name: string
           scientific_name?: string | null
@@ -185,6 +187,7 @@ export type Database = {
           growth_speed?: string | null
           id?: string
           image_url?: string | null
+          gallery_urls?: string[] | null
           is_published?: boolean
           name?: string
           scientific_name?: string | null
@@ -710,6 +713,134 @@ export type Database = {
           token_price?: number
         }
         Relationships: []
+      }
+      material_categories: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          slug: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      materials: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          gallery_urls: string[] | null
+          is_published: boolean
+          name: string
+          slug: string
+          usage_areas: string | null
+          material_type: string | null
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          gallery_urls?: string[] | null
+          is_published?: boolean
+          name: string
+          slug: string
+          usage_areas?: string | null
+          material_type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          gallery_urls?: string[] | null
+          is_published?: boolean
+          name?: string
+          slug?: string
+          usage_areas?: string | null
+          material_type?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "materials_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "material_categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      firm_materials: {
+        Row: {
+          created_at: string
+          firm_id: string
+          id: string
+          material_id: string
+          notes: string | null
+          price_display: string | null
+          show_price: boolean | null
+          stock_status: string | null
+        }
+        Insert: {
+          created_at?: string
+          firm_id: string
+          id?: string
+          material_id: string
+          notes?: string | null
+          price_display?: string | null
+          show_price?: boolean | null
+          stock_status?: string | null
+        }
+        Update: {
+          created_at?: string
+          firm_id?: string
+          id?: string
+          material_id?: string
+          notes?: string | null
+          price_display?: string | null
+          show_price?: boolean | null
+          stock_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "firm_materials_firm_id_fkey"
+            columns: ["firm_id"]
+            isOneToOne: false
+            referencedRelation: "firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "firm_materials_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       otp_codes: {
         Row: {

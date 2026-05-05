@@ -47,7 +47,45 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function FirmaDetayPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  return <FirmaDetayClient slug={resolvedParams.slug} />;
+  const slug = resolvedParams.slug;
+  const supabase = await createClient();
+  
+  const { data: firm } = await supabase
+    .from("firms")
+    .select("company_name, description, city, district, address, phone, email, logo_url")
+    .eq("slug", slug)
+    .single();
+
+  const jsonLd = firm ? {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": firm.company_name,
+    "image": firm.logo_url || "https://www.peyzajbul.com/icon.png",
+    "@id": `https://www.peyzajbul.com/firma/${slug}`,
+    "url": `https://www.peyzajbul.com/firma/${slug}`,
+    "telephone": firm.phone,
+    "email": firm.email,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": firm.address || "",
+      "addressLocality": firm.district || "",
+      "addressRegion": firm.city || "",
+      "addressCountry": "TR"
+    },
+    "description": firm.description || `${firm.city} ${firm.district || ""} peyzaj firması.`,
+  } : null;
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <FirmaDetayClient slug={slug} />
+    </>
+  );
 }
 
 // ISR: Her 1 saatte bir arka planda yenileme yapılması için (Opsiyonel)

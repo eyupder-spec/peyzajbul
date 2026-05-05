@@ -58,25 +58,18 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
     allImages.push(...plant.gallery_urls);
   }
 
-  const schema = {
+  const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": `${plant.name} - Bakım Rehberi`,
-    "description": plant.description || `${plant.name} özellikleri ve bakım rehberi.`,
-    "image": allImages.length > 0 ? allImages : [],
-    "url": `https://www.peyzajbul.com/bitkiler/${slug}`,
-    "mainEntity": {
-      "@type": "Product",
-      "name": plant.name,
-      "description": plant.description || plant.scientific_name,
-      "image": plant.image_url || undefined,
-      "category": cat?.name,
-      "offers": {
-        "@type": "AggregateOffer",
-        "offerCount": firmPlants?.length || 0,
-        "availability": firmPlants?.length ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-        "priceCurrency": "TRY"
-      }
+    "@type": "Product",
+    "name": plant.name,
+    "description": plant.description || plant.scientific_name,
+    "image": plant.image_url ? [plant.image_url] : [],
+    "category": cat?.name || "Bitki",
+    "offers": {
+      "@type": "AggregateOffer",
+      "offerCount": firmPlants?.length || 0,
+      "availability": firmPlants?.length ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "priceCurrency": "TRY"
     }
   };
 
@@ -84,7 +77,7 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
     <div className="min-h-screen flex flex-col bg-background">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Navbar />
       <main className="flex-1 pt-16">
@@ -249,5 +242,6 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
       </main>
       <Footer />
     </div>
+    </>
   );
 }

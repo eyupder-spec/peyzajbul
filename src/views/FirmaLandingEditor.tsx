@@ -73,8 +73,9 @@ const FirmaLandingEditor = () => {
   const [faqItems, setFaqItems] = useState<FAQItem[]>([]);
   const [beforeUrl, setBeforeUrl] = useState("");
   const [afterUrl, setAfterUrl] = useState("");
-  const [detailedServices, setDetailedServices] = useState<DetailedService[]>([]);
+  const [detailedServices, setDetailedServices] = useState<{ title: string; description: string }[]>([]);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [youtubeVideos, setYoutubeVideos] = useState<{ url: string; title: string }[]>([]);
   const [googleMapsUrl, setGoogleMapsUrl] = useState("");
 
   // Social media
@@ -97,7 +98,7 @@ const FirmaLandingEditor = () => {
 
       const { data: firm } = await supabase
         .from("firms")
-        .select("id, company_name, slug, is_premium, premium_until, landing_config, response_time, trust_badges, faq_items, before_after, detailed_services, portfolio_items, google_maps_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin" as any)
+        .select("id, company_name, slug, is_premium, premium_until, landing_config, response_time, trust_badges, faq_items, before_after, detailed_services, portfolio_items, youtube_videos, google_maps_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin" as any)
         .eq("user_id", user.id)
         .single();
 
@@ -126,6 +127,7 @@ const FirmaLandingEditor = () => {
       setAfterUrl(f.before_after?.after || "");
       setDetailedServices(f.detailed_services || []);
       setPortfolioItems(f.portfolio_items || []);
+      setYoutubeVideos(f.youtube_videos || []);
       setGoogleMapsUrl(f.google_maps_url || "");
       setSocialInstagram(f.social_instagram || "");
       setSocialFacebook(f.social_facebook || "");
@@ -185,6 +187,7 @@ const FirmaLandingEditor = () => {
           before_after: (beforeUrl && afterUrl) ? { before: beforeUrl, after: afterUrl } : null,
           detailed_services: detailedServices.length > 0 ? detailedServices : null,
           portfolio_items: portfolioItems.length > 0 ? portfolioItems : null,
+          youtube_videos: youtubeVideos.length > 0 ? youtubeVideos : null,
           google_maps_url: googleMapsUrl || null,
           social_instagram: socialInstagram || null,
           social_facebook: socialFacebook || null,
@@ -439,6 +442,28 @@ const FirmaLandingEditor = () => {
                       </div>
                     ))}
                     <Button variant="outline" size="sm" onClick={() => setPortfolioItems([...portfolioItems, { image_url: "", title: "" }])}><Plus className="h-3 w-3 mr-1" /> Proje Ekle</Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* ═══ YOUTUBE VIDEOS ═══ */}
+              <Card className={`border-border ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
+                <CardContent className="pt-6 space-y-3">
+                  <h3 className="font-heading font-semibold text-foreground flex items-center gap-2">
+                    <Youtube className="h-4 w-4 text-primary" /> Video Galeri (YouTube)
+                  </h3>
+                  <div className="space-y-3">
+                    {youtubeVideos.map((v, i) => (
+                      <div key={i} className="border border-border rounded-lg p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-muted-foreground">Video {i + 1}</span>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:bg-destructive/10" onClick={() => setYoutubeVideos(youtubeVideos.filter((_, j) => j !== i))}><X className="h-3 w-3" /></Button>
+                        </div>
+                        <Input placeholder="YouTube Linki (örn: https://youtu.be/...)" value={v.url} onChange={(e) => { const u = [...youtubeVideos]; u[i] = { ...u[i], url: e.target.value }; setYoutubeVideos(u); }} />
+                        <Input placeholder="Video Başlığı (Opsiyonel)" value={v.title} onChange={(e) => { const u = [...youtubeVideos]; u[i] = { ...u[i], title: e.target.value }; setYoutubeVideos(u); }} />
+                      </div>
+                    ))}
+                    <Button variant="outline" size="sm" onClick={() => setYoutubeVideos([...youtubeVideos, { url: "", title: "" }])}><Plus className="h-3 w-3 mr-1" /> Video Ekle</Button>
                   </div>
                 </CardContent>
               </Card>

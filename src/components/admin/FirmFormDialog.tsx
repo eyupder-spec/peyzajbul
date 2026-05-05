@@ -41,6 +41,7 @@ export type FirmFormData = {
   trust_badges?: { icon: string; label: string }[];
   faq_items?: { question: string; answer: string }[];
   before_after?: { before: string; after: string };
+  youtube_videos?: { url: string; title: string }[];
 };
 
 const emptyForm: FirmFormData = {
@@ -64,6 +65,7 @@ const emptyForm: FirmFormData = {
   trust_badges: [],
   faq_items: [],
   before_after: undefined,
+  youtube_videos: [],
 };
 
 interface FirmFormDialogProps {
@@ -163,6 +165,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           trust_badges: form.trust_badges?.length ? form.trust_badges : null,
           faq_items: form.faq_items?.length ? form.faq_items : null,
           before_after: form.before_after || null,
+          youtube_videos: form.youtube_videos?.length ? form.youtube_videos : null,
         }).eq("id", initialData.id);
         if (error) throw error;
         toast.success("Firma güncellendi!");
@@ -521,6 +524,49 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                       onChange={(e) => update({ before_after: { before: form.before_after?.before || "", after: e.target.value } })}
                     />
                   </div>
+                </div>
+                </div>
+              </div>
+
+              {/* YouTube Videos */}
+              <div className="space-y-2">
+                <Label>Video Galeri (YouTube)</Label>
+                <div className="space-y-3">
+                  {(form.youtube_videos || []).map((v, i) => (
+                    <div key={i} className="flex gap-2 bg-muted/50 rounded-lg p-2 relative">
+                      <div className="flex-1 space-y-1">
+                        <Input
+                          placeholder="YouTube URL (örn: https://youtu.be/...)"
+                          value={v.url || ""}
+                          onChange={(e) => {
+                            const updated = [...(form.youtube_videos || [])];
+                            updated[i] = { ...updated[i], url: e.target.value };
+                            update({ youtube_videos: updated });
+                          }}
+                        />
+                        <Input
+                          placeholder="Video Başlığı (Opsiyonel)"
+                          value={v.title || ""}
+                          onChange={(e) => {
+                            const updated = [...(form.youtube_videos || [])];
+                            updated[i] = { ...updated[i], title: e.target.value };
+                            update({ youtube_videos: updated });
+                          }}
+                        />
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive shrink-0"
+                        onClick={() => update({ youtube_videos: (form.youtube_videos || []).filter((_, j) => j !== i) })}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" onClick={() => update({ youtube_videos: [...(form.youtube_videos || []), { url: "", title: "" }] })}>
+                    <Plus className="h-4 w-4 mr-1" /> Video Ekle
+                  </Button>
                 </div>
               </div>
 

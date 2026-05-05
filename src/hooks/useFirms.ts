@@ -31,7 +31,7 @@ export type PublicFirm = {
   gallery_images?: string[];
 };
 
-const FIRM_SELECT = "id, company_name, city, district, services, description, phone, email, is_premium, premium_until, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items, firm_gallery(image_url)";
+const FIRM_SELECT = "id, company_name, city, district, services, description, phone, email, is_premium, premium_until, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items, youtube_videos, firm_gallery(image_url)";
 
 function attachGalleryImages(firms: any[]): PublicFirm[] {
   const now = new Date();
@@ -94,7 +94,7 @@ export function useFirmById(firmId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("firms")
-        .select("id, company_name, city, district, services, description, phone, email, address, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items")
+        .select("id, company_name, city, district, services, description, phone, email, address, is_premium, google_maps_url, detailed_services, slug, website, logo_url, social_instagram, social_facebook, social_x, social_youtube, social_linkedin, response_time, trust_badges, faq_items, before_after, portfolio_items, youtube_videos")
         .eq("id", firmId)
         .eq("is_approved", true)
         .eq("is_active", true)

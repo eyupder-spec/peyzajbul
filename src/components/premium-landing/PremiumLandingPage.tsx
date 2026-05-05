@@ -165,8 +165,15 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
   const hasFaq = firm.faq_items && firm.faq_items.length > 0;
   const hasGoogleMaps = !!firm.google_maps_url;
   const hasGallery = gallery && gallery.length > 0;
+  const hasYoutubeVideos = firm.youtube_videos && (firm.youtube_videos as any[]).length > 0;
   const hasReviews = reviews && reviews.length > 0;
   const hasSocial = firm.social_instagram || firm.social_facebook || firm.social_x || firm.social_youtube || firm.social_linkedin;
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+  };
 
   const handleReviewPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -393,6 +400,36 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                     <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2}><path d="M8 9l-3 3 3 3M16 9l3 3-3 3" /></svg>
                   </div>
                 </div>
+              </div>
+            </section>
+          )}
+
+          {/* ═══════════════ VIDEO GALLERY ═══════════════ */}
+          {hasYoutubeVideos && (
+            <section>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Video Galeri</h2>
+                <Badge variant="outline" className="font-normal">{(firm.youtube_videos as any[]).length} Video</Badge>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                {(firm.youtube_videos as { url: string; title: string }[]).map((vid, i) => {
+                  const embedUrl = getYouTubeEmbedUrl(vid.url);
+                  if (!embedUrl) return null;
+                  return (
+                    <div key={i} className="flex flex-col gap-2">
+                      <div className="aspect-video rounded-xl overflow-hidden border border-border shadow-sm">
+                        <iframe
+                          src={embedUrl}
+                          title={vid.title || "YouTube video player"}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                        />
+                      </div>
+                      {vid.title && <p className="text-sm font-medium text-foreground px-1">{vid.title}</p>}
+                    </div>
+                  );
+                })}
               </div>
             </section>
           )}

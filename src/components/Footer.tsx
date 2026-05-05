@@ -20,7 +20,7 @@ const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground py-14">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-5 gap-10">
+        <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-10">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <Leaf className="h-6 w-6 text-accent" />
@@ -55,6 +55,13 @@ const Footer = () => {
               <Link href="/gizlilik-politikasi" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Gizlilik Politikası</Link>
               <Link href="/kullanim-kosullari" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Kullanım Koşulları</Link>
               <Link href="/hesap-silme" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors underline decoration-destructive/30 decoration-dotted">Hesap Silme</Link>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-heading font-semibold mb-4 text-accent">Ansiklopedi</h4>
+            <div className="space-y-2.5">
+              <Link href="/bitkiler" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Bitki Rehberi</Link>
+              <Link href="/malzemeler" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Malzeme Ansiklopedisi</Link>
             </div>
           </div>
           <div>

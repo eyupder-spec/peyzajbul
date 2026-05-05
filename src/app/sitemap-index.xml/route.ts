@@ -34,6 +34,11 @@ export async function GET() {
   <sitemap>
     <loc>${baseUrl}/sitemap-plants.xml</loc>
   </sitemap>
+
+  <!-- Malzeme Ansiklopedisi -->
+  <sitemap>
+    <loc>${baseUrl}/sitemap-materials.xml</loc>
+  </sitemap>
 </sitemapindex>`;
 
   return new NextResponse(xml, {

@@ -249,6 +249,5 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
       </main>
       <Footer />
     </div>
-    </>
   );
 }

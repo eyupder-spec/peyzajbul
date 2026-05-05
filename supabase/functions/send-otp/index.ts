@@ -57,8 +57,11 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: "Peyzajbul <noreply@peyzajbul.com>",
         to: [email],
-        subject: "Doğrulama Kodunuz - Peyzajbul",
+        subject: `${code} - Peyzajbul Doğrulama Kodu`,
         html: `
+          <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+            Doğrulama kodunuz: ${code}. Teklif talebinizi tamamlamak için bu kodu kullanabilirsiniz.
+          </div>
           <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#ffffff;border-radius:12px;">
             <h1 style="color:#1a1a1a;font-size:24px;margin-bottom:8px;">Doğrulama Kodunuz</h1>
             <p style="color:#666;font-size:14px;margin-bottom:24px;">Teklif talebinizi tamamlamak için aşağıdaki kodu kullanın:</p>

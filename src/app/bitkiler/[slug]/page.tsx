@@ -60,16 +60,23 @@ export default async function BitkiDetayPage({ params }: { params: Promise<{ slu
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    "name": plant.name,
-    "description": plant.description || plant.scientific_name,
-    "image": plant.image_url ? [plant.image_url] : [],
-    "category": cat?.name || "Bitki",
-    "offers": {
-      "@type": "AggregateOffer",
-      "offerCount": firmPlants?.length || 0,
-      "availability": firmPlants?.length ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      "priceCurrency": "TRY"
+    "@type": "WebPage",
+    "name": `${plant.name} - Bakım Rehberi`,
+    "description": plant.description || `${plant.name} özellikleri ve bakım rehberi.`,
+    "image": allImages.length > 0 ? allImages : [],
+    "url": `https://www.peyzajbul.com/bitkiler/${slug}`,
+    "mainEntity": {
+      "@type": "Product",
+      "name": plant.name,
+      "description": plant.description || plant.scientific_name,
+      "image": plant.image_url || undefined,
+      "category": cat?.name,
+      "offers": {
+        "@type": "AggregateOffer",
+        "offerCount": firmPlants?.length || 0,
+        "availability": firmPlants?.length ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        "priceCurrency": "TRY"
+      }
     }
   };
 

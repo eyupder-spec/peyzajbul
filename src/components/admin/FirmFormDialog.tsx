@@ -525,7 +525,6 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                     />
                   </div>
                 </div>
-                </div>
               </div>
 
               {/* YouTube Videos */}

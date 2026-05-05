@@ -36,24 +36,22 @@ const LeadFormModal = ({ open, onClose, targetFirmId, targetFirmName }: LeadForm
   return (
     <>
       {/* Full-screen container */}
-      <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-sm flex flex-col">
+      <div className="fixed inset-0 z-[100] bg-background backdrop-blur-sm flex flex-col">
 
-        {/* Sticky close button bar - always visible at top */}
-        <div className="flex-shrink-0 flex justify-end px-4 pt-4 pb-2">
-          <button
-            onClick={handleCloseAttempt}
-            className="p-2.5 bg-background border border-border rounded-full shadow-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-            aria-label="Kapat"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        {/* Small absolute close button - never overlaps content */}
+        <button
+          onClick={handleCloseAttempt}
+          className="absolute top-3 right-3 z-10 p-1.5 bg-muted border border-border rounded-full shadow-md hover:bg-accent/10 transition-colors text-muted-foreground hover:text-foreground"
+          aria-label="Kapat"
+        >
+          <X className="h-4 w-4" />
+        </button>
 
-        {/* Scrollable widget content */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
+        {/* Widget fills available screen */}
+        <div className="flex-1 overflow-hidden">
           <LeadFormWidget
             onSuccess={onClose}
-            className="shadow-2xl border-primary/20"
+            className="shadow-none border-0 rounded-none md:rounded-2xl md:shadow-2xl md:border md:border-primary/20 md:max-w-xl md:mx-auto md:my-8"
             targetFirmId={targetFirmId}
             targetFirmName={targetFirmName}
           />

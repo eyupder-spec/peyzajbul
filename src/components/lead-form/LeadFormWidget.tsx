@@ -312,7 +312,7 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
   const progress = (step / TOTAL_STEPS) * 100;
 
   return (
-    <div className={`relative bg-card border border-border shadow-md rounded-2xl flex flex-col w-full max-w-xl mx-auto overflow-hidden ${className}`}>
+    <div className={`relative bg-card border border-border shadow-md rounded-2xl flex flex-col w-full max-w-xl mx-auto overflow-hidden h-full md:h-auto ${className}`}>
 
       {/* Firma Özel Banner */}
       {targetFirmName && (
@@ -333,8 +333,8 @@ export default function LeadFormWidget({ onSuccess, className = "", targetFirmId
         </div>
       </div>
 
-      {/* Orta Kısım: Form Adımları */}
-      <div className="p-6 md:px-8">
+      {/* Orta Kısım: Form Adımları - scrollable on mobile */}
+      <div className="p-6 md:px-8 flex-1 overflow-y-auto">
         {step === 1 && <StepProjectType data={data} onChange={updateData} />}
         {step === 2 && <StepServiceType data={data} onChange={updateData} />}
         {step === 3 && <StepScope data={data} onChange={updateData} />}

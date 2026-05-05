@@ -35,27 +35,30 @@ const LeadFormModal = ({ open, onClose, targetFirmId, targetFirmName }: LeadForm
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-sm flex flex-col p-4 md:p-8">
-      {/* Kapatma Butonu (Ayrı) */}
-      <div className="flex justify-end mb-4">
-        <button 
-          onClick={handleCloseAttempt} 
-          className="p-3 bg-background border border-border rounded-full shadow-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-        >
-          <X className="h-6 w-6" />
-        </button>
-      </div>
+      {/* Full-screen container */}
+      <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-sm flex flex-col">
 
-      {/* Widget'ın Kendisi */}
-      <div className="flex-1 overflow-y-auto">
-        <LeadFormWidget 
-          onSuccess={onClose} 
-          className="shadow-2xl border-primary/20"
-          targetFirmId={targetFirmId}
-          targetFirmName={targetFirmName}
-        />
+        {/* Sticky close button bar - always visible at top */}
+        <div className="flex-shrink-0 flex justify-end px-4 pt-4 pb-2">
+          <button
+            onClick={handleCloseAttempt}
+            className="p-2.5 bg-background border border-border rounded-full shadow-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            aria-label="Kapat"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Scrollable widget content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4">
+          <LeadFormWidget
+            onSuccess={onClose}
+            className="shadow-2xl border-primary/20"
+            targetFirmId={targetFirmId}
+            targetFirmName={targetFirmName}
+          />
+        </div>
       </div>
-    </div>
 
       <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
         <AlertDialogContent className="z-[110]">

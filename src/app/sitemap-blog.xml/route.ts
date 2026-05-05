@@ -10,11 +10,12 @@ export async function GET() {
 
   const { data: posts } = await supabase
     .from('blog_posts')
-    .select('slug, published_at')
+    .select('slug, published_at, cover_image_url, title')
     .eq('is_published', true);
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>${baseUrl}/blog</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
@@ -27,6 +28,11 @@ export async function GET() {
     <lastmod>${new Date(post.published_at || new Date()).toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+    ${post.cover_image_url ? `
+    <image:image>
+      <image:loc>${post.cover_image_url}</image:loc>
+      <image:title>${post.title}</image:title>
+    </image:image>` : ''}
   </url>`).join('')}
 </urlset>`;
 

@@ -173,7 +173,8 @@ const FirmaProjeler = () => {
     setCoverUploading(true);
     try {
       const optimized = await compressAndConvertToWebP(file);
-      const path = `covers/${projectId}/${Date.now()}.webp`;
+      const originalName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]+/g, "-").toLowerCase();
+      const path = `covers/${projectId}/${originalName}-${Date.now()}.webp`;
       const { error: upErr } = await supabase.storage.from("project-images").upload(path, optimized);
       if (upErr) throw upErr;
       const { data: { publicUrl } } = supabase.storage.from("project-images").getPublicUrl(path);
@@ -203,7 +204,8 @@ const FirmaProjeler = () => {
     setGalleryUploading(true);
     try {
       const optimized = await compressAndConvertToWebP(file);
-      const path = `gallery/${galleryProjectId}/${Date.now()}.webp`;
+      const originalName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]+/g, "-").toLowerCase();
+      const path = `gallery/${galleryProjectId}/${originalName}-${Date.now()}.webp`;
       const { error: upErr } = await supabase.storage.from("project-images").upload(path, optimized);
       if (upErr) throw upErr;
       const { data: { publicUrl } } = supabase.storage.from("project-images").getPublicUrl(path);

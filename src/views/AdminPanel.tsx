@@ -439,7 +439,8 @@ const AdminPanel = () => {
     setGalleryUploading(true);
     try {
       const ext = file.name.split(".").pop();
-      const path = `${adminGalleryFirmId}/${Date.now()}.${ext}`;
+      const originalName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]+/g, "-").toLowerCase();
+      const path = `${adminGalleryFirmId}/${originalName}-${Date.now()}.${ext}`;
       const { error: uploadError } = await supabase.storage.from("firm-gallery").upload(path, file);
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage.from("firm-gallery").getPublicUrl(path);
@@ -506,7 +507,8 @@ const AdminPanel = () => {
       let photoUrl: string | null = null;
       if (adminReviewPhoto) {
         const ext = adminReviewPhoto.name.split(".").pop();
-        const path = `${adminReviewsFirmId}/${Date.now()}.${ext}`;
+        const originalName = adminReviewPhoto.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]+/g, "-").toLowerCase();
+        const path = `${adminReviewsFirmId}/${originalName}-${Date.now()}.${ext}`;
         const { error: uploadError } = await supabase.storage.from("firm-reviews").upload(path, adminReviewPhoto);
         if (!uploadError) {
           const { data: urlData } = supabase.storage.from("firm-reviews").getPublicUrl(path);

@@ -104,11 +104,13 @@ const AdminBlogTab = () => {
     setCoverUploading(true);
     try {
       const ext = "webp";
-      const path = `covers/${Date.now()}.${ext}`;
+      const originalName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]+/g, "-").toLowerCase();
+      const fileName = `${originalName}-${Date.now()}.${ext}`;
+      const path = `covers/${fileName}`;
 
       // Görseli WebP'ye dönüştür ve sıkıştır
       const optimizedBlob = await compressAndConvertToWebP(file);
-      const optimizedFile = new File([optimizedBlob], `${Date.now()}.${ext}`, { type: "image/webp" });
+      const optimizedFile = new File([optimizedBlob], fileName, { type: "image/webp" });
 
       const { error } = await supabase.storage.from("blog-images").upload(path, optimizedFile);
       if (error) throw error;

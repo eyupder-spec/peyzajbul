@@ -185,7 +185,8 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
       let photoUrl: string | null = null;
       if (reviewPhoto) {
         const ext = reviewPhoto.name.split(".").pop();
-        const path = `${firm.id}/${Date.now()}.${ext}`;
+        const originalName = reviewPhoto.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]+/g, "-").toLowerCase();
+        const path = `${firm.id}/${originalName}-${Date.now()}.${ext}`;
         const { error: uploadError } = await supabase.storage
           .from("firm-reviews")
           .upload(path, reviewPhoto);

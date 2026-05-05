@@ -122,7 +122,8 @@ const FirmaUrunler = () => {
     setUploadingImage(true);
     try {
       const optimized = await compressAndConvertToWebP(file);
-      const path = `products/${firm.id}/${Date.now()}.webp`;
+      const originalName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]+/g, "-").toLowerCase();
+      const path = `products/${firm.id}/${originalName}-${Date.now()}.webp`;
       const { error: upErr } = await supabase.storage.from("project-images").upload(path, optimized);
       if (upErr) throw upErr;
       const { data: { publicUrl } } = supabase.storage.from("project-images").getPublicUrl(path);

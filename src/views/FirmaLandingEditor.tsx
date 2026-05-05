@@ -155,7 +155,8 @@ const FirmaLandingEditor = () => {
     setUploadingImage(true);
     try {
       const ext = file.name.split(".").pop();
-      const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+      const originalName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]+/g, "-").toLowerCase();
+      const uniqueName = `${originalName}-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
       const path = `${firmId}/premium/${folder}/${uniqueName}`;
 
       const { error: uploadError } = await supabase.storage.from("firm-logos").upload(path, file);

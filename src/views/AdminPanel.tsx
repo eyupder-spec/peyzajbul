@@ -235,6 +235,7 @@ const AdminPanel = () => {
   const [addCoinAmount, setAddCoinAmount] = useState("");
   const [addCoinDesc, setAddCoinDesc] = useState("Admin tarafından manuel yükleme");
   const [addingCoin, setAddingCoin] = useState(false);
+  const [pingingIndexNow, setPingingIndexNow] = useState(false);
 
   const checkAdmin = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -535,6 +536,24 @@ const AdminPanel = () => {
     }
   };
 
+  const handleIndexNowPing = async () => {
+    try {
+      setPingingIndexNow(true);
+      const response = await fetch("/api/admin/indexnow", { method: "POST" });
+      const data = await response.json();
+      
+      if (data.success) {
+        toast({ title: "Başarılı", description: `${data.count} adet URL arama motorlarına (IndexNow) başarıyla bildirildi.` });
+      } else {
+        throw new Error(data.error || "Bilinmeyen bir hata oluştu");
+      }
+    } catch (err: any) {
+      toast({ title: "Hata", description: err.message, variant: "destructive" });
+    } finally {
+      setPingingIndexNow(false);
+    }
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Yükleniyor...</p></div>;
   }
@@ -606,9 +625,21 @@ const AdminPanel = () => {
               <SidebarTrigger />
               <h1 className="font-heading text-lg font-bold text-foreground">{SIDEBAR_ITEMS.find(i => i.key === tab)?.title || "Admin"}</h1>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
-              <LogOut className="h-4 w-4" /> Çıkış
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleIndexNowPing} 
+                disabled={pingingIndexNow}
+                className="gap-2 border-primary/20 text-primary hover:bg-primary/10"
+              >
+                <Rocket className={`h-4 w-4 ${pingingIndexNow ? 'animate-pulse' : ''}`} />
+                {pingingIndexNow ? "Pingleniyor..." : "IndexNow Ping"}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
+                <LogOut className="h-4 w-4" /> Çıkış
+              </Button>
+            </div>
           </header>
 
           {/* Content */}

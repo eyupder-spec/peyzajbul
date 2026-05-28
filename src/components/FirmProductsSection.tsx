@@ -40,7 +40,7 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
 
   if (loadingPlants || loadingProducts) {
     return (
-      <div className="bg-card rounded-xl border border-border p-6 shadow-sm mb-16">
+      <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm mb-16">
         <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6 flex items-center gap-2">
           <div className="w-8 h-8 rounded-md bg-muted animate-pulse"></div>
           <div className="w-64 h-8 bg-muted rounded animate-pulse"></div>
@@ -66,13 +66,14 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
 
   return (
     <section className="mb-16">
-      <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6 flex items-center gap-2">
-        🛒 Ürünler & Bitkiler
-      </h2>
+      <div className="flex flex-col items-center text-center mb-10">
+        <span className="mb-3 text-primary border border-primary/20 bg-primary/5 uppercase tracking-wider text-xs font-semibold px-3 py-1 rounded-full">Katalog</span>
+        <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-800">Ürünler & Bitkiler</h2>
+      </div>
 
       {hasPlants && (
         <div className="mb-8">
-          <p className="text-sm font-semibold text-muted-foreground mb-4">🌿 Katalog Bitkiler</p>
+          <p className="text-sm font-semibold text-slate-500 mb-6 uppercase tracking-wider">🌿 Bitkiler</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {(firmPlants as any[]).map((fp: any) => {
               const plant = fp.plants;
@@ -82,7 +83,7 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
                 <Link
                   key={fp.plant_id || plant.id}
                   href={`/bitkiler/${plant.slug}`}
-                  className="group flex flex-col gap-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:shadow-md transition-all bg-card"
+                  className="group flex flex-col gap-3 p-5 rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-lg transition-all duration-300 bg-white shadow-sm hover:-translate-y-1"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{cat?.icon || "🌿"}</span>
@@ -106,13 +107,13 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
 
       {hasProducts && (
         <div>
-          <p className="text-sm font-semibold text-muted-foreground mb-4">📦 Diğer Ürünler</p>
+          <p className="text-sm font-semibold text-slate-500 mb-6 uppercase tracking-wider">📦 Diğer Ürünler</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {(firmProducts as any[]).map((product: any) => (
               <div 
                 key={product.id} 
                 onClick={() => { setSelectedProduct(product); setModalOpen(true); }}
-                className="flex flex-col rounded-xl border border-border overflow-hidden bg-card hover:shadow-md transition-shadow group cursor-pointer"
+                className="flex flex-col rounded-3xl border border-slate-100 overflow-hidden bg-white shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group cursor-pointer"
               >
                 {product.image_url ? (
                   <div className="aspect-[4/3] w-full relative overflow-hidden bg-muted">
@@ -144,7 +145,7 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
 
       {/* Product Details Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden bg-card rounded-2xl border-none">
+        <DialogContent className="max-w-3xl p-0 overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-2xl">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedProduct?.title}</DialogTitle>
             <DialogDescription>Ürün detayları</DialogDescription>

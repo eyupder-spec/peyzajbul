@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MapPin, Phone, Mail, Crown, Star, Globe, Eye, Instagram, Facebook, Youtube, Linkedin, Twitter, Building2, ArrowLeft, X, Camera, Send, CheckCircle, MessageCircle } from "lucide-react";
+import { MapPin, Phone, Mail, Crown, Star, Globe, Eye, Instagram, Facebook, Youtube, Linkedin, Twitter, Building2, ArrowLeft, X, Camera, Send, CheckCircle, MessageCircle, Leaf } from "lucide-react";
 import { extractFirmIdFromSlug, getSocialUrl } from "@/lib/firmUtils";
 import { useFirmGallery, useFirmReviews, useFirmProjects } from "@/hooks/useFirms";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -223,11 +223,49 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
   };
 
   return (
-    <main className="flex-1 pt-16">
+    <div className="flex flex-col min-h-screen bg-slate-50/50 font-body">
+      
+      {/* ═══════════════ FIRMA ÖZEL HEADER ═══════════════ */}
+      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-lg border-b border-border shadow-sm transition-all duration-300">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-primary/10 hover:text-primary transition-colors group shadow-sm" title="Peyzajbul'a Dön">
+              <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+            </Link>
+            <div className="h-6 w-px bg-border/60 mx-1"></div>
+            {firm.logo_url ? (
+              <img src={firm.logo_url} alt={firm.company_name} className="h-9 w-9 object-cover rounded-lg shadow-sm border border-border/50" />
+            ) : (
+              <div className="h-9 w-9 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Building2 className="h-5 w-5 text-primary" />
+              </div>
+            )}
+            <span className="font-heading font-bold text-lg text-slate-800 truncate max-w-[150px] sm:max-w-xs">{firm.company_name}</span>
+          </div>
+          
+          <div className="hidden md:flex items-center gap-6">
+            {sections.about && <button onClick={() => document.getElementById("hakkimizda")?.scrollIntoView({ behavior: "smooth" })} className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Hakkımızda</button>}
+            {sections.services && <button onClick={() => document.getElementById("hizmetler")?.scrollIntoView({ behavior: "smooth" })} className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Hizmetler</button>}
+            {sections.gallery && hasGallery && <button onClick={() => document.getElementById("galeri")?.scrollIntoView({ behavior: "smooth" })} className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Galeri</button>}
+            <button onClick={() => document.getElementById("iletisim")?.scrollIntoView({ behavior: "smooth" })} className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">İletişim</button>
+            <Button variant="gold" size="sm" onClick={() => setShowLeadModal(true)} className="gap-2 rounded-full shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 px-5">
+              <Crown className="h-4 w-4" /> Teklif Al
+            </Button>
+          </div>
+
+          <div className="md:hidden">
+            <Button variant="gold" size="sm" onClick={() => setShowLeadModal(true)} className="gap-1 rounded-full text-xs px-4 shadow-md">
+              Teklif Al
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1">
 
       {/* ═══════════════ HERO ═══════════════ */}
       {sections.hero && (
-        <section className="relative overflow-hidden">
+        <section className="relative overflow-hidden bg-white">
           {/* Background */}
           {config.hero_image ? (
             <div className="absolute inset-0">
@@ -310,13 +348,13 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
 
       {/* ═══════════════ TRUST BADGES ═══════════════ */}
       {sections.trust_badges && hasTrustBadges && (
-        <section className="bg-card border-b border-border">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-wrap justify-center gap-3">
+        <section className="bg-white border-b border-slate-100 shadow-sm relative z-10">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex flex-wrap justify-center gap-4">
               {(firm.trust_badges as { icon: string; label: string }[]).map((b, i) => (
                 <span
                   key={i}
-                  className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-full px-4 py-2 text-sm font-medium"
+                  className="flex items-center gap-2 bg-emerald-50/50 border border-emerald-100 text-emerald-800 rounded-full px-5 py-2.5 text-sm font-medium shadow-sm hover:shadow-md transition-shadow hover:-translate-y-0.5 duration-300"
                 >
                   <span className="text-lg">{b.icon}</span> {b.label}
                 </span>
@@ -326,21 +364,29 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
         </section>
       )}
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-5xl mx-auto space-y-16">
+      <div className="container mx-auto px-4 py-16 md:py-24">
+        <div className="max-w-5xl mx-auto space-y-24">
 
           {/* ═══════════════ ABOUT ═══════════════ */}
           {sections.about && firm.description && (
-            <section>
-              <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6">Hakkımızda</h2>
-              <p className="text-muted-foreground leading-relaxed text-lg whitespace-pre-wrap">{firm.description}</p>
+            <section id="hakkimizda" className="scroll-mt-24">
+              <div className="flex flex-col items-center text-center mb-10">
+                <Badge variant="outline" className="mb-3 text-primary border-primary/20 bg-primary/5 uppercase tracking-wider">Hakkımızda</Badge>
+                <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-800">Biz Kimiz?</h2>
+              </div>
+              <div className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-slate-100">
+                <p className="text-slate-600 leading-relaxed text-lg whitespace-pre-wrap">{firm.description}</p>
+              </div>
             </section>
           )}
 
           {/* ═══════════════ SERVICES ═══════════════ */}
           {sections.services && firm.services && firm.services.length > 0 && (
-            <section>
-              <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6">Hizmetlerimiz</h2>
+            <section id="hizmetler" className="scroll-mt-24">
+              <div className="flex flex-col items-center text-center mb-10">
+                <Badge variant="outline" className="mb-3 text-primary border-primary/20 bg-primary/5 uppercase tracking-wider">Uzmanlık Alanlarımız</Badge>
+                <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-800">Hizmetlerimiz</h2>
+              </div>
               <div className="flex flex-wrap gap-2 mb-8">
                 {firm.services.slice(0, showAllServices ? undefined : 6).map((s: string) => (
                   <Badge key={s} variant="secondary" className="text-sm py-2 px-4 shadow-sm">{s}</Badge>
@@ -351,7 +397,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                   </button>
                 )}
                 {showAllServices && firm.services.length > 6 && (
-                  <button onClick={() => setShowAllServices(false)} className="text-sm text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1 py-1 px-2">
+                  <button onClick={() => setShowAllServices(false)} className="text-sm text-slate-500 hover:text-slate-800 hover:underline flex items-center gap-1 py-1 px-2">
                     Daha Az
                   </button>
                 )}
@@ -359,11 +405,14 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
 
               {/* Detailed Services */}
               {sections.detailed_services && hasDetailedServices && (
-                <div className="grid md:grid-cols-2 gap-4 mt-6">
+                <div className="grid md:grid-cols-2 gap-6 mt-8">
                   {(firm.detailed_services as any[]).map((ds: any, i: number) => (
-                    <div key={i} className="bg-card rounded-xl border border-border p-6 hover:shadow-md transition-shadow">
-                      <h3 className="font-heading text-lg font-semibold text-foreground mb-2">{ds.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{ds.description}</p>
+                    <div key={i} className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+                      <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <Leaf className="h-6 w-6 text-primary" />
+                      </div>
+                      <h3 className="font-heading text-xl font-bold text-slate-800 mb-3">{ds.title}</h3>
+                      <p className="text-slate-600 leading-relaxed">{ds.description}</p>
                     </div>
                   ))}
                 </div>
@@ -378,8 +427,11 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
 
           {/* ═══════════════ BEFORE/AFTER ═══════════════ */}
           {sections.before_after && hasBeforeAfter && (
-            <section>
-              <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6">Önce / Sonra</h2>
+            <section className="scroll-mt-24">
+              <div className="flex flex-col items-center text-center mb-10">
+                <Badge variant="outline" className="mb-3 text-primary border-primary/20 bg-primary/5 uppercase tracking-wider">Değişimi Görün</Badge>
+                <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-800">Önce / Sonra</h2>
+              </div>
               <div
                 ref={sliderRef}
                 className="relative h-72 md:h-96 rounded-2xl overflow-hidden cursor-col-resize select-none shadow-lg border border-border"
@@ -468,7 +520,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                   <Link
                     key={p.id}
                     href={`/${p.category}/${citySlug}/${firm.slug}/${p.slug}`}
-                    className="group rounded-xl border border-border overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/50 transition-all flex flex-col bg-card"
+                    className="group rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/50 transition-all flex flex-col bg-white"
                   >
                     <div className="aspect-[16/9] relative bg-muted">
                       {p.cover_image ? (
@@ -495,10 +547,13 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
 
           {/* ═══════════════ GALLERY ═══════════════ */}
           {sections.gallery && hasGallery && (
-            <section>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Galeri</h2>
-                <Badge variant="outline" className="font-normal">{gallery!.length} Fotoğraf</Badge>
+            <section id="galeri" className="scroll-mt-24">
+              <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                <div>
+                  <Badge variant="outline" className="mb-3 text-primary border-primary/20 bg-primary/5 uppercase tracking-wider">Görseller</Badge>
+                  <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-800">Galeri</h2>
+                </div>
+                <Badge variant="secondary" className="font-medium bg-white text-slate-600 px-4 py-1.5 shadow-sm">{gallery!.length} Fotoğraf</Badge>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {gallery!.map((img) => (
@@ -528,7 +583,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
             {hasReviews && (
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 {reviews!.map((review: any) => (
-                  <div key={review.id} className="bg-card rounded-xl border border-border p-6 shadow-sm">
+                  <div key={review.id} className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                       <span className="font-semibold text-foreground">{review.reviewer_name}</span>
                       <div className="flex items-center gap-0.5">
@@ -559,7 +614,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
             )}
 
             {reviewFormOpen && !reviewSuccess && (
-              <div className="bg-card rounded-xl border border-border p-6 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="bg-white rounded-3xl border border-slate-100 p-8 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-heading text-lg font-semibold text-foreground">Yorum Bırakın</h3>
                   <button onClick={() => setReviewFormOpen(false)} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
@@ -622,7 +677,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
             )}
             
             {reviewSuccess && (
-              <div className="bg-card rounded-xl border border-border p-6 text-center py-10 mt-6">
+              <div className="bg-white rounded-3xl border border-slate-100 p-8 text-center py-12 mt-6 shadow-sm">
                 <div className="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
                   <CheckCircle className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
                 </div>
@@ -682,7 +737,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
               <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6">Sık Sorulan Sorular</h2>
               <Accordion type="single" collapsible className="space-y-2">
                 {(firm.faq_items as { question: string; answer: string }[]).map((faq, i) => (
-                  <AccordionItem key={i} value={`faq-${i}`} className="border border-border rounded-xl px-5 bg-card">
+                  <AccordionItem key={i} value={`faq-${i}`} className="border border-slate-100 rounded-2xl px-6 bg-white shadow-sm mb-3">
                     <AccordionTrigger className="text-sm font-medium text-left py-4">{faq.question}</AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-4">{faq.answer}</AccordionContent>
                   </AccordionItem>
@@ -712,11 +767,14 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
 
           {/* ═══════════════ CONTACT ═══════════════ */}
           {sections.contact && (
-            <section id="landing-contact">
-              <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6">İletişim</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-card rounded-xl border border-border p-6 space-y-4">
-                  <div className="space-y-3">
+            <section id="iletisim" className="scroll-mt-24">
+              <div className="flex flex-col items-center text-center mb-10">
+                <Badge variant="outline" className="mb-3 text-primary border-primary/20 bg-primary/5 uppercase tracking-wider">Bizimle İletişime Geçin</Badge>
+                <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-800">İletişim</h2>
+              </div>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm space-y-6">
+                  <div className="space-y-5">
                     {showPhone ? (
                       <a href={`tel:${firm.phone}`} className="flex items-center gap-3 text-foreground hover:text-primary transition-colors font-medium">
                         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><Phone className="h-5 w-5 text-primary" /></div>
@@ -781,7 +839,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
 
                   {/* Social Media */}
                   {sections.social_media && hasSocial && (
-                    <div className="bg-card rounded-xl border border-border p-6">
+                    <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
                       <p className="text-sm font-medium text-muted-foreground mb-4">Sosyal Medya</p>
                       <div className="flex items-center gap-4">
                         {firm.social_instagram && (
@@ -819,6 +877,83 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
 
         </div>
       </div>
+      </main>
+
+      {/* ═══════════════ FIRMA ÖZEL FOOTER ═══════════════ */}
+      <footer className="bg-slate-900 text-slate-300 py-12 mt-auto border-t border-slate-800">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 mb-4">
+                {firm.logo_url ? (
+                  <img src={firm.logo_url} alt={firm.company_name} className="h-10 w-10 object-cover rounded-lg bg-white p-0.5" />
+                ) : (
+                  <Building2 className="h-8 w-8 text-white" />
+                )}
+                <span className="font-heading font-bold text-xl text-white">{firm.company_name}</span>
+              </div>
+              <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
+                {firm.description ? firm.description.substring(0, 120) + "..." : `${firm.city} ${firm.district || ""} bölgesinde profesyonel peyzaj hizmetleri.`}
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">İletişim</h4>
+              <ul className="space-y-3 text-sm">
+                {firm.phone && (
+                  <li className="flex items-start gap-3">
+                    <Phone className="h-4 w-4 mt-0.5 text-primary" />
+                    <a href={`tel:${firm.phone}`} className="hover:text-white transition-colors">{firm.phone}</a>
+                  </li>
+                )}
+                {firm.email && (
+                  <li className="flex items-start gap-3">
+                    <Mail className="h-4 w-4 mt-0.5 text-primary" />
+                    <a href={`mailto:${firm.email?.replace(/^https?:\/\//, "")}`} className="hover:text-white transition-colors">{firm.email?.replace(/^https?:\/\//, "")}</a>
+                  </li>
+                )}
+                {firm.address && (
+                  <li className="flex items-start gap-3">
+                    <MapPin className="h-4 w-4 mt-0.5 text-primary" />
+                    <span>{firm.address}, {firm.city}{firm.district ? ` / ${firm.district}` : ""}</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-white font-semibold mb-4">Hızlı Menü</h4>
+              <ul className="space-y-2 text-sm">
+                {sections.about && <li><button onClick={() => document.getElementById("hakkimizda")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-white transition-colors">Hakkımızda</button></li>}
+                {sections.services && <li><button onClick={() => document.getElementById("hizmetler")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-white transition-colors">Hizmetlerimiz</button></li>}
+                {sections.gallery && hasGallery && <li><button onClick={() => document.getElementById("galeri")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-white transition-colors">Galeri</button></li>}
+                <li><button onClick={() => document.getElementById("iletisim")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-white transition-colors">İletişim</button></li>
+              </ul>
+            </div>
+
+            {hasSocial && (
+              <div>
+                <h4 className="text-white font-semibold mb-4">Sosyal Medya</h4>
+                <div className="flex items-center gap-3">
+                  {firm.social_instagram && <a href={getSocialUrl("instagram", firm.social_instagram)} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors"><Instagram className="h-4 w-4" /></a>}
+                  {firm.social_facebook && <a href={getSocialUrl("facebook", firm.social_facebook)} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors"><Facebook className="h-4 w-4" /></a>}
+                  {firm.social_x && <a href={getSocialUrl("x", firm.social_x)} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors"><Twitter className="h-4 w-4" /></a>}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+            <p>© {new Date().getFullYear()} {firm.company_name}. Tüm hakları saklıdır.</p>
+            <div className="flex items-center gap-2">
+              <span>Powered by</span>
+              <Link href="/" className="text-slate-400 hover:text-white font-medium transition-colors flex items-center gap-1.5">
+                <Leaf className="h-3 w-3" /> Peyzajbul
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
 
       {/* ═══════════════ LIGHTBOX ═══════════════ */}
       {selectedImage && (
@@ -828,14 +963,13 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
         </div>
       )}
 
-      {/* Direkt Teklif Modalı */}
       <LeadFormModal
         open={showLeadModal}
         onClose={() => setShowLeadModal(false)}
         targetFirmId={firm.id}
         targetFirmName={firm.company_name}
       />
-    </main>
+    </div>
   );
 };
 

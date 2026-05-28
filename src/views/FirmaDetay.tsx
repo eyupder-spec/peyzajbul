@@ -40,13 +40,13 @@ const FirmaDetay = ({ slug }: { slug?: string }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      {!isPremiumActive && <Navbar />}
       {isPremiumActive && slug ? (
         <PremiumLandingPage slug={slug} />
       ) : (
         <FirmDetailContent slug={slug} />
       )}
-      <Footer />
+      {!isPremiumActive && <Footer />}
     </div>
   );
 };

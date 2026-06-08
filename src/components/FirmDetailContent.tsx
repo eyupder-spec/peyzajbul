@@ -467,7 +467,7 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
             )}
 
             {/* ===== ÜRÜNLER (Bitkiler + Serbest Ürünler) ===== */}
-            {firm.is_premium && <FirmProductsSection firmId={firm.id} />}
+            {firm.is_premium && <FirmProductsSection firmId={firm.id} firmName={firm.company_name} firmLogoUrl={firm.logo_url || undefined} />}
 
 
             {/* Reviews */}

@@ -61,38 +61,71 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     notFound();
   }
 
+  const wordCount = post.content ? post.content.replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length : 0;
+  const articleBody = post.content ? post.content.replace(/<[^>]+>/g, "").substring(0, 500) : "";
+
   const schema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": post.title || "Başlıksız Yazı",
     "description": post.excerpt || "",
-    "image": post.cover_image_url ? [post.cover_image_url] : [],
+    "image": post.cover_image_url
+      ? [{
+          "@type": "ImageObject",
+          "url": post.cover_image_url,
+          "width": 1200,
+          "height": 630
+        }]
+      : [{
+          "@type": "ImageObject",
+          "url": "https://www.peyzajbul.com/og-image.jpg",
+          "width": 1200,
+          "height": 630
+        }],
+    "url": `https://www.peyzajbul.com/blog/${resolvedParams.slug}`,
+    "inLanguage": "tr-TR",
     "datePublished": post.published_at || post.created_at || new Date().toISOString(),
     "dateModified": post.updated_at || post.published_at || post.created_at || new Date().toISOString(),
-    "author": post.author_name ? [
-      {
-        "@type": "Person",
-        "name": post.author_name
-      }
-    ] : [
-      {
-        "@type": "Organization",
-        "name": "Peyzajbul",
-        "url": "https://www.peyzajbul.com"
-      }
-    ],
+    ...(wordCount > 0 ? { "wordCount": wordCount } : {}),
+    ...(articleBody ? { "articleBody": articleBody } : {}),
+    ...(post.tags && post.tags.length > 0 ? { "keywords": Array.isArray(post.tags) ? post.tags.join(", ") : post.tags } : { "keywords": "peyzaj, bahçe, peyzaj tasarım, bahçe bakımı" }),
+    "author": post.author_name
+      ? [{ "@type": "Person", "name": post.author_name }]
+      : [{ "@type": "Organization", "name": "Peyzajbul", "url": "https://www.peyzajbul.com" }],
     "publisher": {
       "@type": "Organization",
       "name": "Peyzajbul",
+      "url": "https://www.peyzajbul.com",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.peyzajbul.com/logo.png"
+        "url": "https://www.peyzajbul.com/icon.png",
+        "width": 512,
+        "height": 512
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": `https://www.peyzajbul.com/blog/${resolvedParams.slug}`
+    },
+    "isPartOf": {
+      "@type": "Blog",
+      "@id": "https://www.peyzajbul.com/blog",
+      "name": "Peyzajbul Blog",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Peyzajbul"
+      }
     }
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://www.peyzajbul.com" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.peyzajbul.com/blog" },
+      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://www.peyzajbul.com/blog/${resolvedParams.slug}` }
+    ]
   };
 
   return (
@@ -100,6 +133,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <BlogDetayClient post={post} />
     </>

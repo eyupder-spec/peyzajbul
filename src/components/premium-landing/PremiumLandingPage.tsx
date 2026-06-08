@@ -422,7 +422,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
 
           {/* ═══════════════ PRODUCTS ═══════════════ */}
           {sections.products && (
-            <FirmProductsSection firmId={firm.id} />
+            <FirmProductsSection firmId={firm.id} firmName={firm.company_name} firmLogoUrl={firm.logo_url || undefined} />
           )}
 
           {/* ═══════════════ BEFORE/AFTER ═══════════════ */}

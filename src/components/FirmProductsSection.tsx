@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
-export default function FirmProductsSection({ firmId }: { firmId: string }) {
+export default function FirmProductsSection({ firmId, firmName, firmLogoUrl }: { firmId: string; firmName?: string; firmLogoUrl?: string }) {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { data: firmPlants, isLoading: loadingPlants } = useQuery({
@@ -201,16 +201,20 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "ItemList",
-              "name": "Ürün Kataloğu",
+              "name": `${firmName ? firmName + ' ' : ''}Ürün Kataloğu`,
               "itemListElement": (firmProducts as any[]).map((product: any, index: number) => ({
                 "@type": "ListItem",
                 "position": index + 1,
                 "item": {
                   "@type": "Product",
                   "name": product.title,
+                  "image": product.image_url || firmLogoUrl || "https://www.peyzajbul.com/icon.png",
                   ...(product.description ? { "description": product.description } : {}),
-                  ...(product.image_url ? { "image": product.image_url } : {}),
                   ...(product.category ? { "category": product.category } : {}),
+                  "brand": {
+                    "@type": "Brand",
+                    "name": firmName || "Peyzajbul"
+                  },
                   ...(product.show_price && product.price_display ? {
                     "offers": {
                       "@type": "Offer",
@@ -220,7 +224,8 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
                       "availability": "https://schema.org/InStock",
                       "seller": {
                         "@type": "Organization",
-                        "name": "Peyzajbul"
+                        "name": firmName || "Peyzajbul",
+                        ...(firmLogoUrl ? { "logo": firmLogoUrl } : {})
                       }
                     }
                   } : {
@@ -245,7 +250,7 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "ItemList",
-              "name": "Bitki Kataloğu",
+              "name": `${firmName ? firmName + ' ' : ''}Bitki Kataloğu`,
               "itemListElement": (firmPlants as any[])
                 .filter((fp: any) => fp.plants)
                 .map((fp: any, index: number) => ({
@@ -254,8 +259,15 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
                   "item": {
                     "@type": "Product",
                     "name": fp.plants.name,
-                    ...(fp.plants.scientific_name ? { "description": fp.plants.scientific_name } : {}),
+                    "image": firmLogoUrl || "https://www.peyzajbul.com/icon.png",
+                    "description": fp.plants.scientific_name
+                      ? `${fp.plants.scientific_name} — ${fp.plants.plant_categories?.name || 'Bitki'}`
+                      : (fp.plants.plant_categories?.name || 'Peyzaj bitkisi'),
                     "url": `https://www.peyzajbul.com/bitkiler/${fp.plants.slug}`,
+                    "brand": {
+                      "@type": "Brand",
+                      "name": firmName || "Peyzajbul"
+                    },
                     ...(fp.show_price && fp.price_display ? {
                       "offers": {
                         "@type": "Offer",
@@ -263,7 +275,11 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
                         "price": fp.price_display.replace(/[^0-9.,]/g, "").replace(",", "."),
                         "availability": fp.stock_status === "limited"
                           ? "https://schema.org/LimitedAvailability"
-                          : "https://schema.org/InStock"
+                          : "https://schema.org/InStock",
+                        "seller": {
+                          "@type": "Organization",
+                          "name": firmName || "Peyzajbul"
+                        }
                       }
                     } : {})
                   }

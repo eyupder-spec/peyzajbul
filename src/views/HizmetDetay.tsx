@@ -40,19 +40,6 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <script type="application/ld+json">{JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Service",
-        "name": category.label,
-        "description": category.seoDescription,
-        "image": `https://www.peyzajbul.com${category.imageUrl}`,
-        "areaServed": { "@type": "Country", "name": "Türkiye" },
-        "provider": {
-          "@type": "Organization",
-          "name": "Peyzajbul"
-        },
-        "url": `https://www.peyzajbul.com/hizmetler/${category.slug}`
-      })}</script>
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="relative bg-primary py-24 overflow-hidden">

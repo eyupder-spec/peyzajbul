@@ -193,6 +193,85 @@ export default function FirmProductsSection({ firmId }: { firmId: string }) {
           )}
         </DialogContent>
       </Dialog>
+      {/* ─── Product + ItemList JSON-LD Schema ─── */}
+      {hasProducts && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              "name": "Ürün Kataloğu",
+              "itemListElement": (firmProducts as any[]).map((product: any, index: number) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "item": {
+                  "@type": "Product",
+                  "name": product.title,
+                  ...(product.description ? { "description": product.description } : {}),
+                  ...(product.image_url ? { "image": product.image_url } : {}),
+                  ...(product.category ? { "category": product.category } : {}),
+                  ...(product.show_price && product.price_display ? {
+                    "offers": {
+                      "@type": "Offer",
+                      "priceCurrency": "TRY",
+                      "price": product.price_display.replace(/[^0-9.,]/g, "").replace(",", "."),
+                      "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0],
+                      "availability": "https://schema.org/InStock",
+                      "seller": {
+                        "@type": "Organization",
+                        "name": "Peyzajbul"
+                      }
+                    }
+                  } : {
+                    "offers": {
+                      "@type": "Offer",
+                      "availability": product.is_active ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                      "priceCurrency": "TRY"
+                    }
+                  }),
+                }
+              }))
+            })
+          }}
+        />
+      )}
+
+      {/* ─── Plant ItemList JSON-LD Schema ─── */}
+      {hasPlants && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              "name": "Bitki Kataloğu",
+              "itemListElement": (firmPlants as any[])
+                .filter((fp: any) => fp.plants)
+                .map((fp: any, index: number) => ({
+                  "@type": "ListItem",
+                  "position": index + 1,
+                  "item": {
+                    "@type": "Product",
+                    "name": fp.plants.name,
+                    ...(fp.plants.scientific_name ? { "description": fp.plants.scientific_name } : {}),
+                    "url": `https://www.peyzajbul.com/bitkiler/${fp.plants.slug}`,
+                    ...(fp.show_price && fp.price_display ? {
+                      "offers": {
+                        "@type": "Offer",
+                        "priceCurrency": "TRY",
+                        "price": fp.price_display.replace(/[^0-9.,]/g, "").replace(",", "."),
+                        "availability": fp.stock_status === "limited"
+                          ? "https://schema.org/LimitedAvailability"
+                          : "https://schema.org/InStock"
+                      }
+                    } : {})
+                  }
+                }))
+            })
+          }}
+        />
+      )}
     </section>
   );
 }

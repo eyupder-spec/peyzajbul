@@ -586,49 +586,6 @@ const FirmDetailContent = ({ isModal = false, slug: propSlug }: FirmDetailConten
               )}
             </div>
 
-            {/* Schema Markup: AggregateRating + Reviews */}
-            {reviews && reviews.length > 0 && (
-              <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                  __html: JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "LocalBusiness",
-                    "name": firm.company_name,
-                    "address": {
-                      "@type": "PostalAddress",
-                      "addressLocality": firm.city,
-                      ...(firm.district ? { "addressRegion": firm.district } : {}),
-                    },
-                    ...(firm.logo_url ? { "image": firm.logo_url } : {}),
-                    "aggregateRating": {
-                      "@type": "AggregateRating",
-                      "ratingValue": avgRating,
-                      "reviewCount": reviews.length,
-                      "bestRating": "5",
-                      "worstRating": "1",
-                    },
-                    ...(firm.telephone || firm.phone ? { "telephone": firm.phone } : {}),
-                    ...(firm.website ? { "url": firm.website } : {}),
-                    ...(firm.description ? { "description": firm.description.substring(0, 150) } : {}),
-                    "review": reviews.map((r: any) => ({
-                      "@type": "Review",
-                      "author": { "@type": "Person", "name": r.reviewer_name },
-                      "reviewRating": {
-                        "@type": "Rating",
-                        "ratingValue": r.rating,
-                        "bestRating": "5",
-                        "worstRating": "1",
-                      },
-                      ...(r.comment ? { "reviewBody": r.comment } : {}),
-                      ...(r.photo_url ? { "image": r.photo_url } : {}),
-                      "datePublished": r.created_at?.split("T")[0],
-                    })),
-                  }),
-                }}
-              />
-            )}
-
             {/* F.A.Q. */}
             {firm.is_premium && (firm as any).faq_items && (firm as any).faq_items.length > 0 && (
               <div className="bg-card rounded-lg border border-border p-6">

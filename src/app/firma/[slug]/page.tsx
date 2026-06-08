@@ -52,19 +52,29 @@ export default async function FirmaDetayPage({ params }: { params: Promise<{ slu
   
   const { data: firm } = await supabase
     .from("firms")
-    .select("company_name, description, city, district, address, phone, email, logo_url")
+    .select("id, company_name, description, city, district, address, phone, email, website, logo_url")
     .eq("slug", slug)
     .single();
 
-  const jsonLd = firm ? {
+  let reviews: any[] = [];
+  if (firm) {
+    const { data } = await supabase
+      .from("firm_reviews")
+      .select("reviewer_name, rating, comment, created_at, photo_url")
+      .eq("firm_id", firm.id)
+      .eq("is_approved", true);
+    if (data) reviews = data;
+  }
+
+  const jsonLd: any = firm ? {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": firm.company_name,
     "image": firm.logo_url || "https://www.peyzajbul.com/icon.png",
     "@id": `https://www.peyzajbul.com/firma/${slug}`,
-    "url": `https://www.peyzajbul.com/firma/${slug}`,
-    "telephone": firm.phone,
-    "email": firm.email,
+    "url": firm.website || `https://www.peyzajbul.com/firma/${slug}`,
+    ...(firm.phone ? { "telephone": firm.phone } : {}),
+    ...(firm.email ? { "email": firm.email } : {}),
     "address": {
       "@type": "PostalAddress",
       "streetAddress": firm.address || "",
@@ -72,8 +82,32 @@ export default async function FirmaDetayPage({ params }: { params: Promise<{ slu
       "addressRegion": firm.city || "",
       "addressCountry": "TR"
     },
-    "description": firm.description || `${firm.city} ${firm.district || ""} peyzaj firması.`,
+    "description": firm.description ? firm.description.substring(0, 150) : `${firm.city} ${firm.district || ""} peyzaj firması.`,
   } : null;
+
+  if (jsonLd && reviews.length > 0) {
+    const avgRating = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+    jsonLd.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": avgRating,
+      "reviewCount": reviews.length,
+      "bestRating": "5",
+      "worstRating": "1",
+    };
+    jsonLd.review = reviews.map(r => ({
+      "@type": "Review",
+      "author": { "@type": "Person", "name": r.reviewer_name },
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": r.rating,
+        "bestRating": "5",
+        "worstRating": "1",
+      },
+      ...(r.comment ? { "reviewBody": r.comment } : {}),
+      ...(r.photo_url ? { "image": r.photo_url } : {}),
+      "datePublished": r.created_at?.split("T")[0],
+    }));
+  }
 
   return (
     <>

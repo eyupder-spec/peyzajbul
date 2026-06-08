@@ -62,22 +62,6 @@ const HizmetBolgeDetay = ({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <script type="application/ld+json">{JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Service",
-        "name": `${districtName || cityName} ${category.label}`,
-        "description": `${fullLocation} bölgesinde profesyonel ${category.label.toLowerCase()} hizmeti.`,
-        "image": `https://www.peyzajbul.com${category.imageUrl}`,
-        "areaServed": {
-          "@type": "City",
-          "name": cityName
-        },
-        "provider": {
-          "@type": "Organization",
-          "name": "Peyzajbul"
-        },
-        "url": `https://www.peyzajbul.com/hizmet/${category.slug}/${il}/${ilce || ''}`.replace(/\/$/, '')
-      })}</script>
       <Navbar />
       <main className="flex-1 pb-16">
         {/* BREADCRUMB & HERO STACKED WITH BACKGROUND */}

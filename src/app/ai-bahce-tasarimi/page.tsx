@@ -1,11 +1,5 @@
-import AIBahceOlusturucu from "@/views/AIBahceOlusturucu";
-import { Metadata } from "next";
+import { permanentRedirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "AI Bahçe Tasarımı | Peyzajbul",
-  description: "Yapay zeka desteğiyle saniyeler içinde hayalinizdeki bahçe konseptini oluşturun.",
-};
-
-export default function AIBahceTasarimiPage() {
-  return <AIBahceOlusturucu />;
+export default function Page() {
+  permanentRedirect("/maliyet-hesapla");
 }

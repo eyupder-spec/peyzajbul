@@ -1,14 +1,26 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+/// <reference lib="deno.ns" />
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+/**
+ * Writes a firm's "Hakkımızda" description with Gemini and saves it to firms.description.
+ *
+ * Auth: admins only (requireAdmin); authentication failures answer 401/403.
+ * Failures while generating or saving the text keep the historical shape
+ * HTTP 200 + {success:false, error, isDetailedError:true}, because the admin
+ * panel shows data.error to the admin.
+ * Secrets: GEMINI_API_KEY.
+ */
 
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+import { HttpError, requireAdmin } from "../_shared/auth.ts";
+import { readJson, serveSecure } from "../_shared/http.ts";
+import { clampText, isUuid } from "../_shared/security.ts";
+
+serveSecure(async (req) => {
+  const { admin } = await requireAdmin(req);
+
+  const body = await readJson(req);
+  const firmId = body.firmId;
+  if (!isUuid(firmId)) {
+    throw new HttpError(400, 'Geçersiz firma kimliği.');
   }
 
   try {
@@ -17,18 +29,8 @@ Deno.serve(async (req) => {
       throw new Error('Supabase üzerinde GEMINI_API_KEY tanımlanmamış.');
     }
 
-    const { firmId } = await req.json();
-    if (!firmId) {
-      throw new Error('Firm ID eksik.');
-    }
-
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
-
     // Fetch the firm to get its details
-    const { data: firm, error: firmError } = await supabaseAdmin
+    const { data: firm, error: firmError } = await admin
       .from('firms')
       .select('company_name, city, district, services')
       .eq('id', firmId)
@@ -55,14 +57,18 @@ KRİTİK KURALLAR (ÖZGÜNLÜK ŞARTTI):
 4. Firmanın ismine ve bulunduğu şehre/ilçeye özel bir kimlik yarat. Kimi zaman modern ve yenilikçi, kimi zaman köklü ve güvenilir bir dil seçerek her üretimde rastgele farklı bir marka tonu (tone of voice) kullan. Sayfadaki diğer AI metinlerine benzememesi için cümle yapılarını ve kelime dağarcığını zengin tut.
 `;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
     const response = await fetch(geminiUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY,
+      },
       body: JSON.stringify({
         contents: [{ parts: [{ text: promptText }] }]
       }),
+      signal: AbortSignal.timeout(60000),
     });
 
     const data = await response.json();
@@ -80,13 +86,13 @@ KRİTİK KURALLAR (ÖZGÜNLÜK ŞARTTI):
       }
     }
 
-    generatedText = generatedText.trim();
+    generatedText = clampText(generatedText, 2000);
     if (!generatedText) {
       throw new Error('Yapay zeka metin üretemedi.');
     }
 
     // Update the local database
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await admin
       .from('firms')
       .update({ description: generatedText })
       .eq('id', firmId);
@@ -95,16 +101,10 @@ KRİTİK KURALLAR (ÖZGÜNLÜK ŞARTTI):
       throw new Error(`Açıklama kaydedilirken veritabanı hatası: ${updateError.message}`);
     }
 
-    return new Response(JSON.stringify({ success: true, description: generatedText }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-
-  } catch (error: any) {
+    return { success: true, description: generatedText };
+  } catch (error) {
     console.error('[enrich-firm-profile] Error:', error);
-    return new Response(JSON.stringify({ success: false, error: error.message, isDetailedError: true }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    const message = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    return { success: false, error: message, isDetailedError: true };
   }
 });

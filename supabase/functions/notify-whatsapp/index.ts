@@ -1,77 +1,68 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+/// <reference lib="deno.ns" />
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://www.peyzajbul.com',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+/**
+ * Sends a WhatsApp text through a self-hosted WAHA instance.
+ *
+ * Auth: internal callers only (requireServiceSecret). The legacy database
+ * triggers (20260313030000_whatsapp_notifications.sql) authenticate with the
+ * service-role key, which requireServiceSecret also accepts.
+ *
+ * Secrets: INTERNAL_FUNCTION_SECRET. Optional: WAHA_API_URL (without it the
+ * function answers 200 {success:false} so triggers never fail), WAHA_API_KEY
+ * (sent as X-Api-Key), WAHA_SESSION (default "default"; a session in the
+ * request body is ignored).
+ *
+ * At most 3 messages per phone number and day (public.edge_rate_limit_hit).
+ */
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+import { adminClient, HttpError, rateLimit, requireServiceSecret } from "../_shared/auth.ts";
+import { readJson, serveSecure } from "../_shared/http.ts";
+import { clampText, normalizeTrMobile } from "../_shared/security.ts";
+
+serveSecure(async (req) => {
+  requireServiceSecret(req);
+
+  const wahaApiUrl = Deno.env.get("WAHA_API_URL");
+  if (!wahaApiUrl) {
+    console.warn("WAHA_API_URL is not configured. Messages will not be sent.");
+    // Returning 200 keeps database triggers from failing while WAHA is not configured.
+    return { success: false, error: "WAHA not configured" };
   }
 
+  const body = await readJson(req);
+  const phone = normalizeTrMobile(body.phone);
+  if (!phone) throw new HttpError(400, "Geçerli bir cep telefonu numarası gerekli.");
+  const message = clampText(body.message, 1000);
+  if (!message) throw new HttpError(400, "Mesaj gerekli.");
+
+  await rateLimit(adminClient(), `wa:${phone}`, 3, 86400);
+
+  const session = Deno.env.get("WAHA_SESSION") ?? "default";
+  const apiKey = Deno.env.get("WAHA_API_KEY");
+
+  console.log(`Sending WhatsApp message to ***${phone.slice(-4)} via ${session} session...`);
+
+  let response: Response;
   try {
-    const WAHA_API_URL = Deno.env.get('WAHA_API_URL');
-    // If you use an API key in WAHA, add it here
-    // const WAHA_API_KEY = Deno.env.get('WAHA_API_KEY');
-
-    if (!WAHA_API_URL) {
-      console.warn('WAHA_API_URL is not configured. Messages will not be sent.');
-      return new Response(JSON.stringify({ success: false, error: 'WAHA not configured' }), {
-        status: 200, // Returning 200 to prevent trigger failure if not configured
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const { phone, message, session = 'default' } = await req.json();
-
-    if (!phone || !message) {
-      throw new Error('Phone and message are required');
-    }
-
-    // Clean phone number (remove non-digits, ensure country code)
-    let cleanPhone = phone.replace(/\D/g, "");
-    if (cleanPhone.startsWith("05")) {
-      cleanPhone = "90" + cleanPhone.slice(1);
-    } else if (cleanPhone.startsWith("5")) {
-      cleanPhone = "90" + cleanPhone;
-    }
-
-    // WAHA API expects the destination in JID format or just the number depending on the endpoint
-    // We'll use the /api/sendText endpoint
-    const wahaUrl = `${WAHA_API_URL}/api/sendText`;
-    
-    console.log(`Sending WhatsApp message to ***${cleanPhone.slice(-4)} via ${session} session...`);
-
-    const response = await fetch(wahaUrl, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        // 'X-Api-Key': WAHA_API_KEY // Uncomment if needed
+    response = await fetch(`${wahaApiUrl.replace(/\/+$/, "")}/api/sendText`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(apiKey ? { "X-Api-Key": apiKey } : {}),
       },
-      body: JSON.stringify({
-        chatId: `${cleanPhone}@c.us`,
-        text: message,
-        session: session
-      }),
+      body: JSON.stringify({ chatId: `${phone}@c.us`, text: message, session }),
+      signal: AbortSignal.timeout(15000),
     });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(`WAHA API error [${response.status}]: ${JSON.stringify(data)}`);
-    }
-
-    return new Response(JSON.stringify({ success: true, data }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-
-  } catch (error) {
-    console.error('WhatsApp Notification Error:', error.message);
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+  } catch (err) {
+    console.error("WhatsApp Notification Error:", err instanceof Error ? err.message : "request failed");
+    throw new HttpError(502, "WhatsApp mesajı gönderilemedi.");
   }
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    console.error(`WhatsApp Notification Error: WAHA API responded with ${response.status}`);
+    throw new HttpError(502, "WhatsApp mesajı gönderilemedi.");
+  }
+
+  return { success: true, data };
 });

@@ -1,59 +1,96 @@
-const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://www.peyzajbul.com',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+/// <reference lib="deno.ns" />
 
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+/**
+ * Sends a new-lead notification to a firm's Telegram chat.
+ *
+ * Auth: internal callers only (requireServiceSecret). Legitimate callers are
+ * the database trigger notify_firms_on_new_lead (through
+ * invoke_internal_function) and the lead notification dispatcher.
+ *
+ * Secrets: TELEGRAM_BOT_TOKEN, INTERNAL_FUNCTION_SECRET.
+ * The chat_id must be stored in firms.telegram_chat_id, so even a leaked
+ * internal secret cannot turn the bot into a message relay.
+ */
 
+import { adminClient, HttpError, requireServiceSecret } from "../_shared/auth.ts";
+import { readJson, serveSecure } from "../_shared/http.ts";
+import { clampText, escapeHtml, isTelegramChatId } from "../_shared/security.ts";
+
+const FIELD_MAX = 120;
+
+function field(value: unknown, fallback = "-"): string {
+  return escapeHtml(clampText(value, FIELD_MAX)) || fallback;
+}
+
+serveSecure(async (req) => {
+  requireServiceSecret(req);
+
+  const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
+  if (!botToken) throw new Error("TELEGRAM_BOT_TOKEN is not configured");
+
+  const body = await readJson(req);
+  const chatId = typeof body.chat_id === "number" ? String(body.chat_id) : body.chat_id;
+  if (!isTelegramChatId(chatId)) throw new HttpError(400, "Geçersiz sohbet kimliği.");
+
+  const admin = adminClient();
+  const { data: firms, error } = await admin
+    .from("firms")
+    .select("telegram_chat_id")
+    .ilike("telegram_chat_id", `%${chatId}%`)
+    .limit(20);
+  if (error) throw error;
+  const isKnownChat = (firms ?? []).some((firm) =>
+    String(firm.telegram_chat_id ?? "").split(/[^\d-]+/).includes(chatId)
+  );
+  if (!isKnownChat) throw new HttpError(403, "Bilinmeyen sohbet kimliği.");
+
+  const rawScore = Number(body.lead_score);
+  const leadScore = Number.isFinite(rawScore) ? Math.min(100, Math.max(0, Math.round(rawScore))) : 0;
+  const scoreEmoji = leadScore >= 70 ? "🔥" : leadScore >= 50 ? "⚡" : "📋";
+  const district = clampText(body.district, FIELD_MAX);
+  const districtText = district ? ` / ${escapeHtml(district)}` : "";
+  const area = field(body.area_size, "") || field(body.project_size);
+
+  const message = [
+    `${scoreEmoji} <b>Yeni Müşteri Adayı!</b>`,
+    "",
+    `🏢 <b>${field(body.firm_name)}</b> için yeni bir talep geldi:`,
+    "",
+    `📌 <b>Hizmet:</b> ${field(body.service_type)}`,
+    `📍 <b>Konum:</b> ${field(body.city)}${districtText}`,
+    `💰 <b>Bütçe:</b> ${field(body.budget)}`,
+    `📐 <b>Alan:</b> ${area} m²`,
+    `⏰ <b>Zaman:</b> ${field(body.timeline)}`,
+    `📊 <b>Aday Skoru:</b> ${leadScore}/100`,
+    "",
+    "👉 Detayları görmek ve iletişim bilgilerini açmak için panele giriş yapın:",
+    "🔗 https://www.peyzajbul.com/firma/giris",
+  ].join("\n");
+
+  let response: Response;
   try {
-    const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN');
-    if (!TELEGRAM_BOT_TOKEN) {
-      throw new Error('TELEGRAM_BOT_TOKEN is not configured');
-    }
-
-    const { chat_id, firm_name, service_type, city, district, budget, project_size, area_size, timeline, lead_score } = await req.json();
-
-    if (!chat_id) {
-      throw new Error('chat_id is required');
-    }
-
-    const areaValue = area_size || project_size || '-';
-    const scoreEmoji = (lead_score ?? 0) >= 70 ? '🔥' : (lead_score ?? 0) >= 50 ? '⚡' : '📋';
-    const districtText = district ? ` / ${district}` : '';
-
-    const message = `${scoreEmoji} *Yeni Müşteri Adayı!*
-\n🏢 *${firm_name}* için yeni bir talep geldi:
-\n📌 *Hizmet:* ${service_type}\n📍 *Konum:* ${city}${districtText}\n💰 *Bütçe:* ${budget}\n📐 *Alan:* ${areaValue} m²\n⏰ *Zaman:* ${timeline}\n📊 *Aday Skoru:* ${lead_score ?? 0}/100
-\n👉 Detayları görmek ve iletişim bilgilerini açmak için panele giriş yapın:
-🔗 https://www.peyzajbul.com/firma/giris`;
-
-    const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-    const response = await fetch(telegramUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        chat_id,
+        chat_id: chatId,
         text: message,
-        parse_mode: 'Markdown',
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
       }),
+      signal: AbortSignal.timeout(15000),
     });
-
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(`Telegram API error [${response.status}]: ${JSON.stringify(data)}`);
-    }
-
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+  } catch {
+    // The error text of a failed fetch contains the request URL, and with it the bot token.
+    console.error("[notify-telegram] Telegram request failed before a response was received.");
+    throw new HttpError(502, "Telegram bildirimi gönderilemedi.");
   }
+
+  if (!response.ok) {
+    const details = await response.json().catch(() => null);
+    console.error(`[notify-telegram] Telegram API error [${response.status}]: ${details?.description ?? "unknown"}`);
+    throw new HttpError(502, "Telegram bildirimi gönderilemedi.");
+  }
+
+  return { success: true };
 });

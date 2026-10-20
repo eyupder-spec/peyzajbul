@@ -1,68 +1,28 @@
-// @ts-nocheck
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
+/// <reference lib="deno.ns" />
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://www.peyzajbul.com",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+/**
+ * DEPRECATED tombstone. Auth: any signed-in, non-anonymous user (requireUser).
+ *
+ * This function used to write the 'firm' role for any user_id in the request
+ * body without authentication. The role is now granted by the database
+ * trigger tr_firms_grant_firm_role when an admin approves the firm
+ * (migration 20261020090000_sec_p1_firms_guards.sql), so the function performs
+ * no database writes. It is kept only because the firm signup form still
+ * invokes it and treats an error as fatal.
+ *
+ * Remove it once the signup flow no longer calls it:
+ *   supabase functions delete assign-firm-role
+ * and delete the [functions.assign-firm-role] block from supabase/config.toml.
+ */
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+import { requireUser } from "../_shared/auth.ts";
+import { serveSecure } from "../_shared/http.ts";
 
-  try {
-    const { user_id } = await req.json();
-
-    if (!user_id) {
-      throw new Error("user_id eksik!");
-    }
-
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
-
-    // Update existing homeowner role to firm or insert new firm role
-    const { data: existingRole } = await supabaseAdmin
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user_id)
-      .eq("role", "homeowner")
-      .maybeSingle();
-
-    if (existingRole) {
-      const { error: updateError } = await supabaseAdmin
-        .from("user_roles")
-        .update({ role: "firm" })
-        .eq("user_id", user_id)
-        .eq("role", "homeowner");
-      if (updateError) throw updateError;
-    } else {
-      const { data: firmRole } = await supabaseAdmin
-        .from("user_roles")
-        .select("id")
-        .eq("user_id", user_id)
-        .eq("role", "firm")
-        .maybeSingle();
-      
-      if (!firmRole) {
-        const { error: insertError } = await supabaseAdmin
-          .from("user_roles")
-          .insert({ user_id: user_id, role: "firm" });
-        if (insertError) throw insertError;
-      }
-    }
-
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
-  }
+serveSecure(async (req) => {
+  await requireUser(req);
+  return {
+    success: true,
+    deprecated: true,
+    message: "Firma rolü artık yönetici onayında otomatik atanır.",
+  };
 });

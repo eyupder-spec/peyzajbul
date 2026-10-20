@@ -7,25 +7,54 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies and build output
 node_modules
 .next
 dist
 dist-ssr
-*.local
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+/out
+/build
+.vercel
+*.tsbuildinfo
 
-# Editor directories and files
+# Environment and secrets (only .env.example is tracked)
+.env
+.env.*
+!.env.example
+*.local
+
+# Supabase CLI local state (never tracked)
+supabase/.temp/
+supabase/.branches/
+
+# SQL POLICY: never ignore *.sql. supabase/migrations/**, supabase/schema.sql, supabase/seed.sql and supabase/tests/** MUST stay trackable (commit f2dedd4 hid the whole schema from git). Data dumps contain PII (leads, auth users): never commit them.
+*.dump
+*.backup
+*.sql.bak
+*.sql.gz
+/backups/
+/dump*.sql
+/backup*.sql
+*_data_dump.sql
+
+# Editors and OS
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-*.sql
+
+# Local agent tooling state (not part of the product)
+.wrongstack/
+.temp_files/
+.claude/settings.local.json
+
+# Scratch output
+/tmp/
+/lint_output*.txt
+/supabase_push_out.txt

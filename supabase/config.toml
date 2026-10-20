@@ -18,13 +18,8 @@ verify_jwt = false
 [functions.assign-firm-role]
 verify_jwt = false
 
-[functions.activate-premium]
-verify_jwt = false
-
 [functions.create-coin-checkout]
 verify_jwt = false
 
-[functions.create-lead-checkout]
-verify_jwt = false
 [functions.firecrawl-company]
 verify_jwt = false

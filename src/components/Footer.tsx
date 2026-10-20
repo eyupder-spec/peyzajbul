@@ -1,132 +1,146 @@
-import { Leaf, Mail, MessageSquare, MapPin, Instagram, Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
-
-const PinterestIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
-  </svg>
-);
+import { Fragment } from "react";
 import Link from "next/link";
+import { Leaf, Mail, MessageCircle, MapPin, Facebook, Twitter, Youtube } from "lucide-react";
+import { CookieSettingsButton } from "@/components/ConsentBanner";
+import { COOKIE_POLICY_PATH, HAS_COOKIE_POLICY_PAGE, PRIVACY_POLICY_PATH } from "@/lib/consent";
+import { supportWhatsAppUrl } from "@/lib/publicStats";
 
 const socialLinks = [
-  { href: "https://www.instagram.com/peyzajbul", label: "Instagram", icon: Instagram, hoverColor: "hover:text-[#E4405F]" },
-  { href: "https://www.facebook.com/peyzajbul", label: "Facebook", icon: Facebook, hoverColor: "hover:text-[#1877F2]" },
-  { href: "https://twitter.com/peyzajbul", label: "X (Twitter)", icon: Twitter, hoverColor: "hover:text-white" },
-  { href: "https://www.youtube.com/@peyzajbul", label: "YouTube", icon: Youtube, hoverColor: "hover:text-[#FF0000]" },
-  { href: "https://www.linkedin.com/company/peyzajbul", label: "LinkedIn", icon: Linkedin, hoverColor: "hover:text-[#0A66C2]" },
-  { href: "https://www.pinterest.com/peyzajbul", label: "Pinterest", icon: PinterestIcon, hoverColor: "hover:text-[#E60023]" },
+  { href: "https://www.facebook.com/peyzajbul", label: "Facebook", icon: Facebook },
+  { href: "https://twitter.com/peyzajbul", label: "X (Twitter)", icon: Twitter },
+  { href: "https://www.youtube.com/@peyzajbul", label: "YouTube", icon: Youtube },
 ];
+
+const discoverLinks = [
+  { label: "Firmalar", href: "/firmalar" },
+  { label: "Projeler", href: "/projeler" },
+  { label: "Rehber", href: "/blog" },
+  { label: "Bitki Rehberi", href: "/bitkiler" },
+  { label: "Malzeme Ansiklopedisi", href: "/malzemeler" },
+  { label: "İller", href: "/iller" },
+];
+
+const serviceLinks = [
+  { label: "İstanbul Peyzaj Mimarlığı", href: "/hizmet/peyzaj-mimarligi/istanbul" },
+  { label: "İstanbul Bahçe Tasarımı", href: "/hizmet/bahce-tasarimi/istanbul" },
+  { label: "Ankara Bahçe Bakımı", href: "/hizmet/bahce-bakimi/ankara" },
+  { label: "İzmir Çim Serme", href: "/hizmet/cim-serme/izmir" },
+  { label: "Tüm hizmetler", href: "/hizmetler" },
+];
+
+const firmLinks = [
+  { label: "Firmanı ekle", href: "/isletme-ekle" },
+  { label: "Fiyatlandırma", href: "/fiyatlandirma" },
+  { label: "Firma Girişi", href: "/firma/giris" },
+  { label: "Peyzaj Dijital Ajans", href: "/peyzaj-dijital-ajans" },
+];
+
+const LEGAL_LINKS = [
+  { label: "Gizlilik Politikası", href: PRIVACY_POLICY_PATH },
+  { label: "Kullanım Koşulları", href: "/kullanim-kosullari" },
+  ...(HAS_COOKIE_POLICY_PAGE ? [{ label: "Çerez Politikası", href: COOKIE_POLICY_PATH }] : []),
+  { label: "Hesap Silme", href: "/hesap-silme" },
+  { label: "Sürüm Notları", href: "/changelog" },
+];
+
+const linkClass =
+  "inline-flex min-h-11 items-center text-sm text-primary-foreground/75 transition-colors hover:text-primary-foreground hover:underline underline-offset-4 md:min-h-0 md:py-1";
+const legalLinkClass =
+  "inline-flex min-h-11 items-center text-xs text-primary-foreground/75 transition-colors hover:text-primary-foreground hover:underline underline-offset-4 md:min-h-0 md:py-1";
+const headingClass = "mb-3 text-sm font-semibold text-primary-foreground";
+
+const LinkColumn = ({ title, links }: { title: string; links: { label: string; href: string }[] }) => (
+  <div>
+    <h3 className={headingClass}>{title}</h3>
+    <ul>
+      {links.map(({ label, href }) => (
+        <li key={href}>
+          <Link href={href} className={linkClass}>
+            {label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 const Footer = () => {
   return (
-    <footer className="bg-primary text-primary-foreground py-14">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-10">
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <Leaf className="h-6 w-6 text-accent" />
-              <span className="font-heading text-xl font-bold text-accent">Peyzajbul</span>
+    <footer className="bg-forest-deep pt-14 text-primary-foreground md:py-16">
+      <div className="container mx-auto">
+        <div className="grid grid-cols-2 gap-10 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
+          <div className="col-span-2 lg:col-span-1">
+            <div className="mb-4 flex items-center gap-2">
+              <Leaf className="h-6 w-6 text-primary-foreground" />
+              <span className="font-display text-xl text-primary-foreground">Peyzajbul</span>
             </div>
-            <p className="text-sm text-primary-foreground/70 leading-relaxed italic">
-              Hayallerinizi yeşerten profesyonellerle tanışın. Türkiye'nin en büyük peyzaj platformunda, projeniz için en doğru uzmanı saniyeler içinde bulun.
+            <p className="max-w-xs text-sm leading-relaxed text-primary-foreground/75">
+              Peyzaj firmalarını karşılaştırın, ücretsiz teklif alın.
             </p>
-            <div className="flex items-center gap-3 mt-4">
-              {socialLinks.map(({ href, label, icon: Icon, hoverColor }) => (
+            <div className="-ml-3 mt-3 flex flex-wrap items-center">
+              {socialLinks.map(({ href, label, icon: Icon }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className={`text-primary-foreground/50 transition-colors ${hoverColor}`}
+                  className="flex h-11 w-11 items-center justify-center text-primary-foreground/75 transition-colors hover:text-primary-foreground"
                 >
                   <Icon className="h-5 w-5" />
                 </a>
               ))}
             </div>
           </div>
+
+          <LinkColumn title="Keşfet" links={discoverLinks} />
+          <LinkColumn title="Hizmetler" links={serviceLinks} />
+          <LinkColumn title="Firmalar İçin" links={firmLinks} />
+
           <div>
-            <h4 className="font-heading font-semibold mb-4 text-accent">Hızlı Bağlantılar</h4>
-            <div className="space-y-2.5">
-              <Link href="/" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Ana Sayfa</Link>
-              <Link href="/firmalar" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Firmalar</Link>
-              <Link href="/projeler" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Projeler</Link>
-              <Link href="/hizmetler" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Hizmetler</Link>
-              <Link href="/blog" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Blog</Link>
-              <Link href="/gizlilik-politikasi" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Gizlilik Politikası</Link>
-              <Link href="/kullanim-kosullari" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Kullanım Koşulları</Link>
-              <Link href="/hesap-silme" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors underline decoration-destructive/30 decoration-dotted">Hesap Silme</Link>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-heading font-semibold mb-4 text-accent">Ansiklopedi</h4>
-            <div className="space-y-2.5">
-              <Link href="/bitkiler" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Bitki Rehberi</Link>
-              <Link href="/malzemeler" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Malzeme Ansiklopedisi</Link>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-heading font-semibold mb-4 text-accent">Popüler Hizmetler</h4>
-            <div className="space-y-2.5">
-              <Link href="/hizmet/peyzaj-mimarligi/istanbul" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İstanbul Peyzaj Mimarlığı</Link>
-              <Link href="/hizmet/bahce-tasarimi/istanbul" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İstanbul Bahçe Tasarımı</Link>
-              <Link href="/hizmet/bahce-bakimi/ankara" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Ankara Bahçe Bakımı</Link>
-              <Link href="/hizmet/cim-serme/izmir" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İzmir Çim Serme</Link>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-heading font-semibold mb-4 text-accent">Firmalar İçin</h4>
-            <div className="space-y-2.5">
-              <Link href="/isletme-ekle" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İşletme Ekle</Link>
-              <Link href="/firma/giris" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Firma Giriş</Link>
-              <Link href="/iller" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">İller</Link>
-              <Link href="/changelog" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Yenilikler (Changelog)</Link>
-              <Link href="/peyzaj-dijital-ajans" className="block text-sm text-primary-foreground/70 hover:text-accent transition-colors">Peyzaj Dijital Ajans</Link>
-              <div className="pt-2">
-                <a href="https://play.google.com/store/apps/details?id=com.peyzajbul.firma" target="_blank" rel="noopener noreferrer" className="block transition-transform hover:scale-105">
-                  <img src="https://play.google.com/intl/en_us/badges/static/images/badges/tr_badge_web_generic.png" alt="Google Play'den alın" className="h-[52px] w-auto -ml-3" />
+            <h3 className={headingClass}>İletişim</h3>
+            <ul>
+              <li className="flex min-h-11 items-center text-sm text-primary-foreground/75 md:min-h-0 md:py-1">
+                OmniPure Marketing LLC
+              </li>
+              <li>
+                <a href="mailto:bilgi@peyzajbul.com" className={`${linkClass} gap-2`}>
+                  <Mail className="h-4 w-4 shrink-0" />
+                  bilgi@peyzajbul.com
                 </a>
-              </div>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-heading font-semibold mb-4 text-accent">İletişim</h4>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-primary-foreground/70">
-                <Mail className="h-4 w-4 text-accent/70" />
-                bilgi@peyzajbul.com
-              </div>
-              <a 
-                href="https://wa.me/905345957147" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-primary-foreground/70 hover:text-accent transition-colors"
-              >
-                <MessageSquare className="h-4 w-4 text-accent" />
-                WhatsApp Destek
-              </a>
-              <div className="flex items-center gap-2 text-sm text-primary-foreground/70">
-                <MapPin className="h-4 w-4 text-accent/70" />
+              </li>
+              <li>
+                <a href={supportWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className={`${linkClass} gap-2`}>
+                  <MessageCircle className="h-4 w-4 shrink-0" />
+                  WhatsApp Destek
+                </a>
+              </li>
+              <li className="flex min-h-11 items-center gap-2 text-sm text-primary-foreground/75 md:min-h-0 md:py-1">
+                <MapPin className="h-4 w-4 shrink-0" />
                 İstanbul, Türkiye
-              </div>
-            </div>
+              </li>
+            </ul>
           </div>
         </div>
-        <div className="border-t border-primary-foreground/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-primary-foreground/50">
-          <span>© 2026 Peyzajbul. Tüm hakları saklıdır.</span>
-          <div className="flex items-center gap-4">
-            {socialLinks.map(({ href, label, icon: Icon, hoverColor }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className={`transition-colors ${hoverColor}`}
-              >
-                <Icon className="h-4 w-4" />
-              </a>
+
+        <div className="mt-12 flex flex-col gap-x-6 gap-y-2 border-t border-primary-foreground/15 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-6 text-xs text-primary-foreground/75 md:mt-14 md:flex-row md:flex-wrap md:items-center md:justify-between md:pb-0">
+          <span>© {new Date().getFullYear()} Peyzajbul</span>
+          <ul className="flex flex-wrap items-center gap-x-5">
+            {LEGAL_LINKS.map(({ label, href }) => (
+              <Fragment key={href}>
+                <li>
+                  <Link href={href} className={legalLinkClass}>
+                    {label}
+                  </Link>
+                </li>
+                {href === COOKIE_POLICY_PATH && (
+                  <li>
+                    <CookieSettingsButton className={legalLinkClass} />
+                  </li>
+                )}
+              </Fragment>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </footer>

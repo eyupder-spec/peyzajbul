@@ -1,28 +1,15 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { submitToIndexNow } from "@/lib/indexnow";
+import { requireAdmin } from "../_lib/requireAdmin";
 
-export async function POST() {
+export const dynamic = "force-dynamic";
+
+export async function POST(req: Request) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+  const { supabase } = auth;
+
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
-    }
-
-    // Admin kontrolü
-    const { data: adminRole } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .single();
-
-    if (!adminRole) {
-      return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 403 });
-    }
-
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const dateStr = sevenDaysAgo.toISOString();
@@ -59,8 +46,8 @@ export async function POST() {
     }
 
     return NextResponse.json({ success: true, count: 0, message: "Yeni içerik bulunamadı" });
-  } catch (error: any) {
+  } catch (error) {
     console.error("IndexNow Route Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası." }, { status: 500 });
   }
 }

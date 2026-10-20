@@ -64,6 +64,34 @@ const DEFAULT_SECTIONS: LandingSections = {
 };
 
 /* ─────────────────────────────────────────────
+   SAFE URL HELPERS
+   google_maps_url is editable by the firm owner, so it is never used as an iframe source as-is.
+───────────────────────────────────────────── */
+function getHttpUrl(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  try {
+    const url = new URL(raw.trim());
+    return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function getSafeMapEmbedUrl(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  try {
+    const url = new URL(raw.trim());
+    if (url.protocol !== "https:") return null;
+    const isGoogleEmbed =
+      (url.hostname === "www.google.com" && url.pathname.startsWith("/maps/embed")) ||
+      (url.hostname === "maps.google.com" && url.searchParams.get("output") === "embed");
+    return isGoogleEmbed ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+/* ─────────────────────────────────────────────
    MAIN COMPONENT
 ───────────────────────────────────────────── */
 interface PremiumLandingPageProps {
@@ -163,7 +191,9 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
   const hasPortfolio = firm.portfolio_items && firm.portfolio_items.length > 0;
   const hasDetailedServices = firm.detailed_services && (firm.detailed_services as any[]).length > 0;
   const hasFaq = firm.faq_items && firm.faq_items.length > 0;
-  const hasGoogleMaps = !!firm.google_maps_url;
+  const mapEmbedUrl = getSafeMapEmbedUrl(firm.google_maps_url);
+  const mapLinkUrl = mapEmbedUrl ? null : getHttpUrl(firm.google_maps_url);
+  const hasGoogleMaps = !!(mapEmbedUrl || mapLinkUrl);
   const hasGallery = gallery && gallery.length > 0;
   const hasYoutubeVideos = firm.youtube_videos && (firm.youtube_videos as any[]).length > 0;
   const hasReviews = reviews && reviews.length > 0;
@@ -475,6 +505,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
                           title={vid.title || "YouTube video player"}
                           className="w-full h-full"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
                           allowFullScreen
                         />
                       </div>
@@ -707,18 +738,28 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
           {sections.google_maps && hasGoogleMaps && (
             <section>
               <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-6">Konum</h2>
-              <div className="rounded-2xl overflow-hidden border border-border shadow-sm">
-                <iframe
-                  src={firm.google_maps_url}
-                  width="100%"
-                  height="400"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title={`${firm.company_name} Konum`}
-                />
-              </div>
+              {mapEmbedUrl ? (
+                <div className="rounded-2xl overflow-hidden border border-border shadow-sm">
+                  <iframe
+                    src={mapEmbedUrl}
+                    width="100%"
+                    height="400"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    sandbox="allow-scripts allow-same-origin allow-popups"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={`${firm.company_name} Konum`}
+                  />
+                </div>
+              ) : mapLinkUrl ? (
+                <Button asChild variant="outline" className="rounded-xl">
+                  <a href={mapLinkUrl} target="_blank" rel="noopener noreferrer">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Haritada Göster
+                  </a>
+                </Button>
+              ) : null}
             </section>
           )}
 
@@ -923,6 +964,7 @@ const PremiumLandingPage = ({ slug }: PremiumLandingPageProps) => {
       <LeadFormModal
         open={showLeadModal}
         onClose={() => setShowLeadModal(false)}
+        source="firm_landing"
         targetFirmId={firm.id}
         targetFirmName={firm.company_name}
       />

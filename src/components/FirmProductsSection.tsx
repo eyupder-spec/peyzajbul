@@ -5,6 +5,39 @@ import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { JsonLd } from "@/lib/jsonLd";
+
+/**
+ * Turns a human price label ("1.250,50 ₺", "₺2.500", "1,5") into the plain numeric string
+ * schema.org expects ("1250.50", "2500", "1.5"). Returns null when no usable price is found
+ * ("Teklif alın"), so callers can omit the Offer instead of emitting an invalid one.
+ */
+function parseTryPrice(display: string): string | null {
+  // First number only, so ranges ("500 - 750 TL") and units ("100 TL/m2") are not glued together
+  const token = display.match(/\d[\d.,]*/)?.[0].replace(/[.,]+$/, "");
+  if (!token) return null;
+
+  const lastDot = token.lastIndexOf(".");
+  const lastComma = token.lastIndexOf(",");
+  let normalized: string;
+  if (lastDot !== -1 && lastComma !== -1) {
+    // Both present: the LAST separator is the decimal mark, the other one groups thousands
+    normalized = lastComma > lastDot
+      ? token.replace(/\./g, "").replace(",", ".")
+      : token.replace(/,/g, "");
+  } else if (lastComma !== -1) {
+    // Only commas: a single one is a decimal comma ("1,5"), several are thousands grouping
+    normalized = lastComma === token.indexOf(",") ? token.replace(",", ".") : token.replace(/,/g, "");
+  } else if (lastDot !== -1) {
+    // Only dots: "2.500" / "1.250.000" are thousands grouping, "12.5" is a decimal
+    normalized = /^\d{1,3}(\.\d{3})+$/.test(token) ? token.replace(/\./g, "") : token;
+  } else {
+    normalized = token;
+  }
+
+  const value = Number(normalized);
+  return Number.isFinite(value) && value > 0 ? normalized : null;
+}
 
 export default function FirmProductsSection({ firmId, firmName, firmLogoUrl }: { firmId: string; firmName?: string; firmLogoUrl?: string }) {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
@@ -193,16 +226,19 @@ export default function FirmProductsSection({ firmId, firmName, firmLogoUrl }: {
           )}
         </DialogContent>
       </Dialog>
-      {/* ─── Product + ItemList JSON-LD Schema ─── */}
+      {/*
+        Product + plant ItemList JSON-LD. NOTE: these only render after the react-query fetch above,
+        so they are not part of the server-rendered HTML; they should be lifted to the server page.
+      */}
       {hasProducts && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "ItemList",
-              "name": `${firmName ? firmName + ' ' : ''}Ürün Kataloğu`,
-              "itemListElement": (firmProducts as any[]).map((product: any, index: number) => ({
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": `${firmName ? firmName + ' ' : ''}Ürün Kataloğu`,
+            "itemListElement": (firmProducts as any[]).map((product: any, index: number) => {
+              const price = product.show_price && product.price_display ? parseTryPrice(product.price_display) : null;
+              return {
                 "@type": "ListItem",
                 "position": index + 1,
                 "item": {
@@ -215,11 +251,12 @@ export default function FirmProductsSection({ firmId, firmName, firmLogoUrl }: {
                     "@type": "Brand",
                     "name": firmName || "Peyzajbul"
                   },
-                  ...(product.show_price && product.price_display ? {
+                  // An Offer without a price is a Search Console error, so it is omitted entirely
+                  ...(price ? {
                     "offers": {
                       "@type": "Offer",
                       "priceCurrency": "TRY",
-                      "price": product.price_display.replace(/[^0-9.,]/g, "").replace(",", "."),
+                      "price": price,
                       "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0],
                       "availability": "https://schema.org/InStock",
                       "seller": {
@@ -228,32 +265,25 @@ export default function FirmProductsSection({ firmId, firmName, firmLogoUrl }: {
                         ...(firmLogoUrl ? { "logo": firmLogoUrl } : {})
                       }
                     }
-                  } : {
-                    "offers": {
-                      "@type": "Offer",
-                      "availability": product.is_active ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-                      "priceCurrency": "TRY"
-                    }
-                  }),
+                  } : {}),
                 }
-              }))
+              };
             })
           }}
         />
       )}
 
-      {/* ─── Plant ItemList JSON-LD Schema ─── */}
       {hasPlants && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "ItemList",
-              "name": `${firmName ? firmName + ' ' : ''}Bitki Kataloğu`,
-              "itemListElement": (firmPlants as any[])
-                .filter((fp: any) => fp.plants)
-                .map((fp: any, index: number) => ({
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": `${firmName ? firmName + ' ' : ''}Bitki Kataloğu`,
+            "itemListElement": (firmPlants as any[])
+              .filter((fp: any) => fp.plants)
+              .map((fp: any, index: number) => {
+                const price = fp.show_price && fp.price_display ? parseTryPrice(fp.price_display) : null;
+                return {
                   "@type": "ListItem",
                   "position": index + 1,
                   "item": {
@@ -268,11 +298,11 @@ export default function FirmProductsSection({ firmId, firmName, firmLogoUrl }: {
                       "@type": "Brand",
                       "name": firmName || "Peyzajbul"
                     },
-                    ...(fp.show_price && fp.price_display ? {
+                    ...(price ? {
                       "offers": {
                         "@type": "Offer",
                         "priceCurrency": "TRY",
-                        "price": fp.price_display.replace(/[^0-9.,]/g, "").replace(",", "."),
+                        "price": price,
                         "availability": fp.stock_status === "limited"
                           ? "https://schema.org/LimitedAvailability"
                           : "https://schema.org/InStock",
@@ -283,8 +313,8 @@ export default function FirmProductsSection({ firmId, firmName, firmLogoUrl }: {
                       }
                     } : {})
                   }
-                }))
-            })
+                };
+              })
           }}
         />
       )}

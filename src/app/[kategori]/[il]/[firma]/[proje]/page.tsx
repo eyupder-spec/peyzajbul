@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getCategoryBySlug } from "@/lib/categories";
+import { JsonLd } from "@/lib/jsonLd";
 import ProjeDetayClient from "@/views/ProjeDetay";
 
 type Params = {
@@ -97,5 +98,82 @@ export default async function ProjeDetayPage(
   props: { params: Promise<Params> }
 ) {
   const params = await props.params;
-  return <ProjeDetayClient params={params} />;
+  const { kategori, il, firma, proje } = params;
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // Fetch project (server-side for SSR)
+  const { data: project } = await (supabase.from as any)("projects")
+    .select("*")
+    .eq("slug", proje)
+    .eq("status", "published")
+    .single();
+
+  let initialFirm: any = null;
+  let initialImages: any[] = [];
+  let initialRelated: any[] = [];
+  let initialTotalProjects = 0;
+
+  if (project) {
+    // Fetch firm
+    const { data: firmData } = await supabase
+      .from("firms")
+      .select("id, company_name, slug, city, district, phone, logo_url, avg_rating, review_count")
+      .eq("id", project.firm_id)
+      .single();
+    if (firmData) initialFirm = firmData;
+
+    // Fetch images
+    const { data: imgData } = await (supabase.from as any)("project_images")
+      .select("*")
+      .eq("project_id", project.id)
+      .order("sort_order", { ascending: true });
+    initialImages = (imgData as any[]) || [];
+
+    // Related projects (same firm, max 3)
+    const { data: relData } = await (supabase.from as any)("projects")
+      .select("id, title, slug, cover_image, category, city")
+      .eq("firm_id", project.firm_id)
+      .eq("status", "published")
+      .neq("id", project.id)
+      .limit(3);
+    initialRelated = (relData as any[]) || [];
+
+    // Total count
+    const { count } = await (supabase.from as any)("projects")
+      .select("id", { count: "exact", head: true })
+      .eq("firm_id", project.firm_id)
+      .eq("status", "published");
+    initialTotalProjects = count ?? 0;
+  }
+
+  // BreadcrumbList JSON-LD
+  const cat = getCategoryBySlug(project?.category || "");
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://www.peyzajbul.com" },
+      { "@type": "ListItem", "position": 2, "name": "Projeler", "item": "https://www.peyzajbul.com/projeler" },
+      ...(cat ? [{ "@type": "ListItem", "position": 3, "name": cat.label, "item": `https://www.peyzajbul.com/hizmetler/${cat.slug}` }] : []),
+      ...(project ? [{ "@type": "ListItem", "position": cat ? 4 : 3, "name": project.title, "item": `https://www.peyzajbul.com/${kategori}/${il}/${firma}/${proje}` }] : []),
+    ]
+  };
+
+  return (
+    <>
+      <JsonLd data={breadcrumbLd} />
+      <ProjeDetayClient
+        params={params}
+        initialProject={project as any || null}
+        initialFirm={initialFirm}
+        initialImages={initialImages}
+        initialRelated={initialRelated}
+        initialTotalProjects={initialTotalProjects}
+      />
+    </>
+  );
 }

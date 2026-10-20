@@ -6,6 +6,16 @@ import { Loader2, Globe, Check, Image as ImageIcon, DownloadCloud } from "lucide
 import { toast } from "sonner";
 import { compressAndConvertToWebP } from "@/lib/imageUtils";
 
+const AUTH_ERROR_MESSAGE = "Oturumunuz sona ermiş veya admin yetkiniz yok. Sayfayı yenileyip tekrar giriş yapın.";
+
+// Thrown when the proxy answers 401/403 so the whole batch stops instead of failing image by image.
+class AdminAuthError extends Error {
+  constructor() {
+    super(AUTH_ERROR_MESSAGE);
+    this.name = "AdminAuthError";
+  }
+}
+
 interface FirmPhotoCrawlerProps {
   firmId: string;
   firmWebsite: string;
@@ -50,7 +60,13 @@ export default function FirmPhotoCrawler({ firmId, firmWebsite, firmName, firmSl
         toast.info("Resim bulunamadı veya site taramaya izin vermedi.");
       }
     } catch (err: any) {
-      toast.error(err.message || "Görsel tarama başarısız oldu.");
+      // supabase-js FunctionsHttpError carries the failed Response in `context`
+      const status = err?.context?.status;
+      if (status === 401 || status === 403) {
+        toast.error(AUTH_ERROR_MESSAGE);
+      } else {
+        toast.error(err.message || "Görsel tarama başarısız oldu.");
+      }
     } finally {
       setCrawling(false);
     }
@@ -77,17 +93,25 @@ export default function FirmPhotoCrawler({ firmId, firmWebsite, firmName, firmSl
     
     setUploading(true);
     let successCount = 0;
-    let failCount = 0;
     let baseOrder = currentGalleryCount;
+
+    // Proxy yalnızca https adreslerini indirir; http olanlar baştan başarısız sayılır
+    const httpsUrls = Array.from(selectedPhotos).filter((u) => /^https:\/\//i.test(u));
+    let failCount = selectedPhotos.size - httpsUrls.length;
+    let authExpired = false;
 
     // Toast'da izlemek için promise tipinde tutalım
     const promise = new Promise(async (resolve, reject) => {
-      for (const url of Array.from(selectedPhotos)) {
+      for (const url of httpsUrls) {
         try {
           // A. Proxy üzerinden görseli indir
           const fetchRes = await fetch(`/api/admin/fetch-image?url=${encodeURIComponent(url)}`);
-          if (!fetchRes.ok) throw new Error("Görsel indirilemedi.");
-          
+          if (fetchRes.status === 401 || fetchRes.status === 403) throw new AdminAuthError();
+          if (!fetchRes.ok) {
+            const errBody = await fetchRes.json().catch(() => null);
+            throw new Error(errBody?.error || "Görsel indirilemedi.");
+          }
+
           const blob = await fetchRes.blob();
           
           // Blob'ı File objesine çevir (compressAndConvertToWebP fonksiyonunun bekleği tip)
@@ -134,12 +158,20 @@ export default function FirmPhotoCrawler({ firmId, firmWebsite, firmName, firmSl
 
           successCount++;
         } catch (error) {
+          if (error instanceof AdminAuthError) {
+            authExpired = true;
+            break;
+          }
           console.error("Görsel işleme/yükleme hatası:", url, error);
           failCount++;
         }
       }
 
-      if (successCount > 0) {
+      if (authExpired) {
+        // Oturum yarıda düştüyse o ana kadar yüklenenler galeride görünsün
+        if (successCount > 0) onUploadSuccess();
+        reject(new AdminAuthError());
+      } else if (successCount > 0) {
         resolve(`${successCount} görsel yüklendi. ${failCount > 0 ? `(${failCount} başarısız)` : ''}`);
       } else {
         reject(new Error(`Görseller yüklenemedi. (${failCount} başarısız)`));
@@ -236,7 +268,7 @@ export default function FirmPhotoCrawler({ firmId, firmWebsite, firmName, firmSl
                   onClick={() => toggleSelect(url)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt={`Scrapped ${i}`} className={`w-full h-full object-cover transition-transform ${selected ? 'opacity-100 scale-105' : 'opacity-70 group-hover:opacity-100'}`} />
+                  <img src={url} alt={`Taranan görsel ${i + 1}`} referrerPolicy="no-referrer" loading="lazy" className={`w-full h-full object-cover transition-transform ${selected ? 'opacity-100 scale-105' : 'opacity-70 group-hover:opacity-100'}`} />
                   
                   <div className={`absolute top-1 right-1 h-5 w-5 rounded-full flex items-center justify-center border transition-colors ${selected ? 'bg-primary border-primary text-primary-foreground' : 'bg-background/80 border-muted-foreground/50 text-transparent group-hover:border-primary/50'}`}>
                     <Check className="h-3 w-3" />

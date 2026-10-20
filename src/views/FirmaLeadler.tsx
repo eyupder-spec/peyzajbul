@@ -1,227 +1,81 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
-import { Coins, Eye, ArrowLeft, Crown } from "lucide-react";
+import { Coins, Eye, ArrowLeft, Inbox } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getScoreBadge, getScoreBreakdown } from "@/lib/leadScoring";
+import { AREA_LABELS, BUDGET_LABELS, SERVICE_LABELS, getLeadLabel } from "@/lib/formatLead";
+import { formatNumber } from "@/lib/pricing";
+import { LeadPreviewDialog } from "@/app/firma/leadler/_shared/LeadPreviewDialog";
+import { LeadPriceButton } from "@/app/firma/leadler/_shared/LeadPriceButton";
+import { useFirmLeads } from "@/app/firma/leadler/_shared/useFirmLeads";
+import { useLeadPurchase } from "@/app/firma/leadler/_shared/useLeadPurchase";
 import {
-  SERVICE_LABELS,
-  PROJECT_TYPE_LABELS,
-  PROPERTY_TYPE_LABELS,
-  CONDITION_LABELS,
-  BUDGET_LABELS,
-  TIMELINE_LABELS,
-  AREA_LABELS,
-  IRRIGATION_TYPE_LABELS,
-  IRRIGATION_SYSTEM_LABELS,
-  WATER_SOURCE_LABELS,
-  getLeadLabel
-} from "@/lib/formatLead";
+  OUTCOME_LABELS,
+  getFomoMessage,
+  getStatusLabel,
+  getStatusVariant,
+  markAssignmentViewed,
+  type Lead,
+} from "@/app/firma/leadler/_shared/leadHelpers";
 
-type Lead = {
-  id: string;
-  created_at: string;
-  service_type: string;
-  project_size: string;
-  budget: string;
-  timeline: string;
-  city: string;
-  district: string | null;
-  full_name: string;
-  phone: string;
-  email: string;
-  lead_score: number | null;
-  status: string;
-  project_type?: string | null;
-  property_type?: string | null;
-  current_condition?: string | null;
-  address?: string | null;
-  notes?: string | null;
-  scope?: string[] | null;
-  irrigation_type?: string | null;
-  irrigation_system?: string | null;
-  water_source?: string | null;
-  photo_urls?: string[] | null;
-  total_purchases?: number | null;
-  token_price?: number;
-  admin_approved?: boolean;
-  target_firm_id?: string | null;
-};
+const REALTIME_CHANNEL = "firm-leadler-realtime";
 
-const getFomoMessage = (count: number): { text: string; className: string; icon: string } => {
-  if (count === 0) return { text: "Henüz kimse almadı — ilk siz ulaşın!", icon: "✅", className: "text-emerald-600 bg-emerald-50 border-emerald-200" };
-  if (count === 1) return { text: "1 firma satın aldı — hemen alın!", icon: "⚡", className: "text-amber-600 bg-amber-50 border-amber-200" };
-  if (count === 2) return { text: "2 firma satın aldı — son şans!", icon: "🔥", className: "text-red-600 bg-red-50 border-red-200" };
-  return { text: "3 firma satın aldı — kapasite doldu!", icon: "🚫", className: "text-muted-foreground bg-muted border-border opacity-70" };
-};
-
-const maskName = (name: string) => {
-  const parts = name.split(" ");
-  return parts.map((p) => p[0] + "**").join(" ");
-};
-
-const maskPhone = (phone: string) => {
-  if (phone.length < 4) return "****";
-  return phone.slice(0, 2) + "** *** **" + phone.slice(-2);
-};
-
-// Score rendering now uses imported getScoreBadge + getScoreBreakdown
-
-const getStatusLabel = (status: string) => {
-  switch (status) {
-    case "active": return "Yeni";
-    case "purchased": return "Satın Alındı";
-    case "expired": return "Süresi Doldu";
-    default: return status;
-  }
-};
-
-const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-  switch (status) {
-    case "active": return "default";
-    case "purchased": return "secondary";
-    case "expired": return "destructive";
-    default: return "outline";
-  }
-};
-
-const FirmaLeadlerContent = () => {
+const FirmaLeadler = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { toast } = useToast();
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [purchasedLeadIds, setPurchasedLeadIds] = useState<Set<string>>(new Set());
-  const [leadPurchaseCounts, setLeadPurchaseCounts] = useState<Record<string, number>>({});
-  const [loading, setLoading] = useState(true);
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [purchasing, setPurchasing] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [firmId, setFirmId] = useState<string | null>(null);
   const [coinBalance, setCoinBalance] = useState(0);
-  const [firmId, setFirmId] = useState<string>("");
-  const [userId, setUserId] = useState<string>("");
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+
+  const { leads, purchasedIds, purchaseCounts, outcomes, refundStatuses, loading, loadError, reload } = useFirmLeads(
+    userId,
+    firmId,
+    REALTIME_CHANNEL,
+  );
 
   useEffect(() => {
-    const purchasedId = searchParams ? searchParams.get("purchased") : null;
-    if (purchasedId) {
-      toast({ title: "Ödeme başarılı!", description: "Lead bilgileri açıldı." });
-    }
-  }, [searchParams, toast]);
+    const checkAccess = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/");
+        return;
+      }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/"); return; }
-      setUserId(user.id);
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "firm");
+      if (!roles || roles.length === 0) {
+        router.push("/");
+        return;
+      }
 
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "firm");
-
-      if (!roles || roles.length === 0) { router.push("/"); return; }
-
-      const { data: firm } = await supabase
-        .from("firms")
-        .select("id, coin_balance")
-        .eq("user_id", user.id)
-        .single();
+      const { data: firm } = await supabase.from("firms").select("id, coin_balance").eq("user_id", user.id).single();
       setCoinBalance(firm?.coin_balance || 0);
       setFirmId(firm?.id || "");
-
-      const { data: leadsData } = await supabase
-        .from("leads_for_firms" as any)
-        .select("*")
-        .order("created_at", { ascending: false }) as { data: Lead[] | null };
-
-      setLeads(leadsData || []);
-
-      const { data: purchases } = await supabase
-        .from("lead_purchases")
-        .select("lead_id")
-        .eq("firm_id", user.id);
-
-      setPurchasedLeadIds(new Set(purchases?.map((p) => p.lead_id) || []));
-
-      // Fetch all purchase counts per lead for FOMO
-      const { data: allPurchases } = await supabase
-        .from("lead_purchases")
-        .select("lead_id");
-
-      const counts: Record<string, number> = {};
-      allPurchases?.forEach((p) => {
-        counts[p.lead_id] = (counts[p.lead_id] || 0) + 1;
-      });
-      setLeadPurchaseCounts(counts);
-
-      setLoading(false);
-
-      // Supabase Realtime Subscription
-      const channel = supabase
-        .channel("firm-leadler-realtime")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "leads" },
-          () => {
-            fetchData(); // Yeni lead gelirse vb listeyi tazele
-          }
-        )
-        .on(
-          "postgres_changes",
-          { event: "INSERT", schema: "public", table: "lead_purchases" },
-          (payload) => {
-            const newPurchase = payload.new as any;
-            setLeadPurchaseCounts(prev => ({ 
-              ...prev, 
-              [newPurchase.lead_id]: (prev[newPurchase.lead_id] || 0) + 1 
-            }));
-            fetchData(); // Satın alım olduğunda görünüm de güncellensin
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
+      setUserId(user.id);
     };
-    
-    let cleanupFn: (() => void) | undefined;
-    fetchData().then(cleanup => { cleanupFn = cleanup; });
-    return () => {
-      if (cleanupFn) cleanupFn();
-    };
+    void checkAccess();
   }, [router]);
 
-  const handlePurchase = async (leadId: string) => {
-    if (coinBalance < 20) {
-      toast({ title: "Yetersiz Jeton", description: "Lütfen jeton yükleyin.", variant: "destructive" });
-      router.push("/firma/jeton");
-      return;
-    }
-    setPurchasing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("spend-coins", {
-        body: { lead_id: leadId },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      setCoinBalance(data.new_balance);
-      setPurchasedLeadIds((prev) => new Set([...prev, leadId]));
-      toast({ title: "Lead açıldı!", description: `Kalan bakiye: ${data.new_balance} jeton` });
-    } catch (err: any) {
-      toast({ title: "Hata", description: err.message, variant: "destructive" });
-    } finally {
-      setPurchasing(false);
-    }
+  const selectedLead = leads.find((lead) => lead.id === selectedLeadId) ?? null;
+
+  const openLead = (lead: Lead) => {
+    setSelectedLeadId(lead.id);
+    if (lead.assignment_id && !lead.viewed_at) markAssignmentViewed(lead.id);
   };
+
+  const { purchasing, buy: handlePurchase } = useLeadPurchase({
+    coinBalance,
+    onBalanceChange: setCoinBalance,
+    reload,
+  });
 
   if (loading) {
     return (
@@ -234,148 +88,137 @@ const FirmaLeadlerContent = () => {
     );
   }
 
+  const renderStatus = (lead: Lead, isPurchased: boolean, compact: boolean) => {
+    const count = purchaseCounts?.[lead.id];
+    const fomo = !isPurchased && count !== undefined ? getFomoMessage(count) : null;
+    const outcome = outcomes[lead.id]?.outcome;
+    return (
+      <div className={`flex flex-col gap-1 ${compact ? "items-end" : ""}`}>
+        <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
+          {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
+        </Badge>
+        {isPurchased && outcome && <Badge variant="outline">{OUTCOME_LABELS[outcome]}</Badge>}
+        {lead.target_firm_id && lead.target_firm_id === firmId && <Badge variant="outline">Size özel</Badge>}
+        {lead.phone_verified === true && <Badge variant="outline">Telefon doğrulandı</Badge>}
+        {fomo && (
+          <span className={`inline-flex items-center text-xs font-medium px-1.5 py-0.5 rounded border ${fomo.className}`}>
+            {fomo.text}
+          </span>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       <Navbar />
       <div className="min-h-screen pt-20 bg-background">
         <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-8 gap-3">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" onClick={() => router.push("/firma/panel")}>
+              <Button variant="ghost" size="icon" onClick={() => router.push("/firma/panel")} aria-label="Panele dön">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <h1 className="text-3xl font-bold text-foreground">Lead Listesi</h1>
+              <h1 className="font-heading text-3xl font-semibold text-foreground">Lead Listesi</h1>
             </div>
             <Button variant="outline" onClick={() => router.push("/firma/jeton")} className="gap-2">
               <Coins className="h-4 w-4" />
-              <span className="font-semibold">{coinBalance} Jeton</span>
+              <span className="font-semibold">{formatNumber(coinBalance)} Jeton</span>
             </Button>
           </div>
 
           {/* Desktop table */}
-          <div className="hidden lg:block">
-            <div className="rounded-lg border border-border overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Tarih</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Hizmet</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Büyüklük</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Bütçe</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">İl</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">İlçe</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Ad Soyad</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Telefon</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Skor</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Durum</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Aksiyon</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {leads.map((lead) => {
-                    const isPurchased = purchasedLeadIds.has(lead.id);
-                    return (
-                      <tr key={lead.id} className="hover:bg-muted/50 transition-colors">
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          {new Date(lead.created_at).toLocaleDateString("tr-TR")}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-foreground">{getLeadLabel(SERVICE_LABELS, lead.service_type)}</td>
-                        <td className="px-4 py-3 text-sm text-foreground">{getLeadLabel(AREA_LABELS, lead.project_size)}</td>
-                        <td className="px-4 py-3 text-sm text-foreground">{getLeadLabel(BUDGET_LABELS, lead.budget)}</td>
-                        <td className="px-4 py-3 text-sm text-foreground">{lead.city}</td>
-                        <td className="px-4 py-3 text-sm text-foreground">{lead.district || "-"}</td>
-                        <td className="px-4 py-3 text-sm text-foreground">{lead.full_name}</td>
-                        <td className="px-4 py-3 text-sm text-foreground">{lead.phone}</td>
-                        <td className="px-4 py-3">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium cursor-help ${getScoreBadge(lead.lead_score).className}`}>
-                                {getScoreBadge(lead.lead_score).emoji} {lead.lead_score || 0}
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              <p className="font-semibold mb-1">{getScoreBadge(lead.lead_score).label}</p>
-                              {getScoreBreakdown(lead).map((item, i) => (
-                                <div key={i} className="flex justify-between text-xs gap-4">
-                                  <span>{item.label}</span>
-                                  <span className="font-mono">+{item.points}</span>
-                                </div>
-                              ))}
-                            </TooltipContent>
-                          </Tooltip>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-foreground">
-                          <div className="flex flex-col gap-1">
-                            <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
-                              {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
-                            </Badge>
-                            {lead.target_firm_id && lead.target_firm_id === firmId && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200 w-fit">
-                                <Crown className="h-3 w-3" /> Size Özel Teklif
-                              </span>
-                            )}
-                            {!isPurchased && (() => {
-                              const fomo = getFomoMessage(leadPurchaseCounts[lead.id] || 0);
-                              return (
-                                <span className={`inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded border animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ${fomo.className}`}>
-                                  {fomo.icon} {fomo.text}
+          {leads.length > 0 && (
+            <div className="hidden lg:block">
+              <div className="rounded-lg border border-border overflow-hidden bg-card">
+                <table className="w-full">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Tarih</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Hizmet</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Büyüklük</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Bütçe</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">İl</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">İlçe</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Ad Soyad</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Telefon</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Skor</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Durum</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Aksiyon</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {leads.map((lead) => {
+                      const isPurchased = purchasedIds.has(lead.id);
+                      const score = getScoreBadge(lead.lead_score);
+                      return (
+                        <tr key={lead.id} className="hover:bg-muted/50 transition-colors duration-150">
+                          <td className="px-4 py-3 text-sm text-foreground">{new Date(lead.created_at).toLocaleDateString("tr-TR")}</td>
+                          <td className="px-4 py-3 text-sm text-foreground">{getLeadLabel(SERVICE_LABELS, lead.service_type)}</td>
+                          <td className="px-4 py-3 text-sm text-foreground">{getLeadLabel(AREA_LABELS, lead.project_size)}</td>
+                          <td className="px-4 py-3 text-sm text-foreground">{getLeadLabel(BUDGET_LABELS, lead.budget)}</td>
+                          <td className="px-4 py-3 text-sm text-foreground">{lead.city}</td>
+                          <td className="px-4 py-3 text-sm text-foreground">{lead.district || "-"}</td>
+                          <td className="px-4 py-3 text-sm text-foreground">{lead.full_name}</td>
+                          <td className="px-4 py-3 text-sm text-foreground">{lead.phone}</td>
+                          <td className="px-4 py-3">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium cursor-help ${score.className}`}>
+                                  {score.emoji} {lead.lead_score || 0}
                                 </span>
-                              );
-                            })()}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          {isPurchased ? (
-                            <Button size="sm" variant="outline" onClick={() => setSelectedLead(lead)} className="w-full">
-                              <Eye className="h-4 w-4 mr-1" /> İncele
-                            </Button>
-                          ) : (
-                            <div className="flex gap-2">
-                              <Button size="sm" variant="outline" onClick={() => setSelectedLead(lead)}>
-                                <Eye className="h-4 w-4 mr-1" /> Önizle
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p className="font-semibold mb-1">{score.label}</p>
+                                {getScoreBreakdown(lead).map((item) => (
+                                  <div key={item.label} className="flex justify-between text-xs gap-4">
+                                    <span>{item.label}</span>
+                                    <span className="font-mono">+{item.points}</span>
+                                  </div>
+                                ))}
+                              </TooltipContent>
+                            </Tooltip>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-foreground">{renderStatus(lead, isPurchased, false)}</td>
+                          <td className="px-4 py-3">
+                            {isPurchased ? (
+                              <Button size="sm" variant="outline" onClick={() => openLead(lead)} className="w-full min-h-11">
+                                <Eye className="h-4 w-4" /> İncele
                               </Button>
-                              <Button size="sm" onClick={() => handlePurchase(lead.id)} disabled={purchasing || (leadPurchaseCounts[lead.id] || 0) >= 3}>
-                                <Coins className="h-4 w-4 mr-1" /> {(leadPurchaseCounts[lead.id] || 0) >= 3 ? "Tükendi" : `${lead.token_price || 20} Jeton`}
-                              </Button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                            ) : (
+                              <div className="flex gap-2">
+                                <Button size="sm" variant="outline" className="min-h-11" onClick={() => openLead(lead)}>
+                                  <Eye className="h-4 w-4" /> Önizle
+                                </Button>
+                                <LeadPriceButton
+                                  lead={lead}
+                                  purchaseCount={purchaseCounts?.[lead.id] ?? null}
+                                  busy={purchasing}
+                                  onBuy={handlePurchase}
+                                />
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Mobile cards */}
           <div className="lg:hidden space-y-4">
             {leads.map((lead) => {
-              const isPurchased = purchasedLeadIds.has(lead.id);
+              const isPurchased = purchasedIds.has(lead.id);
               return (
                 <Card key={lead.id} className="border-border">
                   <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-start justify-between gap-2">
                       <CardTitle className="text-sm">{getLeadLabel(SERVICE_LABELS, lead.service_type)}</CardTitle>
-                      <div className="flex flex-col items-end gap-1">
-                        <Badge variant={getStatusVariant(isPurchased ? "purchased" : lead.status)}>
-                          {isPurchased ? "Satın Alındı" : getStatusLabel(lead.status)}
-                        </Badge>
-                        {lead.target_firm_id && lead.target_firm_id === firmId && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
-                            <Crown className="h-3 w-3" /> Size Özel
-                          </span>
-                        )}
-                      </div>
+                      {renderStatus(lead, isPurchased, true)}
                     </div>
-                    {!isPurchased && (() => {
-                      const fomo = getFomoMessage(leadPurchaseCounts[lead.id] || 0);
-                      return (
-                        <span className={`inline-flex items-center text-xs font-medium px-2 py-1 rounded border mt-1 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ${fomo.className}`}>
-                          {fomo.icon} {fomo.text}
-                        </span>
-                      );
-                    })()}
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="grid grid-cols-2 gap-2 text-sm">
@@ -386,18 +229,22 @@ const FirmaLeadlerContent = () => {
                     </div>
                     {isPurchased ? (
                       <div className="pt-2">
-                        <Button size="sm" variant="outline" className="w-full" onClick={() => setSelectedLead(lead)}>
-                          <Eye className="h-4 w-4 mr-1" /> Detayları İncele
+                        <Button size="sm" variant="outline" className="w-full min-h-11" onClick={() => openLead(lead)}>
+                          <Eye className="h-4 w-4" /> Detayları İncele
                         </Button>
                       </div>
                     ) : (
                       <div className="flex gap-2 pt-2">
-                        <Button size="sm" variant="outline" className="flex-1" onClick={() => setSelectedLead(lead)}>
-                          <Eye className="h-4 w-4 mr-1" /> Önizle
+                        <Button size="sm" variant="outline" className="flex-1 min-h-11" onClick={() => openLead(lead)}>
+                          <Eye className="h-4 w-4" /> Önizle
                         </Button>
-                        <Button size="sm" className="flex-1" onClick={() => handlePurchase(lead.id)} disabled={purchasing}>
-                          <Coins className="h-4 w-4 mr-1" /> {lead.token_price || 20} Jeton
-                        </Button>
+                        <LeadPriceButton
+                          lead={lead}
+                          purchaseCount={purchaseCounts?.[lead.id] ?? null}
+                          busy={purchasing}
+                          onBuy={handlePurchase}
+                          className="flex-1"
+                        />
                       </div>
                     )}
                   </CardContent>
@@ -406,15 +253,25 @@ const FirmaLeadlerContent = () => {
             })}
           </div>
 
-          {leads.length === 0 && (
+          {leads.length === 0 && loadError && (
             <div className="text-center py-16 space-y-4">
-              <div className="text-4xl">🔍</div>
-              <h3 className="text-lg font-semibold text-foreground">Henüz eşleşen lead bulunmuyor</h3>
+              <h3 className="text-lg font-semibold text-foreground">Talepler yüklenemedi</h3>
+              <p className="text-muted-foreground text-sm max-w-md mx-auto">Bağlantınızı kontrol edip tekrar deneyin.</p>
+              <Button variant="outline" className="min-h-11" onClick={() => void reload()}>
+                Yeniden dene
+              </Button>
+            </div>
+          )}
+
+          {leads.length === 0 && !loadError && (
+            <div className="text-center py-16 space-y-4">
+              <Inbox className="h-10 w-10 mx-auto text-muted-foreground/50" aria-hidden="true" />
+              <h3 className="text-lg font-semibold text-foreground">Henüz size yönlendirilen talep yok</h3>
               <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                Profilinizde kayıtlı il ve hizmetlerinizle eşleşen yeni talepler geldiğinde burada görünecek.
-                Hizmetlerinizi veya ilinizi güncellemek için profil sayfanızı ziyaret edin.
+                Profilinizdeki il ve hizmetlerle eşleşen yeni talepler size yönlendirildiğinde burada görünür. Hizmetlerinizi veya
+                ilinizi güncellemek için profil sayfanızı ziyaret edin.
               </p>
-              <Button variant="outline" onClick={() => router.push("/firma/profil")} className="gap-2">
+              <Button variant="outline" onClick={() => router.push("/firma/profil")} className="min-h-11">
                 Profili Düzenle
               </Button>
             </div>
@@ -422,182 +279,20 @@ const FirmaLeadlerContent = () => {
         </div>
       </div>
 
-      {/* Lead Preview Modal */}
-      <Dialog open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
-          <DialogHeader>
-            <DialogTitle>Lead Önizleme</DialogTitle>
-            <DialogDescription className="sr-only">
-              Müşteri talebinin detaylarını ve skorunu inceleyin.
-            </DialogDescription>
-          </DialogHeader>
-          {selectedLead && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Proje Türü</p>
-                  <p className="font-medium text-foreground">{getLeadLabel(PROJECT_TYPE_LABELS, selectedLead.project_type)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Hizmet Türü</p>
-                  <p className="font-medium text-foreground">{getLeadLabel(SERVICE_LABELS, selectedLead.service_type)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Mülk Tipi</p>
-                  <p className="font-medium text-foreground">{getLeadLabel(PROPERTY_TYPE_LABELS, selectedLead.property_type)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Alan Büyüklüğü</p>
-                  <p className="font-medium text-foreground">{getLeadLabel(AREA_LABELS, selectedLead.project_size)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Mevcut Durum</p>
-                  <p className="font-medium text-foreground">{getLeadLabel(CONDITION_LABELS, selectedLead.current_condition)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Bütçe</p>
-                  <p className="font-medium text-foreground">{getLeadLabel(BUDGET_LABELS, selectedLead.budget)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Zaman Çizelgesi</p>
-                  <p className="font-medium text-foreground">{getLeadLabel(TIMELINE_LABELS, selectedLead.timeline)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Konum</p>
-                  <p className="font-medium text-foreground">{selectedLead.district ? `${selectedLead.city}, ${selectedLead.district}` : selectedLead.city}</p>
-                </div>
-
-                {selectedLead.service_type === "sulama-sistemi" && (
-                  <>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Sulama Türü</p>
-                      <p className="font-medium text-foreground">{getLeadLabel(IRRIGATION_TYPE_LABELS, selectedLead.irrigation_type)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Sulama Sistemi</p>
-                      <p className="font-medium text-foreground">{getLeadLabel(IRRIGATION_SYSTEM_LABELS, selectedLead.irrigation_system)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Su Kaynağı</p>
-                      <p className="font-medium text-foreground">{getLeadLabel(WATER_SOURCE_LABELS, selectedLead.water_source)}</p>
-                    </div>
-                  </>
-                )}
-
-                {selectedLead.scope && selectedLead.scope.length > 0 && (
-                  <div className="col-span-2">
-                    <p className="text-sm text-muted-foreground">Kapsam</p>
-                    <p className="font-medium text-foreground">{selectedLead.scope.map(s => s.replace(/-/g, " ")).join(", ")}</p>
-                  </div>
-                )}
-
-                {selectedLead.notes && (
-                  <div className="col-span-2">
-                    <p className="text-sm text-muted-foreground">Notlar</p>
-                    <p className="font-medium text-foreground">{selectedLead.notes}</p>
-                  </div>
-                )}
-
-                {selectedLead.photo_urls && selectedLead.photo_urls.length > 0 && (
-                  <div className="col-span-2">
-                    <p className="text-sm text-muted-foreground mb-2">Görseller</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {selectedLead.photo_urls.map((url, i) => (
-                        <div key={i} onClick={() => setSelectedPhoto(url)} className="block overflow-hidden rounded-md border border-border hover:opacity-80 transition-opacity cursor-pointer">
-                          <img src={url} alt={`Görsel ${i + 1}`} className="w-24 h-24 object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t border-border pt-4">
-                <p className="text-sm text-muted-foreground mb-2">Kişisel Bilgiler (Gizli)</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Ad Soyad</p>
-                    <p className="font-medium text-foreground">{selectedLead.full_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Telefon</p>
-                    <p className="font-medium text-foreground">{selectedLead.phone}</p>
-                  </div>
-                  {selectedLead.address && (
-                    <div className="col-span-2">
-                      <p className="text-sm text-muted-foreground">Adres</p>
-                      <p className="font-medium text-foreground">{selectedLead.address}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">Lead Skoru:</p>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium cursor-help ${getScoreBadge(selectedLead.lead_score).className}`}>
-                      {getScoreBadge(selectedLead.lead_score).emoji} {selectedLead.lead_score || 0} — {getScoreBadge(selectedLead.lead_score).label}
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    {getScoreBreakdown(selectedLead).map((item, i) => (
-                      <div key={i} className="flex justify-between text-xs gap-4">
-                        <span>{item.label}</span>
-                        <span className="font-mono">+{item.points}</span>
-                      </div>
-                    ))}
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-
-              {selectedLead && !purchasedLeadIds.has(selectedLead.id) && (() => {
-                const fomo = getFomoMessage(leadPurchaseCounts[selectedLead.id] || 0);
-                return (
-                  <div className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded border animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ${fomo.className}`}>
-                    {fomo.icon} {fomo.text}
-                  </div>
-                );
-              })()}
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedLead(null)}>Kapat</Button>
-            {selectedLead && !purchasedLeadIds.has(selectedLead.id) && (
-              <Button onClick={() => handlePurchase(selectedLead.id)} disabled={purchasing}>
-                <Coins className="h-4 w-4 mr-2" />
-                Lead Aç ({selectedLead.token_price || 20} Jeton)
-              </Button>
-            )}
-            {selectedLead && purchasedLeadIds.has(selectedLead.id) && (
-              <Button variant="default" onClick={() => window.location.href = `tel:${selectedLead.phone}`}>
-                Hemen Ara
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Full Screen Photo Modal */}
-      <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
-        <DialogContent className="max-w-4xl p-1 bg-transparent border-none shadow-none flex justify-center items-center [&>button]:text-white [&>button]:bg-black/50 hover:[&>button]:bg-black/70 [&>button]:rounded-full [&>button]:p-2 max-h-[95vh] w-[95vw]">
-          <DialogTitle className="sr-only">Görsel İnceleme</DialogTitle>
-          <DialogDescription className="sr-only">Büyütülmüş fotoğraf görünümü.</DialogDescription>
-          {selectedPhoto && (
-            <img src={selectedPhoto} alt="Detaylı Görsel" className="max-w-full max-h-[85vh] object-contain rounded-md shadow-2xl" />
-          )}
-        </DialogContent>
-      </Dialog>
+      <LeadPreviewDialog
+        lead={selectedLead}
+        firmId={firmId ?? ""}
+        isPurchased={selectedLead ? purchasedIds.has(selectedLead.id) : false}
+        purchaseCount={selectedLead ? (purchaseCounts?.[selectedLead.id] ?? null) : null}
+        purchasing={purchasing}
+        outcome={selectedLead ? outcomes[selectedLead.id] : undefined}
+        refundStatus={selectedLead ? refundStatuses[selectedLead.id] : undefined}
+        onClose={() => setSelectedLeadId(null)}
+        onBuy={handlePurchase}
+        onChanged={() => void reload()}
+      />
     </>
   );
 };
 
-export default function FirmaLeadler() {
-  return (
-    <Suspense fallback={<div className="min-h-screen pt-20 flex items-center justify-center"><p className="text-muted-foreground">Yükleniyor...</p></div>}>
-      <FirmaLeadlerContent />
-    </Suspense>
-  );
-}
-
-
+export default FirmaLeadler;

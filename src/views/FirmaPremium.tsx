@@ -1,223 +1,448 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Crown, Image, MapPin, Star, FileText, CheckCircle2, ShieldCheck, ArrowRightLeft, MessageSquare, Briefcase, Zap } from "lucide-react";
-import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import {
+  ArrowUpDown,
+  Briefcase,
+  CheckCircle2,
+  Image as ImageIcon,
+  LayoutTemplate,
+  Link2,
+  ShoppingBag,
+  Users,
+} from "lucide-react";
+import { toast } from "sonner";
+import { supportWhatsAppUrl } from "@/lib/publicStats";
+import {
+  OFFER_FLAGS,
+  PRO_PLANS,
+  SALES_WHATSAPP_URL,
+  TAX_LABEL,
+  founderRenewalLine,
+  formatTRY,
+  getLiveProFeatures,
+  getProHighlights,
+  getProPlan,
+  proPlanLabel,
+  yearlySavingsPercent,
+  type ProPlan,
+  type ProPlanId,
+} from "@/lib/pricing";
+import { invokeEdgeFunction, queryUntyped } from "@/app/firma/panel/rpc";
+import { findPlanMismatches } from "@/app/firma/jeton/planCheck";
+import {
+  callOrWhatsappClicks,
+  fetchFirmEventStats,
+  fetchFounderSlots,
+  hasAnyEvent,
+  type FirmEventStats,
+  type FounderSlots,
+} from "@/app/firma/panel/firmStats";
 
-const PREMIUM_COST = 20; // jetons per month
+interface FirmRow {
+  id: string;
+  is_premium: boolean | null;
+  premium_until: string | null;
+  company_name: string | null;
+  subscription_plan: string | null;
+}
 
-const PREMIUM_FEATURES = [
-  { icon: ShieldCheck, label: "Güven (Trust) Rozetleri", desc: "Özel rozetlerle müşterilerinize güven verin." },
-  { icon: ArrowRightLeft, label: "Öncesi / Sonrası Slider", desc: "Projelerinizdeki mucizevi değişimi interaktif gösterin." },
-  { icon: Briefcase, label: "Özel Portföy Vitrini", desc: "Tamamlanan projelerinizi şık bir grid ile sergileyin." },
-  { icon: MessageSquare, label: "Sık Sorulan Sorular (SSS)", desc: "Müşterilerinizin potansiyel sorularını peşinen yanıtlayın." },
-  { icon: Zap, label: "Yanıt Süresi Gösterimi", desc: "Hızlı yanıt verdiğinizi göstererek dönüşüm oranınızı artırın." },
-  { icon: Image, label: "Geniş Hero Galeri", desc: "Profilinizin en üstünde yer alan dev fotoğraf galerisi." },
-  { icon: Star, label: "Müşteri Değerlendirmeleri", desc: "Yıldız puanlarınızla güvenilirliğinizi kanıtlayın." },
-  { icon: FileText, label: "Detaylı Hizmetler", desc: "Sunduğunuz hizmetleri tüm detaylarıyla anlatın." },
-  { icon: Crown, label: "Öne Çıkarma & Shimmer Efekt", desc: "Listelerde altın parıltılı çerçevenizle tüm dikkatleri çekin." },
-];
+const FIRM_COLUMNS = "id, is_premium, premium_until, company_name, subscription_plan";
+const POLL_INTERVAL_MS = 2000;
+const POLL_MAX_ATTEMPTS = 10;
+
+const FEATURE_ICONS: Record<string, typeof CheckCircle2> = {
+  "listing-priority": ArrowUpDown,
+  gallery: ImageIcon,
+  projects: Briefcase,
+  products: ShoppingBag,
+  landing: LayoutTemplate,
+  links: Link2,
+  "lead-priority": Users,
+};
+
+const DATE_FORMAT = new Intl.DateTimeFormat("tr-TR", {
+  timeZone: "Europe/Istanbul",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+function isProActive(firm: FirmRow | null): boolean {
+  return Boolean(firm?.is_premium) && (!firm?.premium_until || new Date(firm.premium_until) > new Date());
+}
+
+function planPriceUnit(plan: ProPlan): string {
+  return plan.interval === "year" ? "yıl" : "ay";
+}
 
 const FirmaPremium = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [activating, setActivating] = useState(false);
-  const [firm, setFirm] = useState<any>(null);
-  const [isYearly, setIsYearly] = useState(false);
+  const [firm, setFirm] = useState<FirmRow | null>(null);
+  const [slots, setSlots] = useState<FounderSlots | null>(null);
+  const [unavailablePlans, setUnavailablePlans] = useState<Set<string>>(new Set());
+  const [stats, setStats] = useState<FirmEventStats | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<ProPlanId>("yearly");
+  const [activationState, setActivationState] = useState<"pending" | "delayed" | null>(null);
+  const [portalBusy, setPortalBusy] = useState(false);
+
+  const requestedPlan = searchParams?.get("plan");
+  const returnedFromStripe = searchParams?.get("success") === "true";
+
+  const loadFirm = useCallback(async (userId: string): Promise<FirmRow | null> => {
+    const { data } = await queryUntyped<FirmRow[]>("firms", (q) => q.select(FIRM_COLUMNS).eq("user_id", userId).limit(1));
+    return data?.[0] ?? null;
+  }, []);
 
   useEffect(() => {
     const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/"); return; }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/");
+        return;
+      }
 
-      const { data } = await supabase
-        .from("firms")
-        .select("id, is_premium, premium_until, coin_balance, company_name, subscription_plan")
-        .eq("user_id", user.id)
-        .single();
+      const loaded = await loadFirm(user.id);
+      if (!loaded) {
+        router.push("/firma/panel");
+        return;
+      }
+      setFirm(loaded);
 
-      if (!data) { router.push("/firma/panel"); return; }
-      setFirm(data);
+      const [founderSlots, eventStats, mismatched] = await Promise.all([
+        OFFER_FLAGS.founderEnabled ? fetchFounderSlots(getProPlan("founder")?.cap) : Promise.resolve(null),
+        isProActive(loaded) ? Promise.resolve(null) : fetchFirmEventStats(loaded.id, 30),
+        findPlanMismatches(),
+      ]);
+      setSlots(founderSlots);
+      setStats(eventStats);
+      // Gösterilen fiyat, ödemede tahsil edilecek pricing_plans satırıyla uyuşmayan plan satışa açılmaz.
+      setUnavailablePlans(mismatched ?? new Set());
       setLoading(false);
     };
-    load();
-  }, [router]);
+    void load();
+  }, [router, loadFirm]);
 
-  const handleSubscribe = async () => {
+  const founderAvailable = OFFER_FLAGS.founderEnabled && slots !== null && slots.remaining > 0;
+  const visiblePlans = PRO_PLANS.filter(
+    (candidate) => !unavailablePlans.has(candidate.id) && (candidate.id !== "founder" || founderAvailable),
+  );
+
+  // ?plan= yalnızca satışta olan bir plana ön seçim yapar.
+  useEffect(() => {
+    const preselect = getProPlan(requestedPlan);
+    if (preselect && (preselect.id !== "founder" || founderAvailable)) setSelectedPlan(preselect.id);
+  }, [requestedPlan, founderAvailable]);
+
+  // Seçili plan satışta değilse (kontenjan bitti, fiyat uyuşmuyor) satıştaki bir plana dönülür.
+  const visiblePlanIds = visiblePlans.map((candidate) => candidate.id).join(",");
+  useEffect(() => {
+    if (loading || !visiblePlanIds) return;
+    const ids = visiblePlanIds.split(",") as ProPlanId[];
+    if (!ids.includes(selectedPlan)) setSelectedPlan(ids.includes("yearly") ? "yearly" : ids[0]);
+  }, [loading, visiblePlanIds, selectedPlan]);
+
+  // Stripe dönüşünde premium, invoice.paid webhook'uyla verilir: 2 sn aralıkla en çok 10 kez bakılır.
+  const firmId = firm?.id ?? null;
+  const proActive = isProActive(firm);
+  useEffect(() => {
+    if (loading || !firmId || !returnedFromStripe) return;
+    if (proActive) {
+      setActivationState(null);
+      return;
+    }
+    setActivationState("pending");
+
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const check = async (attempt: number) => {
+      const { data } = await queryUntyped<FirmRow[]>("firms", (q) => q.select(FIRM_COLUMNS).eq("id", firmId).limit(1));
+      if (cancelled) return;
+      const fresh = data?.[0];
+      if (fresh && isProActive(fresh)) {
+        setFirm(fresh);
+        setActivationState(null);
+        toast.success("Pro üyeliğiniz aktif.");
+        return;
+      }
+      if (attempt >= POLL_MAX_ATTEMPTS) {
+        setActivationState("delayed");
+        return;
+      }
+      timer = setTimeout(() => void check(attempt + 1), POLL_INTERVAL_MS);
+    };
+
+    void check(1);
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [loading, firmId, proActive, returnedFromStripe]);
+
+  const handleSubscribe = async (planId: ProPlanId) => {
     if (!firm) return;
-
     setActivating(true);
     try {
-      const { data, error } = await supabase.functions.invoke("create-premium-checkout", {
-        body: { plan: isYearly ? "yearly" : "monthly" },
-      });
-
-      if (error) throw error;
-      if (data?.url) window.location.href = data.url;
-      if (data?.error) throw new Error(data.error);
-    } catch (err: any) {
-      toast.error(err.message || "Ödeme başlatılamadı.");
+      const result = await invokeEdgeFunction<{ url?: string }>("create-premium-checkout", { plan: planId });
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+      if (result.data.url) {
+        window.location.href = result.data.url;
+        return;
+      }
+      toast.error("Ödeme başlatılamadı, lütfen tekrar deneyin.");
     } finally {
       setActivating(false);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    setPortalBusy(true);
+    try {
+      const result = await invokeEdgeFunction<{ url?: string }>("create-billing-portal", {});
+      if (!result.ok || !result.data.url) {
+        toast.error(result.ok ? "Abonelik yönetim sayfası açılamadı." : result.message);
+        return;
+      }
+      window.location.href = result.data.url;
+    } finally {
+      setPortalBusy(false);
     }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background pt-20 flex items-center justify-center">
-        <p className="text-muted-foreground animate-pulse">Yükleniyor...</p>
+        <p className="text-muted-foreground">Yükleniyor...</p>
       </div>
     );
   }
 
-  const isPremiumActive = firm?.is_premium && firm?.premium_until && new Date(firm.premium_until) > new Date();
+  const isPremiumActive = isProActive(firm);
+  const plan = visiblePlans.find((candidate) => candidate.id === selectedPlan) ?? visiblePlans[0] ?? null;
+  const yearly = getProPlan("yearly");
+  const features = getLiveProFeatures();
+  const showValueBlock = !isPremiumActive && stats !== null;
+  const trackingSince = stats?.tracking_since ? DATE_FORMAT.format(new Date(stats.tracking_since)) : null;
+  const supportLink = supportWhatsAppUrl("Merhaba, Pro üyeliğimle ilgili destek almak istiyorum.");
+  const billingLink = SALES_WHATSAPP_URL("Merhaba, Pro üyeliğimin faturası veya iptali hakkında bilgi almak istiyorum.");
 
   return (
     <>
       <Navbar />
       <div className="min-h-screen bg-background pb-16">
-
-        {/* HERO SECTION */}
-        <div className="relative overflow-hidden bg-card border-b border-border pt-20">
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-background to-accent/5" />
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="container relative mx-auto px-4 py-16 md:py-24 max-w-5xl text-center">
-            <Badge variant="outline" className="mb-6 px-4 py-1.5 border-yellow-500/50 text-yellow-600 dark:text-yellow-400 bg-yellow-500/10">
-              <Crown className="w-4 h-4 mr-2" /> Profesyoneller İçin
+        {/* HERO */}
+        <div className="bg-card border-b border-border pt-20">
+          <div className="container mx-auto px-4 py-12 md:py-16 max-w-3xl text-center">
+            <Badge variant="outline" className="mb-4 px-3 py-1">
+              Firmalar için
             </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-extrabold tracking-tight mb-6">
-              Firmanızı <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-yellow-400">Zirveye</span> Taşıyın
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-              Premium profil ile rakiplerinizden sıyrılın. Güven rozetleri, interaktif proje sunumları ve altın listeleme çerçevesi ile potansiyel müşterilerin ilk tercihi olun.
+            <h1 className="font-heading mb-4">Pro Üyelik</h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
+              Profilinizi listelerde öne çıkarın; fotoğraf, proje ve ürünlerinizi sınırsız sergileyin.
             </p>
 
-            {isPremiumActive ? (
-              <div className="inline-flex flex-col items-center bg-gradient-to-b from-[#fffbf0] to-white dark:from-[hsl(43_30%_15%)] dark:to-card border border-yellow-500/30 rounded-2xl p-6 shadow-xl">
-                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-yellow-500/20">
-                  <CheckCircle2 className="w-8 h-8 text-white" />
-                </div>
-                <h2 className="text-xl font-bold text-foreground mb-1">Premium Üyeliğiniz Aktif</h2>
-                <p className="text-muted-foreground mb-1">
-                  Plan: <span className="font-semibold text-foreground uppercase">{firm.subscription_plan || "Aylık"}</span>
-                </p>
-                <p className="text-muted-foreground mb-4 text-sm">
-                  Yenileme: <span className="font-semibold text-foreground">{new Date(firm.premium_until).toLocaleDateString("tr-TR")}</span>
-                </p>
-                <Button onClick={() => router.push("/firma/profil")} className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 hover:to-yellow-600 text-white shadow-md">
-                  Profilini Düzenle
-                </Button>
+            {showValueBlock && stats && (
+              <div className="mx-auto mb-8 max-w-xl rounded-xl border border-border bg-secondary p-4 text-left text-secondary-foreground">
+                {hasAnyEvent(stats.current) ? (
+                  <p className="text-sm leading-relaxed">
+                    Profiliniz son 30 günde <strong>{stats.current.profile_view}</strong> kez görüntülendi,{" "}
+                    <strong>{callOrWhatsappClicks(stats.current)}</strong> kez Ara veya WhatsApp düğmesine tıklandı.
+                  </p>
+                ) : (
+                  <p className="text-sm leading-relaxed">
+                    {trackingSince ? `Takip ${trackingSince} tarihinde başladı; ` : ""}
+                    ilk veriler birkaç gün içinde burada olacak.
+                  </p>
+                )}
               </div>
+            )}
+
+            {activationState === "pending" && (
+              <p className="mb-6 text-sm text-muted-foreground" role="status">
+                Ödeme durumunuz kontrol ediliyor…
+              </p>
+            )}
+            {activationState === "delayed" && (
+              <p className="mb-6 text-sm text-muted-foreground" role="status">
+                Ödemeyi tamamladıysanız ve Pro üyeliğiniz hâlâ aktif görünmüyorsa{" "}
+                <a href={supportLink} target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-4">
+                  WhatsApp’tan yazın
+                </a>
+                .
+              </p>
+            )}
+
+            {isPremiumActive && firm ? (
+              <div className="mx-auto max-w-md rounded-xl border border-border bg-background p-6 text-center">
+                <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-verified" aria-hidden="true" />
+                <h2 className="font-heading text-xl text-foreground mb-1">Pro üyeliğiniz aktif</h2>
+                <p className="text-muted-foreground mb-1">
+                  Plan: <span className="font-semibold text-foreground">{proPlanLabel(firm.subscription_plan)}</span>
+                </p>
+                {firm.premium_until && (
+                  <p className="text-muted-foreground mb-4 text-sm">
+                    Yenileme tarihi:{" "}
+                    <span className="font-semibold text-foreground">{DATE_FORMAT.format(new Date(firm.premium_until))}</span>
+                  </p>
+                )}
+                <div className="flex flex-col gap-2">
+                  <Button variant="accent" className="min-h-11" onClick={() => router.push("/firma/profil")}>
+                    Profilini Düzenle
+                  </Button>
+                  {OFFER_FLAGS.billingPortal ? (
+                    <Button variant="outline" className="min-h-11" onClick={handleManageSubscription} disabled={portalBusy}>
+                      {portalBusy ? "Açılıyor..." : "Aboneliği Yönet"}
+                    </Button>
+                  ) : (
+                    <Button variant="outline" className="min-h-11" asChild>
+                      <a href={billingLink} target="_blank" rel="noopener noreferrer">
+                        Fatura ve iptal için bize yazın
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : !plan ? (
+              <p className="mx-auto max-w-md text-muted-foreground">
+                Pro üyelik şu anda satışta değil. Bilgi için{" "}
+                <a href={supportLink} target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-4">
+                  WhatsApp’tan yazın
+                </a>
+                .
+              </p>
             ) : (
-              <div className="flex flex-col items-center">
-                {/* Plan Toggle */}
-                <div className="flex items-center gap-4 mb-8 bg-card border border-border p-2 rounded-full px-6 shadow-sm">
-                  <Label htmlFor="plan-toggle" className={`text-sm cursor-pointer transition-colors ${!isYearly ? "text-foreground font-bold" : "text-muted-foreground"}`}>Aylık</Label>
-                  <Switch id="plan-toggle" checked={isYearly} onCheckedChange={setIsYearly} className="data-[state=checked]:bg-yellow-500" />
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="plan-toggle" className={`text-sm cursor-pointer transition-colors ${isYearly ? "text-foreground font-bold" : "text-muted-foreground"}`}>Yıllık</Label>
-                    <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none text-[10px] py-0 px-1.5 animate-bounce">
-                      %20 TASARRUF
-                    </Badge>
-                  </div>
+              <div className="mx-auto flex max-w-md flex-col items-center">
+                <div className="mb-6 flex w-full flex-wrap justify-center gap-2 rounded-xl border border-border bg-background p-1" role="group" aria-label="Plan seçimi">
+                  {visiblePlans.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setSelectedPlan(option.id)}
+                      aria-pressed={plan.id === option.id}
+                      className={`min-h-11 flex-1 rounded-lg px-3 text-sm font-medium transition-colors duration-150 ${
+                        plan.id === option.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      {option.id === "monthly" ? "Aylık" : option.id === "yearly" ? "Yıllık" : "Kurucu Üye"}
+                    </button>
+                  ))}
                 </div>
 
-                <div className="inline-flex flex-col items-center p-1 rounded-2xl bg-gradient-to-br from-yellow-400 via-yellow-200 to-yellow-500 animate-[pulse_4s_cubic-bezier(0.4,0,0.6,1)_infinite] shadow-2xl">
-                  <div className="bg-card px-8 py-8 rounded-xl flex flex-col items-center w-[340px]">
-                    <p className="text-xs font-bold text-yellow-600 uppercase tracking-[0.2em] mb-4">Seçilen Plan: {isYearly ? "YILLIK" : "AYLIK"}</p>
-                    <div className="flex items-baseline gap-2 mb-6">
-                      <span className="text-sm font-semibold text-muted-foreground">$</span>
-                      <span className="text-6xl font-black text-foreground tracking-tight">{isYearly ? "150" : "15"}</span>
-                      <span className="text-lg font-medium text-muted-foreground">/{isYearly ? "yıl" : "ay"}</span>
-                    </div>
-
-                    <ul className="w-full space-y-3 mb-8 text-left">
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                        <span>Altın Çerçeve & Öne Çıkarılma</span>
-                      </li>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                        <span>Güven (Trust) Rozetleri</span>
-                      </li>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                        <span>Öncesi / Sonrası Proje Sliderı</span>
-                      </li>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                        <span>Sınırsız Portföy Görseli</span>
-                      </li>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                        <span>Öncelikli Müşteri Desteği</span>
-                      </li>
-                    </ul>
-
-                    <Button
-                      onClick={handleSubscribe}
-                      disabled={activating}
-                      size="lg"
-                      className="w-full h-14 text-lg font-bold bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 hover:to-yellow-600 text-white shadow-lg transition-all active:scale-95"
-                    >
-                      {activating ? "Hazırlanıyor..." : "Aboneliği Başlat"}
-                    </Button>
-
-                    <p className="mt-4 text-[10px] text-muted-foreground text-center">
-                      Güvenli ödeme altyapısı Stripe ile korunmaktadır. İstediğiniz zaman iptal edebilirsiniz.
-                    </p>
+                <div className="w-full rounded-xl border border-border bg-background p-6 text-left shadow-card">
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{plan.name}</p>
+                    {plan.id === "yearly" && <Badge variant="secondary">%{yearlySavingsPercent()} daha uygun</Badge>}
                   </div>
+
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-heading text-5xl text-foreground tracking-tight">{formatTRY(plan.priceTRY)}</span>
+                    <span className="text-lg text-muted-foreground">/{planPriceUnit(plan)}</span>
+                  </div>
+                  <p className="mb-4 text-xs text-muted-foreground">{TAX_LABEL}</p>
+
+                  {plan.id === "yearly" && (
+                    <p className="mb-4 text-sm text-muted-foreground">12 aylık ödemeye göre ({formatTRY(getProPlan("monthly")?.priceTRY ?? 0)} x 12).</p>
+                  )}
+                  {plan.id === "founder" && (
+                    <div className="mb-4 space-y-1 text-sm text-muted-foreground">
+                      {yearly && <p>Normal yıllık fiyat {formatTRY(yearly.priceTRY)}.</p>}
+                      <p>{founderRenewalLine(plan)}</p>
+                      {slots && plan.cap !== undefined && (
+                        <p className="font-medium text-foreground">
+                          Kalan kontenjan {slots.remaining}/{plan.cap}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <ul className="mb-6 space-y-2">
+                    {getProHighlights().map((feature) => (
+                      <li key={feature.id} className="flex items-start gap-2 text-sm text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-verified" aria-hidden="true" />
+                        <span>{feature.label}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button variant="accent" size="lg" className="w-full" onClick={() => handleSubscribe(plan.id)} disabled={activating}>
+                    {activating ? "Hazırlanıyor..." : "Aboneliği Başlat"}
+                  </Button>
+
+                  <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+                    Ödeme Stripe’ın güvenli sayfasında TL olarak alınır; kart bilgileriniz Peyzajbul’a iletilmez. Abonelik her
+                    dönem otomatik yenilenir.{" "}
+                    {OFFER_FLAGS.billingPortal ? (
+                      "Aboneliğinizi panelden yönetebilirsiniz."
+                    ) : (
+                      <>
+                        İptal ve fatura için{" "}
+                        <a href={billingLink} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+                          WhatsApp’tan bize yazın
+                        </a>
+                        .
+                      </>
+                    )}{" "}
+                    {OFFER_FLAGS.moneyBack14d && "14 gün içinde iade edilir."}
+                  </p>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* FEATURES GRID */}
-        <div className="container mx-auto px-4 py-20 max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-heading font-bold text-foreground mb-4">Neden Premium?</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Profilinizi sıradanlıktan çıkarıp bir vitrine dönüştüren ekstra özellikler ile daha fazla Lead'i müşteriye çevirin.
-            </p>
+        {/* FEATURES */}
+        <div className="container mx-auto px-4 py-16 max-w-5xl">
+          <div className="text-center mb-10">
+            <h2 className="font-heading text-foreground mb-3">Pro ile neler var?</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Aşağıdaki özelliklerin tümü bugün çalışmaktadır.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PREMIUM_FEATURES.map((f, i) => (
-              <Card key={i} className="group border-border/50 bg-card hover:bg-accent/5 hover:border-accent/30 transition-all duration-300 hover:-translate-y-1 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-bl-full pointer-events-none" />
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-900/10 flex items-center justify-center mb-4 text-yellow-600 dark:text-yellow-400 group-hover:scale-110 transition-transform shadow-sm">
-                    <f.icon className="w-6 h-6" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {features.map((feature) => {
+              const Icon = FEATURE_ICONS[feature.id] ?? CheckCircle2;
+              return (
+                <div key={feature.id} className="rounded-xl border border-border bg-card p-5">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-primary">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <h3 className="font-semibold text-lg text-foreground mb-2">{f.label}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
+                  <h3 className="mb-1 text-base font-semibold text-foreground">{feature.label}</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{feature.desc}</p>
+                </div>
+              );
+            })}
           </div>
 
-          <div className="mt-20 text-center flex flex-col items-center">
-            <p className="text-muted-foreground mb-6">Daha fazla bilgi veya sorularınız için panele dönebilirsiniz.</p>
-            <Button variant="outline" onClick={() => router.push("/firma/panel")} className="w-full max-w-sm">
+          <div className="mt-12 flex flex-col items-center gap-3 text-center">
+            <p className="text-sm text-muted-foreground">
+              Fiyatların tamamı için{" "}
+              <Link href="/fiyatlandirma" className="underline underline-offset-4">
+                fiyatlandırma sayfasına
+              </Link>{" "}
+              bakabilirsiniz.
+            </p>
+            <Button variant="outline" onClick={() => router.push("/firma/panel")} className="w-full max-w-sm min-h-11">
               Firma Paneline Dön
             </Button>
           </div>
         </div>
-
       </div>
     </>
   );
 };
 
 export default FirmaPremium;
-

@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, Crown, LogOut, Layout, Eye, ExternalLink, X, Plus, MapPin, Clock, ShieldCheck, HelpCircle, ArrowRightLeft, Briefcase, Globe, Instagram, Facebook, Youtube, Linkedin } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { FirmaSidebar } from "@/components/firma/FirmaSidebar";
+import { validateMapUrl } from "@/app/firma-sahiplen/_lib/mapUrl";
 
 /* ─── TYPES ─── */
 type LandingSections = {
@@ -77,6 +78,7 @@ const FirmaLandingEditor = () => {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [youtubeVideos, setYoutubeVideos] = useState<{ url: string; title: string }[]>([]);
   const [googleMapsUrl, setGoogleMapsUrl] = useState("");
+  const [googleMapsUrlError, setGoogleMapsUrlError] = useState<string | null>(null);
 
   // Social media
   const [socialInstagram, setSocialInstagram] = useState("");
@@ -176,6 +178,13 @@ const FirmaLandingEditor = () => {
   };
 
   const handleSave = async () => {
+    const mapsCheck = validateMapUrl(googleMapsUrl);
+    if (!mapsCheck.ok) {
+      setGoogleMapsUrlError(mapsCheck.message);
+      toast({ title: "Harita adresi geçersiz", description: mapsCheck.message, variant: "destructive" });
+      return;
+    }
+
     setSaving(true);
     try {
       const { error } = await (supabase.from("firms") as any)
@@ -188,7 +197,7 @@ const FirmaLandingEditor = () => {
           detailed_services: detailedServices.length > 0 ? detailedServices : null,
           portfolio_items: portfolioItems.length > 0 ? portfolioItems : null,
           youtube_videos: youtubeVideos.length > 0 ? youtubeVideos : null,
-          google_maps_url: googleMapsUrl || null,
+          google_maps_url: mapsCheck.url,
           social_instagram: socialInstagram || null,
           social_facebook: socialFacebook || null,
           social_x: socialX || null,
@@ -496,7 +505,16 @@ const FirmaLandingEditor = () => {
                   <h3 className="font-heading font-semibold text-foreground flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-primary" /> Google Maps
                   </h3>
-                  <Input placeholder="https://www.google.com/maps/embed?..." value={googleMapsUrl} onChange={(e) => setGoogleMapsUrl(e.target.value)} />
+                  <Input
+                    placeholder="https://www.google.com/maps/embed?..."
+                    value={googleMapsUrl}
+                    onChange={(e) => { setGoogleMapsUrl(e.target.value); setGoogleMapsUrlError(null); }}
+                    aria-invalid={googleMapsUrlError ? true : undefined}
+                    aria-describedby={googleMapsUrlError ? "landing-maps-url-error" : undefined}
+                  />
+                  {googleMapsUrlError && (
+                    <p id="landing-maps-url-error" role="alert" className="text-xs font-medium text-destructive">{googleMapsUrlError}</p>
+                  )}
                   <p className="text-xs text-muted-foreground">Google Maps → Paylaş → Haritayı Göm → iframe içindeki src URL'i yapıştırın.</p>
                 </CardContent>
               </Card>

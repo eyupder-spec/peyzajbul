@@ -5,8 +5,21 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, ChevronRight, Crown, Image, Info, ShieldAlert, Sparkles } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+interface ProfileCompletionFirm {
+  is_premium: boolean | null;
+  phone: string | null;
+  address: string | null;
+  description: string | null;
+  logo_url: string | null;
+  social_instagram: string | null;
+  social_facebook: string | null;
+  social_youtube: string | null;
+  social_x: string | null;
+  social_linkedin: string | null;
+}
+
 interface ProfileCompletionCardProps {
-  firm: any;
+  firm: ProfileCompletionFirm | null;
   galleryCount: number;
 }
 
@@ -18,12 +31,12 @@ export function ProfileCompletionCard({ firm, galleryCount }: ProfileCompletionC
   const tasks = [
     {
       id: "premium",
-      label: "Premium'a Geç (Rozet Kazan)",
+      label: "Pro Üyelik ile profilinizi öne çıkarın",
       points: 20,
       completed: firm.is_premium,
       icon: <Crown className="h-4 w-4 text-amber-500" />,
-      action: () => router.push("/premium"),
-      actionLabel: "Yükselt",
+      action: () => router.push("/firma/premium"),
+      actionLabel: "İncele",
     },
     {
       id: "basic",
@@ -31,7 +44,7 @@ export function ProfileCompletionCard({ firm, galleryCount }: ProfileCompletionC
       points: 30,
       completed: !!(firm.phone && firm.address && firm.description),
       icon: <Info className="h-4 w-4 text-blue-500" />,
-      action: () => router.push("/firma/ayarlar"),
+      action: () => router.push("/firma/profil"),
       actionLabel: "Tamamla",
     },
     {
@@ -40,7 +53,7 @@ export function ProfileCompletionCard({ firm, galleryCount }: ProfileCompletionC
       points: 20,
       completed: !!firm.logo_url,
       icon: <Image className="h-4 w-4 text-purple-500" />,
-      action: () => router.push("/firma/ayarlar"),
+      action: () => router.push("/firma/profil"),
       actionLabel: "Yükle",
     },
     {
@@ -58,7 +71,7 @@ export function ProfileCompletionCard({ firm, galleryCount }: ProfileCompletionC
       points: 10,
       completed: !!(firm.social_instagram || firm.social_facebook || firm.social_youtube || firm.social_x || firm.social_linkedin),
       icon: <ShieldAlert className="h-4 w-4 text-pink-500" />,
-      action: () => router.push("/firma/ayarlar"),
+      action: () => router.push("/firma/profil"),
       actionLabel: "Bağla",
     },
   ];

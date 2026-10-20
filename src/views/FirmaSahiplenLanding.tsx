@@ -21,36 +21,36 @@ const FirmaSahiplenLanding = () => {
   const steps = [
     {
       icon: <Search className="h-6 w-6 text-primary" />,
-      title: "Firmanızı Arayın",
-      description: "Dizinimizde kayıtlı yüzlerce firma arasından kendi işletmenizi bulun."
+      title: "Firmanızı Bulun",
+      description: "Dizinde firmanızı arayıp profil sayfasını açın. Size gönderilmiş bir sahiplenme bağlantınız varsa doğrudan onu açabilirsiniz."
     },
     {
       icon: <MousePointer2 className="h-6 w-6 text-primary" />,
-      title: "Sahiplenme Talebi gönderin",
-      description: "Firma sayfasındaki 'Bu İşletme Size mi Ait? bölümündeki 'Firma Kaydını Sahiplen' butonuna tıklayarak formu doldurun."
+      title: "Doğrulama Kodunu Alın",
+      description: "Profildeki 'Bu sizin firmanız mı?' düğmesine basın. Profilde kayıtlı e-posta adresinize 6 haneli bir kod gönderilir. Profilde e-posta yoksa WhatsApp ile doğrulama yapılır."
     },
     {
       icon: <ShieldCheck className="h-6 w-6 text-primary" />,
-      title: "Hızlıca Doğrulayın",
-      description: "Ekibimiz bilgilerinizi kontrol edip onayladıktan sonra kontrol panelinize erişin."
+      title: "Profil Sizin Olsun",
+      description: "E-postanıza gelen kodu girdiğinizde profil hemen sizin olur ve firma panelinize girersiniz. Yalnızca WhatsApp ile doğrulamada başvurunuzu yönetici onaylar; sonuç e-postayla bildirilir."
     }
   ];
 
   const benefits = [
     {
       icon: <TrendingUp className="h-10 w-10 text-primary" />,
-      title: "Yeni Müşteriler",
-      description: "Hizmet verdiğiniz bölgelerden gelen gerçek müşteri adaylarına (lead) anında ulaşın."
+      title: "Bölgenizden Talepler",
+      description: "Sahiplendiğiniz profil, bölgenize ve hizmetlerinize uyan taleplerin eşleştirildiği firmalar arasına girer."
     },
     {
       icon: <Building2 className="h-10 w-10 text-primary" />,
-      title: "Profesyonel Profil",
-      description: "Projelerinizi, hizmetlerinizi ve referanslarınızı şık bir profilde sergileyin."
+      title: "Profilinizi Yönetin",
+      description: "Açıklamanızı, hizmetlerinizi, iletişim bilgilerinizi ve galerinizi güncelleyin. Ücretsiz planda galeriye 5 fotoğraf eklenebilir."
     },
     {
       icon: <CheckCircle className="h-10 w-10 text-primary" />,
-      title: "Güven Rozeti",
-      description: "Onaylı firma rozeti ile müşterilerin gözünde güvenilirliğinizi artırın."
+      title: "Sahiplenildi İşareti",
+      description: "Sahiplenilen profilde 'Profil sahiplenildi' işareti görünür; ziyaretçiler doğrudan sizden teklif isteyebilir."
     }
   ];
 
@@ -111,7 +111,7 @@ const FirmaSahiplenLanding = () => {
             <div className="max-w-4xl mx-auto border border-primary/20 rounded-3xl p-8 md:p-12 bg-primary/5">
               <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold mb-4">3 Basit Adımda Başlayın</h2>
-                <p className="text-muted-foreground">Süreç hızlı ve ücretsizdir.</p>
+                <p className="text-muted-foreground">Sahiplenmek ücretsizdir.</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-8 relative">
@@ -121,7 +121,7 @@ const FirmaSahiplenLanding = () => {
                       {i + 1}
                     </div>
                     <h4 className="font-bold text-lg">{step.title}</h4>
-                    <p className="text-xs text-muted-foreground">{step.description}</p>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
                   </div>
                 ))}
               </div>

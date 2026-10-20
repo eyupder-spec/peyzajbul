@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { TURKISH_CITIES } from "@/lib/leadFormData";
 import { SERVICE_LABELS } from "@/lib/categories";
 import { DISTRICTS_BY_CITY } from "@/lib/districts";
+import { validateMapUrl } from "@/app/firma-sahiplen/_lib/mapUrl";
 
 const SERVICE_OPTIONS = SERVICE_LABELS;
 
@@ -84,11 +85,13 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
   const [newServiceTitle, setNewServiceTitle] = useState("");
   const [newServiceDesc, setNewServiceDesc] = useState("");
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [mapsUrlError, setMapsUrlError] = useState<string | null>(null);
 
   // Re-initialize form when dialog opens with different data
   useEffect(() => {
     if (open) {
       setForm(initialData || emptyForm);
+      setMapsUrlError(null);
     }
   }, [open, initialData]);
 
@@ -140,6 +143,12 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
       toast.error("Firma adı, telefon, e-posta ve il zorunludur.");
       return;
     }
+    const mapsCheck = validateMapUrl(form.google_maps_url);
+    if (!mapsCheck.ok) {
+      setMapsUrlError(mapsCheck.message);
+      toast.error(mapsCheck.message);
+      return;
+    }
     const cleanEmail = form.email.trim().replace(/^https?:\/\//, "");
     setSaving(true);
     try {
@@ -159,7 +168,7 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
           is_active: form.is_active,
           is_premium: form.is_premium || false,
           premium_until: form.premium_until || null,
-          google_maps_url: form.google_maps_url || null,
+          google_maps_url: mapsCheck.url,
           detailed_services: form.detailed_services || [],
           response_time: form.response_time || null,
           trust_badges: form.trust_badges?.length ? form.trust_badges : null,
@@ -389,8 +398,16 @@ const FirmFormDialog = ({ open, onClose, onSaved, initialData }: FirmFormDialogP
                 <Input
                   placeholder="https://www.google.com/maps/embed?..."
                   value={form.google_maps_url || ""}
-                  onChange={(e) => update({ google_maps_url: e.target.value })}
+                  onChange={(e) => {
+                    update({ google_maps_url: e.target.value });
+                    setMapsUrlError(null);
+                  }}
+                  aria-invalid={mapsUrlError ? true : undefined}
+                  aria-describedby={mapsUrlError ? "firm-maps-url-error" : undefined}
                 />
+                {mapsUrlError && (
+                  <p id="firm-maps-url-error" role="alert" className="text-xs font-medium text-destructive">{mapsUrlError}</p>
+                )}
               </div>
 
               <div className="space-y-2">

@@ -262,7 +262,7 @@ export default function AdminBannersTab() {
               <Select value={placement} onValueChange={setPlacement}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="home_top">Ana Sayfa Üst (Leaderboard)</SelectItem>
+                  <SelectItem value="home_top">Ana Sayfa: Nasıl Çalışır Altı (Leaderboard)</SelectItem>
                   <SelectItem value="home_middle">Ana Sayfa Orta (Leaderboard)</SelectItem>
                   <SelectItem value="home_left">Ana Sayfa Sol Dikey (Skyscraper)</SelectItem>
                   <SelectItem value="home_right">Ana Sayfa Sağ Dikey (Skyscraper)</SelectItem>

@@ -1,54 +1,65 @@
-import { ClipboardList, PhoneCall, CheckCircle, ChevronRight } from "lucide-react";
+import { ClipboardList, Handshake, Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const steps = [
   {
     icon: ClipboardList,
-    title: "Formu Doldur",
-    desc: "Projenizin detaylarını ve ihtiyaçlarınızı bize bildirin.",
+    title: "Projenizi anlatın",
+    desc: "Hizmet, il ve alan büyüklüğü gibi birkaç soruyu yanıtlayın.",
   },
   {
-    icon: PhoneCall,
-    title: "Firmalar Seni Arar",
-    desc: "Bölgenizdeki en iyi firmalar sizinle iletişime geçer.",
+    icon: Send,
+    title: "Talebiniz firmalara iletilir",
+    desc: "Talebinizi doğruladıktan sonra bölgenizdeki ilgili firmalara gönderilir.",
   },
   {
-    icon: CheckCircle,
-    title: "En İyi Teklifi Seç",
-    desc: "Teklifleri karşılaştırın, en uygun firmayı seçin.",
+    icon: Handshake,
+    title: "Teklifleri karşılaştırın",
+    desc: "Firmalarla görüşün, size uygun teklifi seçin. Teklif almak ücretsiz ve bağlayıcı değildir.",
   },
 ];
 
-const HowItWorks = () => {
+interface HowItWorksProps {
+  onTeklifAl: () => void;
+}
+
+const HowItWorks = ({ onTeklifAl }: HowItWorksProps) => {
   return (
-    <section id="nasil-calisir" className="py-20 bg-primary/8">
+    <section id="nasil-calisir" className="bg-muted py-20">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-14">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Nasıl Çalışır?
-          </h2>
-          <div className="w-16 h-1 bg-accent rounded-full mx-auto mb-4" />
-          <p className="text-muted-foreground max-w-xl mx-auto font-body">
-            3 kolay adımda hayalinizdeki peyzaj projesine başlayın.
+        <div className="mb-14 text-center">
+          <h2 className="mb-4 font-display text-3xl font-semibold text-foreground md:text-4xl">Nasıl Çalışır?</h2>
+          <p className="mx-auto max-w-xl text-muted-foreground">
+            Talebinizi bırakın, teklifleri kendi hızınızda değerlendirin.
           </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto relative">
-          {/* Connector lines - desktop only */}
-          <div className="hidden md:block absolute top-8 left-[calc(33.33%+0.5rem)] right-[calc(33.33%+0.5rem)] h-px border-t-2 border-dashed border-accent/30" />
-
-          {steps.map((step, i) => (
-            <div key={i} className="text-center group relative">
-              <div className="relative inline-flex">
-                <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-accent/20 group-hover:scale-110 transition-all duration-300 shadow-sm">
-                  <step.icon className="h-7 w-7 text-primary" />
+        <div className="relative mx-auto max-w-4xl">
+          {/* Connector line, desktop only */}
+          <div
+            aria-hidden
+            className="absolute left-[calc(33.33%+0.5rem)] right-[calc(33.33%+0.5rem)] top-8 hidden h-px border-t-2 border-dashed border-primary/20 md:block"
+          />
+          <ol className="grid gap-8 md:grid-cols-3">
+            {steps.map((step, i) => (
+              <li key={step.title} className="relative text-center">
+                <div className="relative mb-5 inline-flex">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-card text-primary ring-1 ring-border">
+                    <step.icon aria-hidden className="h-7 w-7" />
+                  </div>
+                  <span className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                    {i + 1}
+                  </span>
                 </div>
-                <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center shadow-md">
-                  {i + 1}
-                </span>
-              </div>
-              <h3 className="font-heading text-xl font-semibold text-foreground mb-2">{step.title}</h3>
-              <p className="text-muted-foreground text-sm font-body">{step.desc}</p>
-            </div>
-          ))}
+                <h3 className="mb-2 text-xl font-bold text-foreground">{step.title}</h3>
+                <p className="text-sm text-muted-foreground">{step.desc}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div className="mt-12 text-center">
+          <Button variant="accent" size="lg" className="px-8 text-base" onClick={onTeklifAl}>
+            Ücretsiz Teklif Al
+          </Button>
         </div>
       </div>
     </section>

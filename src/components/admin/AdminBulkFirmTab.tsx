@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { generateFirmSlug } from "@/lib/firmUtils";
 import { SERVICE_LABELS } from "@/lib/categories";
+import { neutralSummary, phoneKey } from "@/lib/outreachTemplates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Upload, Globe, Download, Trash2, Loader2, CheckCircle, XCircle, ChevronsUpDown, Check } from "lucide-react";
+import { Upload, Globe, Download, Trash2, Loader2, CheckCircle, XCircle, ChevronsUpDown, Check, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type BulkFirmRow = {
@@ -28,7 +29,13 @@ type BulkFirmRow = {
   twitter?: string;
   linkedin?: string;
   youtube?: string;
-  status?: "pending" | "success" | "error";
+  /** Where the row came from; stored in firm_provenance. */
+  source: "csv" | "crawler";
+  /** Crawled page text. Read-only and never published: the listing gets a neutral summary instead. */
+  sourceText?: string;
+  /** True while the description is still the generated neutral summary and follows edits of the other fields. */
+  autoDescription?: boolean;
+  status?: "pending" | "success" | "error" | "duplicate";
   errorMsg?: string;
 };
 
@@ -36,6 +43,7 @@ const EMPTY_ROW: BulkFirmRow = {
   company_name: "", phone: "", email: "", city: "", district: "",
   address: "", website: "", description: "", services: "",
   instagram: "", facebook: "", twitter: "", linkedin: "", youtube: "",
+  source: "csv",
 };
 
 const CSV_HEADERS = "firma_adi;telefon;email;il;ilce;adres;website;aciklama;hizmetler;instagram;facebook;twitter;linkedin;youtube";
@@ -56,6 +64,31 @@ const HEADER_MAP: Record<string, keyof BulkFirmRow> = {
   youtube: "youtube", yt: "youtube"
 };
 
+// firm_provenance is not in the generated types yet (src/lib/supabase/types.ts predates the claim migrations).
+interface ProvenanceTable {
+  upsert(values: Record<string, unknown>): PromiseLike<{ error: { message: string } | null }>;
+}
+
+const provenanceTable = () =>
+  (supabase as unknown as { from: (table: string) => ProvenanceTable }).from("firm_provenance");
+
+/** Last-ten-digit keys of every phone already in the directory, so an import never lists a firm twice. */
+async function loadExistingPhoneKeys(): Promise<Set<string>> {
+  const keys = new Set<string>();
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase.from("firms").select("phone").range(from, from + 999);
+    if (error) throw error;
+    for (const firm of data ?? []) {
+      const key = phoneKey(firm.phone);
+      if (key) keys.add(key);
+    }
+    if ((data?.length ?? 0) < 1000) break;
+  }
+  return keys;
+}
+
+type BatchSummary = { added: number; duplicates: number; errors: number; provenanceFailures: number };
+
 function parseCSV(text: string): BulkFirmRow[] {
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   if (lines.length < 2) return [];
@@ -69,13 +102,13 @@ function parseCSV(text: string): BulkFirmRow[] {
     const values = line.split(delimiter).map(v => v.trim().replace(/^"|"$/g, ""));
     const row: BulkFirmRow = { ...EMPTY_ROW };
     mappedHeaders.forEach((key, i) => {
-      if (key && values[i]) (row as any)[key] = values[i];
+      if (key && values[i]) (row as unknown as Record<string, string>)[key] = values[i];
     });
     return row;
   }).filter(r => r.company_name);
 }
 
-export default function AdminBulkFirmTab() {
+export default function AdminBulkFirmTab({ onOpenOutreach }: { onOpenOutreach?: () => void } = {}) {
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<"csv" | "crawler">("csv");
@@ -84,6 +117,7 @@ export default function AdminBulkFirmTab() {
   const [crawling, setCrawling] = useState(false);
   const [inserting, setInserting] = useState(false);
   const [crawlProgress, setCrawlProgress] = useState({ done: 0, total: 0 });
+  const [summary, setSummary] = useState<BatchSummary | null>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -136,10 +170,10 @@ export default function AdminBulkFirmTab() {
           body: { url },
         });
         if (error || !data?.success) {
-          results.push({ ...EMPTY_ROW, company_name: url, status: "error", errorMsg: data?.error || error?.message || "Bilinmeyen hata" });
+          results.push({ ...EMPTY_ROW, source: "crawler", company_name: url, status: "error", errorMsg: data?.error || error?.message || "Bilinmeyen hata" });
         } else {
           const c = data.company;
-          results.push({
+          const crawled: BulkFirmRow = {
             company_name: c.company_name || "",
             phone: c.phone || "",
             email: c.email || "",
@@ -147,17 +181,22 @@ export default function AdminBulkFirmTab() {
             district: c.district || "",
             address: c.address || "",
             website: url,
-            description: c.description || "",
+            description: "",
             services: Array.isArray(c.services) ? c.services.join(", ") : (c.services || ""),
             instagram: c.instagram || "",
             facebook: c.facebook || "",
             twitter: c.twitter || "",
             linkedin: c.linkedin || "",
             youtube: c.youtube || "",
-          });
+            source: "crawler",
+            // The scraped text is first-person marketing copy the firm never agreed to see republished.
+            sourceText: c.description || "",
+            autoDescription: true,
+          };
+          results.push({ ...crawled, description: neutralSummary(crawled) });
         }
-      } catch (err: any) {
-        results.push({ ...EMPTY_ROW, company_name: url, status: "error", errorMsg: err.message });
+      } catch (err: unknown) {
+        results.push({ ...EMPTY_ROW, source: "crawler", company_name: url, status: "error", errorMsg: err instanceof Error ? err.message : "Bilinmeyen hata" });
       }
       setCrawlProgress(prev => ({ ...prev, done: prev.done + 1 }));
     }
@@ -168,7 +207,13 @@ export default function AdminBulkFirmTab() {
   };
 
   const updateRow = (index: number, field: keyof BulkFirmRow, value: string) => {
-    setRows(prev => prev.map((r, i) => i === index ? { ...r, [field]: value, status: undefined, errorMsg: undefined } : r));
+    setRows(prev => prev.map((r, i) => {
+      if (i !== index) return r;
+      const next = { ...r, [field]: value, status: undefined, errorMsg: undefined } as BulkFirmRow;
+      if (field === "description") next.autoDescription = false;
+      else if (r.autoDescription && ["company_name", "city", "district"].includes(field)) next.description = neutralSummary(next);
+      return next;
+    }));
   };
 
   const toggleService = (index: number, service: string) => {
@@ -181,7 +226,9 @@ export default function AdminBulkFirmTab() {
       } else {
         newServices = [...currentServices, service];
       }
-      return { ...r, services: newServices.join(", "), status: undefined, errorMsg: undefined };
+      const next: BulkFirmRow = { ...r, services: newServices.join(", "), status: undefined, errorMsg: undefined };
+      if (r.autoDescription) next.description = neutralSummary(next);
+      return next;
     }));
   };
 
@@ -197,16 +244,37 @@ export default function AdminBulkFirmTab() {
     }
 
     setInserting(true);
+    setSummary(null);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { toast({ title: "Oturum hatası", variant: "destructive" }); setInserting(false); return; }
 
+    let existingKeys: Set<string>;
+    try {
+      existingKeys = await loadExistingPhoneKeys();
+    } catch (err: unknown) {
+      toast({ title: "Mevcut firmalar okunamadı", description: err instanceof Error ? err.message : undefined, variant: "destructive" });
+      setInserting(false);
+      return;
+    }
+
     let successCount = 0;
+    let duplicateCount = 0;
+    let provenanceFailures = 0;
     const updatedRows = [...rows];
 
     for (let i = 0; i < updatedRows.length; i++) {
       const r = updatedRows[i];
+      if (r.status === "success") continue;
       if (!r.company_name || !r.phone || !r.city) {
         updatedRows[i] = { ...r, status: "error", errorMsg: "Zorunlu alan eksik (ad, telefon, il)" };
+        continue;
+      }
+
+      // A phone that is already listed means the firm is already in the directory: never list it twice.
+      const key = phoneKey(r.phone);
+      if (key && existingKeys.has(key)) {
+        updatedRows[i] = { ...r, status: "duplicate", errorMsg: undefined };
+        duplicateCount++;
         continue;
       }
 
@@ -217,7 +285,10 @@ export default function AdminBulkFirmTab() {
 
         const cleanEmail = r.email ? r.email.trim().replace(/^https?:\/\//, "") : null;
 
-        const { data: inserted, error } = await supabase.from("firms").insert({
+        const id = crypto.randomUUID();
+        const { error } = await supabase.from("firms").insert({
+          id,
+          slug: generateFirmSlug(r.company_name, id),
           user_id: user.id,
           company_name: r.company_name,
           phone: r.phone,
@@ -235,28 +306,38 @@ export default function AdminBulkFirmTab() {
           social_youtube: r.youtube || null,
           is_approved: true,
           is_active: true,
-        }).select("id, company_name").single();
+        });
 
         if (error) throw error;
+        if (key) existingKeys.add(key);
 
-        if (inserted) {
-          const slug = generateFirmSlug(inserted.company_name, inserted.id);
-          await supabase.from("firms").update({ slug }).eq("id", inserted.id);
-        }
+        const { error: provenanceError } = await provenanceTable().upsert({
+          firm_id: id,
+          source_type: r.source,
+          source_url: r.website || null,
+          scraped_at: new Date().toISOString(),
+          imported_by: user.id,
+        });
+        if (provenanceError) provenanceFailures++;
 
         updatedRows[i] = { ...r, status: "success" };
         successCount++;
-      } catch (err: any) {
-        updatedRows[i] = { ...r, status: "error", errorMsg: err.message };
+      } catch (err: unknown) {
+        updatedRows[i] = { ...r, status: "error", errorMsg: err instanceof Error ? err.message : "Bilinmeyen hata" };
       }
     }
 
+    const errorCount = updatedRows.filter(r => r.status === "error").length;
     setRows(updatedRows);
     setInserting(false);
-    toast({ title: `${successCount} firma eklendi`, description: `${updatedRows.filter(r => r.status === "error").length} hata oluştu.` });
+    setSummary({ added: successCount, duplicates: duplicateCount, errors: errorCount, provenanceFailures });
+    toast({
+      title: `${successCount} firma eklendi`,
+      description: `${duplicateCount} tekrar kayıt atlandı, ${errorCount} hata oluştu.`,
+    });
   };
 
-  const clearAll = () => { setRows([]); setUrls(""); };
+  const clearAll = () => { setRows([]); setUrls(""); setSummary(null); };
 
   return (
     <div className="space-y-6">
@@ -324,6 +405,29 @@ export default function AdminBulkFirmTab() {
         </Card>
       )}
 
+      {/* Batch summary */}
+      {summary && summary.added > 0 && (
+        <Card className="border-verified/40 bg-verified/5">
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 pt-4">
+            <div className="space-y-1">
+              <p className="font-semibold text-foreground">
+                {summary.added} firma eklendi, her firma için sahiplenme bağlantısı hazır
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Bağlantıları Sahiplenme &gt; Outreach kuyruğu sekmesinde görebilir ve CSV olarak indirebilirsiniz.
+                {summary.duplicates > 0 ? ` ${summary.duplicates} firma dizinde zaten kayıtlı olduğu için atlandı.` : ""}
+                {summary.provenanceFailures > 0 ? ` ${summary.provenanceFailures} firmanın kaynak kaydı yazılamadı (firm_provenance tablosunu kontrol edin).` : ""}
+              </p>
+            </div>
+            {onOpenOutreach && (
+              <Button size="sm" variant="outline" onClick={onOpenOutreach} className="gap-2">
+                <Link2 className="h-4 w-4" /> Outreach kuyruğuna git
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Preview Table */}
       {rows.length > 0 && (
         <Card>
@@ -353,6 +457,7 @@ export default function AdminBulkFirmTab() {
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[160px]">Adres</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[120px]">Website</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[160px]">Açıklama</th>
+                    <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[140px]">Kaynak metin (yayınlanmaz)</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[160px]">Hizmetler</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">Instagram</th>
                     <th className="text-left px-2 py-1.5 text-muted-foreground font-medium min-w-[100px]">Facebook</th>
@@ -365,7 +470,7 @@ export default function AdminBulkFirmTab() {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {rows.map((row, idx) => (
-                    <tr key={idx} className={row.status === "error" ? "bg-destructive/10" : row.status === "success" ? "bg-green-500/10" : "hover:bg-muted/50"}>
+                    <tr key={idx} className={row.status === "error" ? "bg-destructive/10" : row.status === "success" ? "bg-green-500/10" : row.status === "duplicate" ? "bg-amber-500/10" : "hover:bg-muted/50"}>
                       <td className="px-2 py-1 text-muted-foreground">{idx + 1}</td>
                       <td className="px-2 py-1">
                         <Input value={row.company_name} onChange={(e) => updateRow(idx, "company_name", e.target.value)} className="h-7 text-xs" />
@@ -390,6 +495,16 @@ export default function AdminBulkFirmTab() {
                       </td>
                       <td className="px-2 py-1">
                         <Input value={row.description} onChange={(e) => updateRow(idx, "description", e.target.value)} className="h-7 text-xs" />
+                      </td>
+                      <td className="px-2 py-1 align-top">
+                        {row.sourceText ? (
+                          <details className="text-xs text-muted-foreground">
+                            <summary className="cursor-pointer">Göster</summary>
+                            <p className="mt-1 max-w-[260px] whitespace-pre-wrap select-text">{row.sourceText}</p>
+                          </details>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
                       </td>
                       <td className="px-2 py-1">
                         <Popover>
@@ -444,6 +559,7 @@ export default function AdminBulkFirmTab() {
                       </td>
                       <td className="px-2 py-1">
                         {row.status === "success" && <Badge className="bg-green-600 text-[10px]">Eklendi</Badge>}
+                        {row.status === "duplicate" && <Badge variant="secondary" className="text-[10px]">Zaten kayıtlı</Badge>}
                         {row.status === "error" && (
                           <Badge variant="destructive" className="text-[10px]" title={row.errorMsg}>{row.errorMsg?.slice(0, 20) || "Hata"}</Badge>
                         )}

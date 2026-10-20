@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { generateFirmSlug } from "@/lib/firmUtils";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
-import { Building2, LogIn, UserPlus, CheckCircle } from "lucide-react";
+import { Building2, CheckCircle, Clock, Loader2, LogIn, UserPlus } from "lucide-react";
 import { TURKISH_CITIES } from "@/lib/leadFormData";
 import { DISTRICTS_BY_CITY } from "@/lib/districts";
+import { maskEmail } from "@/lib/outreachTemplates";
+import OtpStep from "@/app/firma-sahiplen/_components/OtpStep";
+import {
+  callClaimFirm,
+  isClaimError,
+  startSession,
+  type ClaimErrorBody,
+  type LoginVerified,
+  type RegisterPending,
+  type SendOtpOk,
+} from "@/app/firma-sahiplen/_components/claimClient";
 
 const SERVICE_OPTIONS = [
   "Bahçe Düzenleme",
@@ -28,11 +39,13 @@ const SERVICE_OPTIONS = [
 ];
 
 type FormErrors = Record<string, string>;
+type LoginStep = "email" | "otp" | "pending" | "none";
+type RegisterStep = "form" | "otp" | "done" | "exists" | "pending";
 
 const validateEmail = (email: string): string | null => {
   if (!email.trim()) return "E-posta adresi zorunludur.";
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!re.test(email)) return "Geçerli bir e-posta adresi girin.";
+  if (!re.test(email.trim())) return "Geçerli bir e-posta adresi girin.";
   return null;
 };
 
@@ -44,18 +57,12 @@ const validatePhone = (phone: string): string | null => {
   return null;
 };
 
-const validatePassword = (password: string): string | null => {
-  if (!password) return "Şifre zorunludur.";
-  if (password.length < 8) return "Şifre en az 8 karakter olmalıdır.";
-  if (!/[A-Z]/.test(password)) return "Şifre en az 1 büyük harf içermelidir.";
-  if (!/[0-9]/.test(password)) return "Şifre en az 1 rakam içermelidir.";
-  return null;
-};
-
 const validateWebsite = (url: string): string | null => {
   if (!url.trim()) return null; // optional
+  const value = url.trim();
+  if (/^http:\/\//i.test(value)) return "Web adresi https:// ile başlamalıdır.";
   try {
-    const u = new URL(url.startsWith("http") ? url : `https://${url}`);
+    const u = new URL(/^https:\/\//i.test(value) ? value : `https://${value}`);
     if (!u.hostname.includes(".")) return "Geçerli bir web adresi girin.";
     return null;
   } catch {
@@ -63,40 +70,28 @@ const validateWebsite = (url: string): string | null => {
   }
 };
 
+const FieldError = ({ message }: { message?: string }) =>
+  message ? <p className="mt-1 text-sm text-destructive">{message}</p> : null;
+
 const FirmaGiris = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [signupSuccess, setSignupSuccess] = useState(false);
-
-  // Check for existing session on mount
-  useState(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        // Only redirect if approved firm
-        const { data: firm } = await supabase
-          .from("firms")
-          .select("is_approved")
-          .eq("user_id", session.user.id)
-          .single();
-
-        if (firm?.is_approved) {
-          router.push("/firma/panel");
-        }
-      }
-    };
-    checkSession();
-  });
-
+  const [tab, setTab] = useState("login");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sentAt, setSentAt] = useState(0);
+  const [resendAfter, setResendAfter] = useState(60);
 
   // Login state
+  const [loginStep, setLoginStep] = useState<LoginStep>("email");
   const [loginEmail, setLoginEmail] = useState("");
+  const [usePassword, setUsePassword] = useState(false);
   const [loginPassword, setLoginPassword] = useState("");
 
-  // Signup state
+  // Registration state
+  const [registerStep, setRegisterStep] = useState<RegisterStep>("form");
+  const [existingFirmId, setExistingFirmId] = useState<string | null>(null);
   const [signupEmail, setSignupEmail] = useState("");
-  const [signupPassword, setSignupPassword] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
@@ -105,9 +100,148 @@ const FirmaGiris = () => {
   const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
   const [services, setServices] = useState<string[]>([]);
+  const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const availableDistricts = city ? (DISTRICTS_BY_CITY[city] || []) : [];
+
+  // A signed-in, approved firm owner goes straight to the panel
+  useEffect(() => {
+    let cancelled = false;
+    const redirectOwner = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user || cancelled) return;
+
+      const [{ data: roles }, { data: firms }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", session.user.id).eq("role", "firm"),
+        supabase.from("firms").select("id").eq("user_id", session.user.id).eq("is_approved", true).limit(1),
+      ]);
+      if (!cancelled && (roles?.length ?? 0) > 0 && (firms?.length ?? 0) > 0) router.push("/firma/panel");
+    };
+    void redirectOwner();
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  const finishLogin = () => {
+    toast({ title: "Giriş başarılı!", description: "Firma paneline yönlendiriliyorsunuz." });
+    router.push("/firma/panel");
+  };
+
+  const switchTab = (next: string) => {
+    setError(null);
+    setTab(next);
+  };
+
+  // --- Passwordless login ----------------------------------------------------------------------
+
+  const sendLoginCode = async () => {
+    const email = loginEmail.trim().toLowerCase();
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setError(emailError);
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    const result = await callClaimFirm<SendOtpOk>({ action: "login_send", email });
+    setBusy(false);
+    if (isClaimError(result)) {
+      setError(result.message);
+      return;
+    }
+    setSentAt(Date.now());
+    setResendAfter(result.resend_after);
+    setLoginStep("otp");
+  };
+
+  const verifyLoginCode = async (otp: string) => {
+    setBusy(true);
+    setError(null);
+    const result = await callClaimFirm<LoginVerified>({
+      action: "login_verify",
+      email: loginEmail.trim().toLowerCase(),
+      otp,
+    });
+    if (isClaimError(result)) {
+      setBusy(false);
+      setError(result.message);
+      return;
+    }
+
+    if (result.firm_status === "approved") {
+      const signedIn = await startSession(result.token_hash);
+      setBusy(false);
+      if (!signedIn) {
+        setError("Giriş başlatılamadı. Lütfen yeni bir kod isteyin.");
+        return;
+      }
+      finishLogin();
+      return;
+    }
+    setBusy(false);
+    setLoginStep(result.firm_status === "pending" ? "pending" : "none");
+  };
+
+  const resetLogin = () => {
+    setError(null);
+    setLoginStep("email");
+  };
+
+  // --- Password login (accounts created before the e-mail code) ---------------------------------
+
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: loginEmail.trim(),
+        password: loginPassword,
+      });
+      if (signInError) {
+        throw new Error(
+          /invalid login credentials/i.test(signInError.message)
+            ? "E-posta veya şifre hatalı."
+            : "Giriş yapılamadı. Lütfen tekrar deneyin.",
+        );
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Giriş başarısız.");
+
+      const [{ data: roles }, { data: firms }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "firm"),
+        supabase
+          .from("firms")
+          .select("is_approved")
+          .eq("user_id", user.id)
+          .order("is_approved", { ascending: false })
+          .limit(1),
+      ]);
+      const firm = firms?.[0];
+
+      // Approval is checked first: the firm role is only granted when an admin approves the firm.
+      if (firm && !firm.is_approved) {
+        await supabase.auth.signOut();
+        setLoginStep("pending");
+        return;
+      }
+      if (!firm || (roles?.length ?? 0) === 0) {
+        await supabase.auth.signOut();
+        throw new Error("Bu hesap firma hesabı değil.");
+      }
+
+      finishLogin();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Giriş yapılamadı. Lütfen tekrar deneyin.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // --- Registration ------------------------------------------------------------------------------
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -115,281 +249,509 @@ const FirmaGiris = () => {
     if (emailErr) newErrors.email = emailErr;
     const phoneErr = validatePhone(phone);
     if (phoneErr) newErrors.phone = phoneErr;
-    const passErr = validatePassword(signupPassword);
-    if (passErr) newErrors.password = passErr;
     const webErr = validateWebsite(website);
     if (webErr) newErrors.website = webErr;
-    if (!companyName.trim()) newErrors.companyName = "Firma adı zorunludur.";
+    if (companyName.trim().length < 2) newErrors.companyName = "Firma adı zorunludur.";
     if (!city) newErrors.city = "İl seçimi zorunludur.";
     if (services.length === 0) newErrors.services = "En az bir hizmet türü seçin.";
+    if (!consent) newErrors.consent = "Devam etmek için aydınlatma metnini okuduğunuzu onaylayın.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword,
-      });
-      if (error) throw error;
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Giriş başarısız");
-
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "firm");
-
-      if (!roles || roles.length === 0) {
-        await supabase.auth.signOut();
-        throw new Error("Bu hesap firma hesabı değil.");
-      }
-
-      const { data: firm } = await supabase
-        .from("firms")
-        .select("is_approved")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!firm?.is_approved) {
-        await supabase.auth.signOut();
-        throw new Error("Firma hesabınız henüz onaylanmamış. Admin onayı bekleniyor.");
-      }
-
-      toast({ title: "Giriş başarılı!", description: "Firma paneline yönlendiriliyorsunuz." });
-      router.push("/firma/panel");
-    } catch (err: any) {
-      toast({ title: "Hata", description: err.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    setLoading(true);
-    try {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: signupEmail,
-        password: signupPassword,
-        options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_SITE_URL || window.location.origin,
-          data: { company_name: companyName, phone },
-        },
-      });
-      if (signUpError) throw signUpError;
-
-      if (signUpData.user) {
-        const { error: roleError } = await supabase.functions.invoke("assign-firm-role", {
-          body: { user_id: signUpData.user.id }
-        });
-        if (roleError) throw roleError;
-
-        const websiteValue = website.trim()
-          ? (website.startsWith("http") ? website.trim() : `https://${website.trim()}`)
-          : null;
-
-        const firmSlug = generateFirmSlug(companyName, signUpData.user.id);
-
-        const { error: firmError } = await supabase.from("firms").insert({
-          user_id: signUpData.user.id,
-          company_name: companyName,
-          phone,
-          email: signupEmail,
-          city,
-          district: district || null,
-          address: address || null,
-          website: websiteValue,
-          description: description || null,
-          services,
-          is_approved: false,
-          slug: firmSlug,
-        });
-        if (firmError) throw firmError;
-
-        await supabase.auth.signOut();
-        setSignupSuccess(true);
-      }
-    } catch (err: any) {
-      toast({ title: "Hata", description: err.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
+  const clearFieldError = (field: string) => {
+    if (errors[field]) setErrors((p) => ({ ...p, [field]: "" }));
   };
 
   const toggleService = (service: string) => {
-    setServices((prev) =>
-      prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
+    setServices((prev) => (prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]));
+    clearFieldError("services");
+  };
+
+  /**
+   * The phone number is already in the directory: a live listing is claimed instead of registered again
+   * (phone_exists), and an application that is still waiting for review gets the same "inceleniyor" card as
+   * the login (application_pending), not a link to a page that does not exist yet.
+   */
+  const showRegisterRefusal = (result: ClaimErrorBody) => {
+    if (result.error === "phone_exists" && result.firm_id) {
+      setExistingFirmId(result.firm_id);
+      setRegisterStep("exists");
+    } else if (result.error === "application_pending") {
+      setRegisterStep("pending");
+    } else {
+      setError(result.message);
+    }
+  };
+
+  const sendRegisterCode = async () => {
+    setBusy(true);
+    setError(null);
+    const result = await callClaimFirm<SendOtpOk>({
+      action: "send_otp",
+      purpose: "register",
+      email: signupEmail.trim().toLowerCase(),
+      register: {
+        company_name: companyName.trim(),
+        phone: phone.trim(),
+        city,
+        district: district || undefined,
+        address: address.trim() || undefined,
+        website: website.trim() || undefined,
+        description: description.trim() || undefined,
+        services,
+      },
+    });
+    setBusy(false);
+
+    if (isClaimError(result)) {
+      showRegisterRefusal(result);
+      return;
+    }
+    setSentAt(Date.now());
+    setResendAfter(result.resend_after);
+    setRegisterStep("otp");
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    await sendRegisterCode();
+  };
+
+  const verifyRegisterCode = async (otp: string) => {
+    setBusy(true);
+    setError(null);
+    const result = await callClaimFirm<RegisterPending>({
+      action: "verify_otp",
+      purpose: "register",
+      email: signupEmail.trim().toLowerCase(),
+      otp,
+    });
+    setBusy(false);
+
+    if (isClaimError(result)) {
+      showRegisterRefusal(result);
+      return;
+    }
+    setRegisterStep("done");
+  };
+
+  const spinner = busy ? <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" /> : null;
+
+  const errorLine = error && (
+    <p role="alert" className="text-sm font-medium text-destructive">
+      {error}
+    </p>
+  );
+
+  // --- Screens -----------------------------------------------------------------------------------
+
+  const statusCard = (icon: React.ReactNode, title: string, body: React.ReactNode, actions: React.ReactNode) => (
+    <>
+      <Navbar />
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 pb-8 pt-20">
+        <Card className="w-full max-w-md border-border text-center">
+          <CardContent className="space-y-4 pb-8 pt-8">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary text-primary">{icon}</div>
+            <h1 className="text-[1.75rem] leading-tight">{title}</h1>
+            <div className="text-muted-foreground">{body}</div>
+            <div className="flex flex-col gap-2">{actions}</div>
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  );
+
+  if (registerStep === "done") {
+    return statusCard(
+      <CheckCircle className="h-8 w-8" aria-hidden="true" />,
+      "Başvurunuz alındı",
+      <p>Başvurunuz inceleniyor. Onaylandığında e-posta ile haber vereceğiz.</p>,
+      <Button variant="outline" onClick={() => router.push("/")}>
+        Ana sayfaya dön
+      </Button>,
     );
-    if (errors.services) setErrors((p) => ({ ...p, services: "" }));
-  };
+  }
 
-  const FieldError = ({ field }: { field: string }) => {
-    if (!errors[field]) return null;
-    return <p className="text-sm text-destructive mt-1">{errors[field]}</p>;
-  };
+  if (registerStep === "exists" && existingFirmId) {
+    return statusCard(
+      <Building2 className="h-8 w-8" aria-hidden="true" />,
+      "Firmanız dizinde zaten kayıtlı",
+      <p>Bu telefon numarasıyla kayıtlı bir profil var. Yeni başvuru yerine mevcut profili sahiplenin.</p>,
+      <Button asChild variant="accent" size="lg">
+        <Link href={`/firma-sahiplen/${existingFirmId}`}>Profili sahiplen</Link>
+      </Button>,
+    );
+  }
 
-  if (signupSuccess) {
-    return (
+  if (registerStep === "pending" || (tab === "login" && loginStep === "pending")) {
+    return statusCard(
+      <Clock className="h-8 w-8" aria-hidden="true" />,
+      "Başvurunuz inceleniyor",
+      <p>Başvurunuz inceleniyor. Onaylandığında e-posta ile haber vereceğiz.</p>,
+      <Button variant="outline" onClick={() => router.push("/")}>
+        Ana sayfaya dön
+      </Button>,
+    );
+  }
+
+  if (tab === "login" && loginStep === "none") {
+    return statusCard(
+      <Building2 className="h-8 w-8" aria-hidden="true" />,
+      "Bu e-posta ile kayıtlı firma hesabı yok",
+      <p>Firmanız dizinde listeleniyorsa profilinizi sahiplenebilir, listede yoksa yeni başvuru yapabilirsiniz.</p>,
       <>
-        <Navbar />
-        <div className="min-h-screen pt-20 bg-background flex items-center justify-center px-4">
-          <Card className="w-full max-w-md border-border text-center">
-            <CardContent className="pt-8 pb-8 space-y-4">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                <CheckCircle className="h-8 w-8 text-primary" />
-              </div>
-              <h2 className="text-xl font-bold text-foreground">Başvurunuz Alındı!</h2>
-              <p className="text-muted-foreground">
-                Firma başvurunuz admin onayına gönderildi. Onaylandığında e-posta ile bilgilendirileceksiniz.
-              </p>
-              <Button variant="outline" onClick={() => router.push("/")}>Ana Sayfaya Dön</Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+        <Button asChild variant="accent" size="lg">
+          <Link href="/firma-sahiplen">Firmamı sahiplen</Link>
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            resetLogin();
+            setTab("register");
+          }}
+        >
+          Yeni firma başvurusu
+        </Button>
+        <Button variant="link" onClick={resetLogin}>
+          Başka bir e-posta dene
+        </Button>
+      </>,
     );
   }
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen pt-20 bg-background flex items-center justify-center px-4 py-8">
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 pb-8 pt-24">
         <Card className="w-full max-w-lg border-border">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-              <Building2 className="h-7 w-7 text-primary" />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-primary">
+              <Building2 className="h-7 w-7" aria-hidden="true" />
             </div>
             <CardTitle className="text-2xl text-foreground">Firma Girişi</CardTitle>
             <CardDescription className="text-muted-foreground">
-              Firma hesabınıza giriş yapın veya yeni başvuru oluşturun
+              E-posta adresinize gelen tek kullanımlık kodla girin ya da yeni başvuru oluşturun
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login"><LogIn className="h-4 w-4 mr-2" /> Giriş Yap</TabsTrigger>
-                <TabsTrigger value="signup"><UserPlus className="h-4 w-4 mr-2" /> Kayıt Ol</TabsTrigger>
+            <Tabs value={tab} onValueChange={switchTab} className="w-full">
+              <TabsList className="grid h-auto w-full grid-cols-2 p-1">
+                <TabsTrigger value="login" className="min-h-11">
+                  <LogIn className="mr-2 h-4 w-4" aria-hidden="true" /> Giriş
+                </TabsTrigger>
+                <TabsTrigger value="register" className="min-h-11">
+                  <UserPlus className="mr-2 h-4 w-4" aria-hidden="true" /> Yeni Firma Başvurusu
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">E-posta</Label>
-                    <Input id="login-email" type="email" placeholder="firma@ornek.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required autoComplete="email" />
+                {loginStep === "otp" ? (
+                  <div className="mt-4 space-y-4">
+                    <h2 className="text-xl">Kodu girin</h2>
+                    <OtpStep
+                      hint={maskEmail(loginEmail.trim().toLowerCase())}
+                      sentAt={sentAt}
+                      resendAfter={resendAfter}
+                      busy={busy}
+                      error={error}
+                      onSubmit={verifyLoginCode}
+                      onResend={sendLoginCode}
+                      onBack={resetLogin}
+                      backLabel="E-posta adresini değiştir"
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Şifre</Label>
-                    <Input id="login-password" type="password" placeholder="••••••••" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required autoComplete="current-password" />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
-                  </Button>
-                </form>
+                ) : usePassword ? (
+                  <form onSubmit={handlePasswordLogin} className="mt-4 space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="login-email">E-posta</Label>
+                      <Input
+                        id="login-email"
+                        type="email"
+                        placeholder="firma@ornek.com"
+                        className="h-11"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        required
+                        autoComplete="email"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="login-password">Şifre</Label>
+                      <Input
+                        id="login-password"
+                        type="password"
+                        placeholder="••••••••"
+                        className="h-11"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        required
+                        autoComplete="current-password"
+                      />
+                    </div>
+                    {errorLine}
+                    <Button type="submit" variant="accent" size="lg" className="w-full" disabled={busy}>
+                      {spinner}
+                      {busy ? "Giriş yapılıyor..." : "Şifreyle giriş yap"}
+                    </Button>
+                    <div className="text-center">
+                      <Button
+                        type="button"
+                        variant="link"
+                        onClick={() => {
+                          setError(null);
+                          setUsePassword(false);
+                        }}
+                      >
+                        E-posta koduyla giriş yap
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      void sendLoginCode();
+                    }}
+                    className="mt-4 space-y-4"
+                  >
+                    <div className="space-y-2">
+                      <Label htmlFor="login-email">E-posta</Label>
+                      <Input
+                        id="login-email"
+                        type="email"
+                        inputMode="email"
+                        placeholder="firma@ornek.com"
+                        className="h-11"
+                        value={loginEmail}
+                        onChange={(e) => {
+                          setLoginEmail(e.target.value);
+                          if (error) setError(null);
+                        }}
+                        required
+                        autoComplete="email"
+                      />
+                      <p className="text-xs text-muted-foreground">Size 6 haneli tek kullanımlık bir kod göndeririz. Şifre gerekmez.</p>
+                    </div>
+                    {errorLine}
+                    <Button type="submit" variant="accent" size="lg" className="w-full" disabled={busy}>
+                      {spinner}
+                      {busy ? "Kod gönderiliyor..." : "Giriş kodu gönder"}
+                    </Button>
+                    <div className="text-center">
+                      <Button
+                        type="button"
+                        variant="link"
+                        onClick={() => {
+                          setError(null);
+                          setUsePassword(true);
+                        }}
+                      >
+                        Şifrem var
+                      </Button>
+                    </div>
+                  </form>
+                )}
               </TabsContent>
 
-              <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="company-name">Firma Adı *</Label>
-                    <Input id="company-name" placeholder="Örn: Yeşil Peyzaj Ltd." value={companyName} onChange={(e) => { setCompanyName(e.target.value); if (errors.companyName) setErrors((p) => ({ ...p, companyName: "" })); }} />
-                    <FieldError field="companyName" />
+              <TabsContent value="register">
+                {registerStep === "otp" ? (
+                  <div className="mt-4 space-y-4">
+                    <h2 className="text-xl">E-postanızı doğrulayın</h2>
+                    <OtpStep
+                      hint={maskEmail(signupEmail.trim().toLowerCase())}
+                      sentAt={sentAt}
+                      resendAfter={resendAfter}
+                      busy={busy}
+                      error={error}
+                      onSubmit={verifyRegisterCode}
+                      onResend={sendRegisterCode}
+                      onBack={() => {
+                        setError(null);
+                        setRegisterStep("form");
+                      }}
+                      backLabel="Bilgileri düzenle"
+                    />
                   </div>
-
-                  <div className="grid grid-cols-2 gap-3">
+                ) : (
+                  <form onSubmit={handleRegister} className="mt-4 space-y-4" noValidate>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-phone">Telefon *</Label>
-                      <Input id="signup-phone" type="tel" placeholder="05XX XXX XX XX" value={phone} onChange={(e) => { setPhone(e.target.value); if (errors.phone) setErrors((p) => ({ ...p, phone: "" })); }} />
-                      <FieldError field="phone" />
+                      <Label htmlFor="company-name">Firma Adı *</Label>
+                      <Input
+                        id="company-name"
+                        placeholder="Örn: Yeşil Peyzaj Ltd."
+                        className="h-11"
+                        value={companyName}
+                        onChange={(e) => {
+                          setCompanyName(e.target.value);
+                          clearFieldError("companyName");
+                        }}
+                      />
+                      <FieldError message={errors.companyName} />
                     </div>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-phone">Telefon *</Label>
+                        <Input
+                          id="signup-phone"
+                          type="tel"
+                          inputMode="tel"
+                          placeholder="05XX XXX XX XX"
+                          className="h-11"
+                          value={phone}
+                          onChange={(e) => {
+                            setPhone(e.target.value);
+                            clearFieldError("phone");
+                          }}
+                        />
+                        <FieldError message={errors.phone} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="website">Web Sitesi</Label>
+                        <Input
+                          id="website"
+                          type="url"
+                          placeholder="https://firma.com"
+                          className="h-11"
+                          value={website}
+                          onChange={(e) => {
+                            setWebsite(e.target.value);
+                            clearFieldError("website");
+                          }}
+                        />
+                        <FieldError message={errors.website} />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label>İl *</Label>
+                        <Select
+                          value={city}
+                          onValueChange={(val) => {
+                            setCity(val);
+                            setDistrict("");
+                            clearFieldError("city");
+                          }}
+                        >
+                          <SelectTrigger className="h-11">
+                            <SelectValue placeholder="İl seçin" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {TURKISH_CITIES.map((c) => (
+                              <SelectItem key={c} value={c}>
+                                {c}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FieldError message={errors.city} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>İlçe</Label>
+                        <Select value={district} onValueChange={setDistrict} disabled={!city}>
+                          <SelectTrigger className="h-11">
+                            <SelectValue placeholder={city ? "İlçe seçin" : "Önce il seçin"} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableDistricts.map((d) => (
+                              <SelectItem key={d} value={d}>
+                                {d}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="website">Web Sitesi</Label>
-                      <Input id="website" type="url" placeholder="https://firma.com" value={website} onChange={(e) => { setWebsite(e.target.value); if (errors.website) setErrors((p) => ({ ...p, website: "" })); }} />
-                      <FieldError field="website" />
+                      <Label htmlFor="address">Adres</Label>
+                      <Textarea
+                        id="address"
+                        placeholder="Firma adresi (opsiyonel)"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        rows={2}
+                      />
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                    <fieldset className="space-y-1">
+                      <legend className="mb-1 text-sm font-medium">Hizmet Türleri *</legend>
+                      <div className="grid grid-cols-1 sm:grid-cols-2">
+                        {SERVICE_OPTIONS.map((service) => (
+                          <label key={service} className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+                            <Checkbox checked={services.includes(service)} onCheckedChange={() => toggleService(service)} />
+                            <span className="text-foreground">{service}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <FieldError message={errors.services} />
+                    </fieldset>
+
                     <div className="space-y-2">
-                      <Label>İl *</Label>
-                      <Select value={city} onValueChange={(val) => { setCity(val); setDistrict(""); if (errors.city) setErrors((p) => ({ ...p, city: "" })); }}>
-                        <SelectTrigger><SelectValue placeholder="İl seçin" /></SelectTrigger>
-                        <SelectContent>
-                          {TURKISH_CITIES.map((c) => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FieldError field="city" />
+                      <Label htmlFor="description">Firma Tanıtımı</Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Firmanızı kısaca tanıtın..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={3}
+                        maxLength={1000}
+                      />
                     </div>
-                    <div className="space-y-2">
-                      <Label>İlçe</Label>
-                      <Select value={district} onValueChange={setDistrict} disabled={!city}>
-                        <SelectTrigger><SelectValue placeholder={city ? "İlçe seçin" : "Önce il seçin"} /></SelectTrigger>
-                        <SelectContent>
-                          {availableDistricts.map((d) => (
-                            <SelectItem key={d} value={d}>{d}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Adres</Label>
-                    <Textarea id="address" placeholder="Firma adresi (opsiyonel)" value={address} onChange={(e) => setAddress(e.target.value)} rows={2} />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Hizmet Türleri *</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {SERVICE_OPTIONS.map((service) => (
-                        <label key={service} className="flex items-center gap-2 text-sm cursor-pointer">
-                          <Checkbox
-                            checked={services.includes(service)}
-                            onCheckedChange={() => toggleService(service)}
-                          />
-                          <span className="text-foreground">{service}</span>
-                        </label>
-                      ))}
-                    </div>
-                    <FieldError field="services" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Firma Tanıtımı</Label>
-                    <Textarea id="description" placeholder="Firmanızı kısaca tanıtın..." value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
-                  </div>
-
-                  <div className="border-t border-border pt-4 space-y-4">
-                    <p className="text-sm font-medium text-muted-foreground">Hesap Bilgileri</p>
-                    <div className="space-y-2">
+                    <div className="space-y-2 border-t border-border pt-4">
                       <Label htmlFor="signup-email">E-posta *</Label>
-                      <Input id="signup-email" type="email" placeholder="firma@ornek.com" value={signupEmail} onChange={(e) => { setSignupEmail(e.target.value); if (errors.email) setErrors((p) => ({ ...p, email: "" })); }} autoComplete="email" />
-                      <FieldError field="email" />
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        inputMode="email"
+                        placeholder="firma@ornek.com"
+                        className="h-11"
+                        value={signupEmail}
+                        onChange={(e) => {
+                          setSignupEmail(e.target.value);
+                          clearFieldError("email");
+                        }}
+                        autoComplete="email"
+                      />
+                      <p className="text-xs text-muted-foreground">Doğrulama kodu ve giriş kodları bu adrese gelir. Şifre belirlemeniz gerekmez.</p>
+                      <FieldError message={errors.email} />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password">Şifre *</Label>
-                      <Input id="signup-password" type="password" placeholder="Min. 8 karakter, 1 büyük harf, 1 rakam" value={signupPassword} onChange={(e) => { setSignupPassword(e.target.value); if (errors.password) setErrors((p) => ({ ...p, password: "" })); }} autoComplete="new-password" />
-                      <FieldError field="password" />
+
+                    <div>
+                      <label className="flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm">
+                        <Checkbox
+                          className="mt-0.5"
+                          checked={consent}
+                          onCheckedChange={(checked) => {
+                            setConsent(checked === true);
+                            clearFieldError("consent");
+                          }}
+                        />
+                        <span className="text-foreground">
+                          <Link href="/gizlilik-politikasi" target="_blank" className="font-medium text-primary underline underline-offset-4">
+                            Aydınlatma metnini
+                          </Link>{" "}
+                          okudum.
+                        </span>
+                      </label>
+                      <FieldError message={errors.consent} />
                     </div>
-                  </div>
 
-                  <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground">
-                    ⚠️ Başvurunuz admin onayından geçtikten sonra sisteme giriş yapabilirsiniz.
-                  </div>
+                    <p className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+                      Başvurunuz e-posta doğrulamasından sonra incelenir. Onaylandığında e-posta ile haber veririz.
+                    </p>
 
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Başvuru gönderiliyor..." : "Firma Başvurusu Gönder"}
-                  </Button>
-                </form>
+                    {errorLine}
+                    <Button type="submit" variant="accent" size="lg" className="w-full" disabled={busy}>
+                      {spinner}
+                      {busy ? "Kod gönderiliyor..." : "Doğrulama kodu gönder"}
+                    </Button>
+                  </form>
+                )}
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -400,4 +762,3 @@ const FirmaGiris = () => {
 };
 
 export default FirmaGiris;
-

@@ -1,15 +1,22 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LeadFormWidget from "@/components/lead-form/LeadFormWidget";
-import { Sparkles, ClipboardCheck, Clock, Users } from "lucide-react";
+import TrustBadges from "@/components/TrustBadges";
+import { getPublicStats } from "@/lib/publicStats";
+import { Sparkles, ClipboardCheck, Clock, Users, ShieldCheck, Check } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Teklif Al - Peyzajbul",
   description: "Bahçeniz için profesyonel peyzaj firmalarından hızlıca fiyat teklifi alın. Proje detaylarını paylaşın, uzmanlar size ulaşsın.",
 };
 
-export default function TeklifAlPage() {
+export const revalidate = 3600;
+
+export default async function TeklifAlPage() {
+  const stats = await getPublicStats();
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -30,7 +37,7 @@ export default function TeklifAlPage() {
               Hayalinizdeki Bahçe İçin <br /> <span className="text-accent underline decoration-accent/30 underline-offset-8">Hemen Teklif Alın</span>
             </h1>
             <p className="text-primary-foreground/70 font-body text-balance max-w-2xl mx-auto text-lg leading-relaxed">
-              İhtiyaçlarınızı belirtin, bölgenizdeki en iyi peyzaj firmaları sizi arasın. 
+              İhtiyaçlarınızı belirtin, bölgenizdeki peyzaj firmalarından ilgilenenler sizi arasın.
               Vakit kaybetmeden projenizi hayata geçirin.
             </p>
           </div>
@@ -64,7 +71,7 @@ export default function TeklifAlPage() {
                     <div>
                       <h3 className="font-bold text-lg mb-1">2. Uzmanlarla Eşleşin</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        Talebiniz bölgenizdeki profesyonel peyzaj ekiplerine ve mimarlara iletilir.
+                        Talebiniz e-posta doğrulamasından ve kontrolden geçtikten sonra şehrinizdeki firmalara iletilir.
                       </p>
                     </div>
                   </div>
@@ -76,25 +83,36 @@ export default function TeklifAlPage() {
                     <div>
                       <h3 className="font-bold text-lg mb-1">3. Teklifleri Değerlendirin</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        Firmalar sizinle iletişime geçer, en uygun teklifi ve çözümü seçersiniz.
+                        İlgilenen firmalar (en fazla 3) sizinle iletişime geçer; teklifleri karşılaştırıp karar verirsiniz.
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Trust Badge / Info Card */}
-              <div className="bg-muted/30 border border-border rounded-[2rem] p-8 relative overflow-hidden">
-                <blockquote className="relative z-10 italic text-muted-foreground leading-relaxed">
-                  "Peyzajbul üzerinden verdiğim teklif talebi sayesinde 24 saat içinde 3 farklı firmadan dönüş aldım. Bahçem tam istediğim gibi oldu."
-                </blockquote>
-                <div className="mt-4 flex items-center gap-3">
+              {/* Güvencemiz: wording holds before and after the lead pipeline and PII migrations are applied (auto or admin review, assigned-firms-only access) */}
+              <div className="bg-muted/30 border border-border rounded-[2rem] p-8">
+                <div className="flex items-center gap-3 mb-5">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-primary" />
+                    <ShieldCheck className="h-5 w-5 text-primary" />
                   </div>
-                  <span className="text-sm font-bold">Mutlu Kullanıcı</span>
+                  <h2 className="font-heading text-xl font-bold text-foreground">Güvencemiz</h2>
                 </div>
+                <ul className="space-y-4">
+                  {[
+                    "Talebiniz e-posta doğrulamasından ve otomatik ya da yönetici kontrolünden geçtikten sonra şehrinizdeki uygun firmalardan en fazla 3'üne iletilir.",
+                    "Telefon ve e-posta bilgilerinize yalnızca talebinizin iletildiği firmalar erişebilir; ziyaretçiler ve talebiniz iletilmeyen firmalar bu bilgileri göremez.",
+                    "Peyzajbul aracıdır: fiyat ve sözleşme doğrudan sizinle firma arasındadır; yanıt süresi ve iş alınacağı garanti edilmez.",
+                  ].map((item) => (
+                    <li key={item} className="flex gap-3 text-sm text-muted-foreground leading-relaxed">
+                      <Check className="h-5 w-5 shrink-0 text-primary mt-0.5" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
+
+              <TrustBadges variant="light" stats={stats} className="bg-card border border-border rounded-[2rem] p-8" />
             </div>
 
             {/* Right Column: The Form */}
@@ -102,10 +120,12 @@ export default function TeklifAlPage() {
               <div className="relative">
                 {/* Decorative blob behind the form */}
                 <div className="absolute inset-0 bg-accent/5 blur-3xl -z-10 rounded-full transform scale-90" />
-                <LeadFormWidget className="shadow-2xl border-primary/10" />
+                <LeadFormWidget source="teklif_al" className="shadow-2xl border-primary/10" />
               </div>
               <p className="text-center text-xs text-muted-foreground mt-6 px-4">
-                Talebiniz gönderildiğinde <span className="font-bold">KVKK Metni</span>'ni ve <span className="font-bold">Kullanım Koşulları</span>'nı kabul etmiş sayılırsınız.
+                Talebiniz gönderildiğinde{" "}
+                <Link href="/gizlilik-politikasi" className="font-bold underline underline-offset-2 hover:text-foreground">KVKK Metni</Link>'ni ve{" "}
+                <Link href="/kullanim-kosullari" className="font-bold underline underline-offset-2 hover:text-foreground">Kullanım Koşulları</Link>'nı kabul etmiş sayılırsınız.
               </p>
             </div>
 

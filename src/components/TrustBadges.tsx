@@ -1,26 +1,59 @@
-import { Building2, Users, MapPinned } from "lucide-react";
+import { Building2, MapPinned, Send, ShieldCheck, Star, type LucideIcon } from "lucide-react";
+import { formatAsOf, visibleStatItems, type PublicStatKey, type PublicStats } from "@/lib/publicStats";
 
-const stats = [
-  { icon: Building2, value: "250+", label: "Kayıtlı Firma" },
-  { icon: Users, value: "4.500+", label: "Başarılı Eşleşme" },
-  { icon: MapPinned, value: "81", label: "İl Genelinde" },
-];
+interface TrustBadgesProps {
+  stats: PublicStats | null;
+  /** "dark" expects a bg-primary parent (hero), "light" sits on white or muted backgrounds. */
+  variant?: "dark" | "light";
+  className?: string;
+}
 
-const TrustBadges = () => {
+const ICONS: Record<PublicStatKey, LucideIcon> = {
+  firms: Building2,
+  cities: MapPinned,
+  claimed: ShieldCheck,
+  reviews: Star,
+  leads30d: Send,
+};
+
+const TrustBadges = ({ stats, variant = "dark", className = "" }: TrustBadgesProps) => {
+  if (!stats) return null;
+  const items = visibleStatItems(stats);
+  if (items.length === 0) return null;
+
+  const dark = variant === "dark";
+
   return (
-    <section className="py-16 bg-primary">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto text-center">
-          {stats.map((stat, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <stat.icon className="h-8 w-8 text-accent mb-3" />
-              <div className="font-heading text-3xl font-bold text-primary-foreground">{stat.value}</div>
-              <div className="text-primary-foreground/70 text-sm font-body mt-1">{stat.label}</div>
+    <div className={`text-center ${dark ? "text-primary-foreground" : "text-foreground"} ${className}`}>
+      <div className="flex flex-wrap justify-center gap-x-10 gap-y-6">
+        {items.map((item) => {
+          const Icon = ICONS[item.key];
+          return (
+            <div key={item.key} className="flex flex-col items-center min-w-[7rem]">
+              <Icon className="h-6 w-6 text-accent mb-2" />
+              <div className="font-heading text-2xl md:text-3xl font-bold">
+                {item.value.toLocaleString("tr-TR")}
+              </div>
+              <div
+                className={`text-xs md:text-sm font-body mt-0.5 ${
+                  dark ? "text-primary-foreground/70" : "text-muted-foreground"
+                }`}
+              >
+                {item.label}
+              </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
-    </section>
+      <p
+        className={`mt-6 max-w-2xl mx-auto text-xs font-body ${
+          dark ? "text-primary-foreground/60" : "text-muted-foreground"
+        }`}
+      >
+        Firma bilgileri kamuya açık kaynaklardan derlenir; sahiplenen profiller yönetici onayından geçer. Son güncelleme:{" "}
+        {formatAsOf(stats.asOf)}
+      </p>
+    </div>
   );
 };
 

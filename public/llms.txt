@@ -1,12 +1,12 @@
 # Peyzajbul - Türkiye'nin Peyzaj Firma Rehberi
 
-> Peyzajbul, Türkiye genelinde 81 ilde peyzaj firmalarını listeleyen, karşılaştıran ve ücretsiz teklif almayı sağlayan bir platformdur.
+> Peyzajbul, Türkiye'deki peyzaj firmalarını kamuya açık kaynaklardan derleyen, karşılaştırmaya ve ücretsiz teklif istemeye olanak tanıyan bir rehberdir. Güncel firma ve il sayıları /firmalar ve /iller sayfalarındadır.
 
 ## Ana Sayfalar
 
 - [Ana Sayfa](https://www.peyzajbul.com/): Öne çıkan firmalar, hizmetler ve nasıl çalışır bölümü
-- [Tüm Firmalar](https://www.peyzajbul.com/firmalar): Onaylı peyzaj firmalarının tam listesi
-- [İller](https://www.peyzajbul.com/iller): 81 il bazında peyzaj firmaları
+- [Tüm Firmalar](https://www.peyzajbul.com/firmalar): Rehberde listelenen peyzaj firmaları
+- [İller](https://www.peyzajbul.com/iller): İl bazında peyzaj firmaları (yalnızca firma kaydı bulunan iller)
 - [Kategoriler](https://www.peyzajbul.com/hizmetler): 20 hizmet kategorisi
 
 ## Hizmet Kategorileri
@@ -42,9 +42,10 @@
 
 ## Platform Özellikleri
 
-- Türkiye'nin 81 ilinde peyzaj firma rehberi
+- İl bazında peyzaj firma rehberi
 - 20 farklı peyzaj hizmet kategorisi
 - Ücretsiz teklif alma sistemi
-- Premium firma profilleri (galeri, detaylı hizmetler, harita)
-- Müşteri değerlendirmeleri ve puanlama
+- Öne çıkan (ücretli üyelik) firma profilleri (galeri, detaylı hizmetler, harita); sponsorlu yerleşim reklam niteliğindedir ve doğrulama anlamına gelmez
+- Müşteri değerlendirmeleri (yönetici onaylı, henüz sınırlı sayıda)
 - Firma karşılaştırma imkanı
+- [Tam İçerik (llms-full.txt)](https://www.peyzajbul.com/llms-full.txt): Blog, bitki rehberi, malzeme ansiklopedisi ve SSS dahil genişletilmiş sürüm

@@ -1,9 +1,10 @@
 import FirmaKayitLandingClient from "@/views/FirmaKayitLanding";
+import { getPublicStats } from "@/lib/publicStats";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Peyzaj Firması Kayıt | İşinizi ve Müşteri Kitlenizi Büyütün",
-  description: "Peyzaj firmanızı Peyzajbul'a kaydederek daha fazla müşteriye ulaşın. 81 ilde binlerce bahçe sahibinin sizi bulmasını sağlayın. Ücretsiz kayıt olun.",
+  description: "Peyzaj firmanızı Peyzajbul rehberine ekleyin ya da rehberde zaten listelenen profilinizi sahiplenin. Kayıt ücretsizdir, kredi kartı gerekmez.",
   alternates: {
     canonical: "https://www.peyzajbul.com/isletme-ekle",
   },
@@ -32,14 +33,18 @@ const faqJsonLd = {
   ]
 };
 
-export default function IsletmeEklePage() {
+export const revalidate = 3600;
+
+export default async function IsletmeEklePage() {
+  const stats = await getPublicStats();
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <FirmaKayitLandingClient />
+      <FirmaKayitLandingClient stats={stats} />
     </>
   );
 }

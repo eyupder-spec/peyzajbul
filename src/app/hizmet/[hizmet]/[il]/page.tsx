@@ -7,6 +7,7 @@ import {
   getCityName,
   seoCities,
   seoDistricts,
+  generateServiceCityFaq,
 } from '@/lib/seo-data';
 import { getCategoryBySlug, getAllCategories } from '@/lib/categories';
 import HizmetBolgeDetay from '@/views/HizmetBolgeDetay';
@@ -73,7 +74,8 @@ export default async function ServiceCityPage({ params }: PageProps) {
   const cityName = getCityName(il);
   const fullLocation = cityName;
 
-  const schemaData = {
+  // Service schema
+  const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
     "name": `${cityName} ${category.label} Hizmeti`,
@@ -90,11 +92,46 @@ export default async function ServiceCityPage({ params }: PageProps) {
     "serviceType": category.label
   };
 
+  // FAQPage schema with dynamic city Q&A
+  const cityFaqs = generateServiceCityFaq(category.label, cityName);
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": cityFaqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+
+  // BreadcrumbList schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://www.peyzajbul.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Hizmetler", "item": "https://www.peyzajbul.com/hizmetler" },
+      { "@type": "ListItem", "position": 3, "name": category.label, "item": `https://www.peyzajbul.com/hizmetler/${category.slug}` },
+      { "@type": "ListItem", "position": 4, "name": cityName, "item": `https://www.peyzajbul.com/hizmet/${category.slug}/${il}` }
+    ]
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <HizmetBolgeDetay
         category={category}

@@ -1,6 +1,16 @@
+import { Metadata } from "next";
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Gizlilik Politikası | Peyzajbul",
+  description:
+    "Peyzajbul platformu gizlilik politikası: toplanan veriler, kullanım amaçları, veri paylaşımı ve hesap silme haklarınız.",
+  alternates: {
+    canonical: "https://www.peyzajbul.com/gizlilik-politikasi",
+  },
+};
 
 export default function PrivacyPolicyPage() {
   return (

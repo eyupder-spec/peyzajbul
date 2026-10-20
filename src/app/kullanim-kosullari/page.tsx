@@ -1,6 +1,16 @@
+import { Metadata } from "next";
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Kullanım Koşulları | Peyzajbul",
+  description:
+    "Peyzajbul platformu kullanım koşulları: hizmet kapsamı, kullanıcı sorumlulukları, fikri mülkiyet ve değişiklik hakları.",
+  alternates: {
+    canonical: "https://www.peyzajbul.com/kullanim-kosullari",
+  },
+};
 
 export default function TermsOfServicePage() {
   return (

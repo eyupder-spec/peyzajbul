@@ -21,7 +21,8 @@ export default async function HizmetDetayPage({ params }: { params: Promise<{ sl
   const resolvedParams = await params;
   const category = getCategoryBySlug(resolvedParams.slug);
 
-  const schemaData = category ? {
+  // Service schema
+  const serviceSchema = category ? {
     "@context": "https://schema.org",
     "@type": "Service",
     "name": category.label,
@@ -35,12 +36,49 @@ export default async function HizmetDetayPage({ params }: { params: Promise<{ sl
     "url": `https://www.peyzajbul.com/hizmetler/${category.slug}`
   } : null;
 
+  // FAQPage schema (only if faqs exist)
+  const faqSchema = category && category.faqs && category.faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": category.faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  } : null;
+
+  // BreadcrumbList schema
+  const breadcrumbSchema = category ? {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://www.peyzajbul.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Hizmetler", "item": "https://www.peyzajbul.com/hizmetler" },
+      { "@type": "ListItem", "position": 3, "name": category.label, "item": `https://www.peyzajbul.com/hizmetler/${category.slug}` }
+    ]
+  } : null;
+
   return (
     <>
-      {schemaData && (
+      {serviceSchema && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+        />
+      )}
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
+      {breadcrumbSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
       )}
       <HizmetDetayClient slug={resolvedParams.slug} />

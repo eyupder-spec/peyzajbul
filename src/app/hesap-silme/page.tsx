@@ -1,8 +1,19 @@
+import { Metadata } from "next";
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Trash2, ShieldCheck, Mail } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Hesap Silme Talebi | Peyzajbul",
+  description:
+    "Peyzajbul hesabınızı ve tüm ilişkili verilerinizi kalıcı olarak silmek için adım adım talimatlar.",
+  robots: { index: false, follow: false },
+  alternates: {
+    canonical: "https://www.peyzajbul.com/hesap-silme",
+  },
+};
 
 export default function AccountDeletionPage() {
   return (

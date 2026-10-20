@@ -126,6 +126,34 @@ export function generateServiceCityParams(services: { slug: string }[]) {
   return params;
 }
 
+////////////////////////////////////////////////////
+// DYNAMIC GEO FAQ GENERATOR
+////////////////////////////////////////////////////
+
+export function generateServiceCityFaq(
+  serviceLabel: string,
+  cityName: string,
+  districtName?: string
+): { question: string; answer: string }[] {
+  const location = districtName || cityName;
+  const locationFull = districtName ? `${districtName}, ${cityName}` : cityName;
+
+  return [
+    {
+      question: `${location} bölgesinde ${serviceLabel.toLowerCase()} hizmeti veren firma var mı?`,
+      answer: `Evet, ${locationFull} bölgesinde ${serviceLabel.toLowerCase()} hizmeti sunan onaylı peyzaj firmaları bulunmaktadır. Peyzajbul üzerinden bölgenizdeki firmaları listeleyebilir, portföylerini inceleyebilir ve ücretsiz teklif alabilirsiniz.`
+    },
+    {
+      question: `${locationFull} bölgesinde ${serviceLabel.toLowerCase()} için nasıl teklif alabilirim?`,
+      answer: `${locationFull} bölgesinde ${serviceLabel.toLowerCase()} hizmeti için Peyzajbul üzerinden birden fazla firmaya aynı anda teklif talebi gönderebilirsiniz. Firmalar projenizi değerlendirerek size özel fiyat tekliflerini iletecek, siz de bütçenize en uygun seçeneği belirleyebileceksiniz.`
+    },
+    {
+      question: `${serviceLabel} firması seçerken nelere dikkat etmeliyim?`,
+      answer: `${locationFull} bölgesinde ${serviceLabel.toLowerCase()} firması seçerken daha önce tamamladıkları projeleri incelemek, müşteri yorumlarını okumak ve birden fazla firmadan teklif alarak karşılaştırma yapmak önemlidir. Peyzajbul üzerinde firma profillerinde yer alan referanslar ve puanlar karar vermenize yardımcı olur.`
+    }
+  ];
+}
+
 export function generateServiceCityDistrictParams(
   services: { slug: string }[]
 ) {

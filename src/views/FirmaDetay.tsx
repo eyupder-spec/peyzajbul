@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import FirmDetailContent from "@/components/FirmDetailContent";
 import PremiumLandingPage from "@/components/premium-landing/PremiumLandingPage";
 
-const FirmaDetay = ({ slug }: { slug?: string }) => {
+const FirmaDetay = ({ slug, initialFirm, initialReviews, initialGallery }: { slug?: string; initialFirm?: any; initialReviews?: any[]; initialGallery?: any[] }) => {
   // Quick premium check
   const { data: firmMeta, isLoading } = useQuery({
     queryKey: ["firm-premium-check", slug],
@@ -44,7 +44,7 @@ const FirmaDetay = ({ slug }: { slug?: string }) => {
       {isPremiumActive && slug ? (
         <PremiumLandingPage slug={slug} />
       ) : (
-        <FirmDetailContent slug={slug} />
+        <FirmDetailContent slug={slug} initialFirm={initialFirm} initialReviews={initialReviews} initialGallery={initialGallery} />
       )}
       {!isPremiumActive && <Footer />}
     </div>

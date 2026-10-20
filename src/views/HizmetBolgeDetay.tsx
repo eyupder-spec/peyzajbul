@@ -12,6 +12,7 @@ import LeadFormModal from "@/components/lead-form/LeadFormModal";
 import LeadFormWidget from "@/components/lead-form/LeadFormWidget";
 import { useApprovedFirms } from "@/hooks/useFirms";
 import { Category } from "@/lib/categories";
+import { generateServiceCityFaq } from "@/lib/seo-data";
 import Image from "next/image";
 
 interface HizmetBolgeDetayProps {
@@ -131,6 +132,13 @@ const HizmetBolgeDetay = ({
               <article className="prose prose-sm md:prose-base max-w-none prose-headings:text-foreground prose-p:text-muted-foreground leading-relaxed">
                 <h2 className="text-2xl font-bold text-foreground mb-6">{fullLocation} Bölgesinde {category.label} Çözümleri</h2>
 
+                {/* GEO Answer-first intro paragraph */}
+                <div className="bg-primary/5 border border-primary/10 rounded-xl p-5 mb-8">
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                    <strong>{fullLocation}</strong> bölgesinde <strong>{category.label.toLowerCase()}</strong> hizmeti veren onaylı peyzaj firmalarını karşılaştırın, projenize özel ücretsiz teklif alın. Peyzajbul, bölgenizdeki en güvenilir firmaları bir araya getirerek size özel teklif toplama ve firma karşılaştırma imkanı sunar.
+                  </p>
+                </div>
+
                 {category.seoArticle?.split('\n').map((line, i) => {
                   const trimmedLine = line.trim();
                   if (!trimmedLine) return <br key={i} className="hidden" />;
@@ -222,30 +230,23 @@ const HizmetBolgeDetay = ({
                 </div>
               </div>
 
-              {/* FAQ SECTION - NEW SEO SECTION */}
-              <div className="space-y-6 pt-4">
-                <h3 className="heading-premium-h3 text-2xl">{fullLocation} {category.label} Hakkında Sıkça Sorulan Sorular</h3>
-                <div className="grid gap-4">
-                  <div className="border border-border rounded-xl p-6 bg-white shadow-sm">
-                    <h4 className="font-bold mb-2">Peyzaj projesi için fiyatlar nasıl belirlenir?</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Fiyatlandırma genellikle projenin büyüklüğü (m²), kullanılacak bitki türleri, sert zemin uygulamaları ve işçilik detaylarına göre değişir. {cityName} genelindeki firmalar genellikle ücretsiz keşif sonrası net fiyat verirler.
-                    </p>
+              {/* FAQ SECTION - DYNAMIC GEO FAQ */}
+              {(() => {
+                const faqs = generateServiceCityFaq(category.label, cityName, districtName);
+                return (
+                  <div className="space-y-6 pt-4">
+                    <h3 className="heading-premium-h3 text-2xl">{fullLocation} {category.label} Hakkında Sıkça Sorulan Sorular</h3>
+                    <div className="grid gap-4">
+                      {faqs.map((faq, idx) => (
+                        <div key={idx} className="border border-border rounded-xl p-6 bg-white shadow-sm">
+                          <h4 className="font-bold mb-2">{faq.question}</h4>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="border border-border rounded-xl p-6 bg-white shadow-sm">
-                    <h4 className="font-bold mb-2">{category.label} uygulaması ne kadar sürer?</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Ortalama bir bahçe düzenleme veya {category.label.toLowerCase()} projesi, iş kapsamına bağlı olarak 1 hafta ile 1 ay arasında tamamlanmaktadır.
-                    </p>
-                  </div>
-                  <div className="border border-border rounded-xl p-6 bg-white shadow-sm">
-                    <h4 className="font-bold mb-2">Bölgeme en yakın firmayı nasıl bulabilirim?</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Peyzajbul sisteminde konum bazlı filtreleme yaparak {districtName || cityName} içerisinde hizmet veren onaylı profesyonelleri saniyeler içinde listeleyebilirsiniz.
-                    </p>
-                  </div>
-                </div>
-              </div>
+                );
+              })()}
 
 
               <div id="firmalar-listesi" className="pt-8">

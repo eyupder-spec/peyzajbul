@@ -255,6 +255,53 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_comments: {
+        Row: {
+          admin_reply: string | null
+          admin_reply_at: string | null
+          content: string
+          created_at: string
+          id: string
+          is_approved: boolean
+          post_id: string
+          updated_at: string
+          user_email: string | null
+          user_name: string
+        }
+        Insert: {
+          admin_reply?: string | null
+          admin_reply_at?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          post_id: string
+          updated_at?: string
+          user_email?: string | null
+          user_name: string
+        }
+        Update: {
+          admin_reply?: string | null
+          admin_reply_at?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          post_id?: string
+          updated_at?: string
+          user_email?: string | null
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       changelog_entries: {
         Row: {
           content: string | null

@@ -25,7 +25,7 @@ const Iller = () => {
               İllere Göre Peyzaj Firmaları
             </h1>
             <p className="text-primary-foreground/70 font-body">
-              Türkiye'nin 81 ilinde peyzaj firmalarını keşfedin.
+              Bir il seçin, o bölgedeki peyzaj firmalarını inceleyin.
             </p>
           </div>
         </div>

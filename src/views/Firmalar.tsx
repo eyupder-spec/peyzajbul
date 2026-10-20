@@ -10,8 +10,26 @@ import { CITIES } from "@/lib/cities";
 import { SERVICE_LABELS } from "@/lib/categories";
 import LeadFormBanner from "@/components/lead-form/LeadFormBanner";
 
-const Firmalar = () => {
-  const { data: firms, isLoading } = useApprovedFirms();
+interface FirmData {
+  id: string;
+  company_name: string;
+  city: string;
+  district: string | null;
+  services: string[];
+  description: string | null;
+  is_premium: boolean;
+  slug: string | null;
+  logo_url: string | null;
+  gallery_images?: string[];
+}
+
+interface FirmalarProps {
+  initialFirms?: FirmData[];
+}
+
+const Firmalar = ({ initialFirms }: FirmalarProps) => {
+  const { data: firmsFromHook, isLoading } = useApprovedFirms();
+  const firms = firmsFromHook || initialFirms || [];
   const [search, setSearch] = useState("");
   const [cityFilter, setCityFilter] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
@@ -81,7 +99,7 @@ const Firmalar = () => {
             </div>
           </div>
 
-          {isLoading ? (
+          {isLoading && !initialFirms ? (
             <p className="text-center text-muted-foreground">Yükleniyor...</p>
           ) : (
             <>

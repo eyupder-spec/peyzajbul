@@ -7,20 +7,39 @@ import FirmCard from "@/components/FirmCard";
 import { Button } from "@/components/ui/button";
 import { getCityBySlug, generateCitySeoContent, CITIES } from "@/lib/cities";
 import { useFirmsByCity } from "@/hooks/useFirms";
-import { ArrowLeft, MapPin } from "lucide-react";
+import { ArrowLeft, MapPin, ChevronDown } from "lucide-react";
 import RelatedBlogPosts from "@/components/RelatedBlogPosts";
+import { useState } from "react";
 
+interface FirmData {
+  id: string;
+  company_name: string;
+  city: string;
+  district: string | null;
+  services: string[];
+  description: string | null;
+  is_premium: boolean;
+  slug: string | null;
+  logo_url: string | null;
+  gallery_images?: string[];
+}
 
 interface IlFirmalariProps {
   slug: string;
+  initialFirms?: FirmData[];
+  faq?: { question: string; answer: string }[];
 }
 
-const IlFirmalari = ({ slug }: IlFirmalariProps) => {
+const IlFirmalari = ({ slug, initialFirms, faq }: IlFirmalariProps) => {
   // slug format: istanbul-peyzaj-firmalari
   const citySlug = slug?.replace(/-peyzaj-firmalari$/, "") || "";
   const city = getCityBySlug(citySlug);
 
-  const { data: firms, isLoading } = useFirmsByCity(city?.name || "");
+  const { data: firmsFromHook, isLoading } = useFirmsByCity(city?.name || "");
+  const firms = firmsFromHook || initialFirms || [];
+  const hasData = firms.length > 0;
+
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   if (!city) {
     return (
@@ -36,8 +55,6 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
   }
 
   const seo = generateCitySeoContent(city.name);
-
-
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -56,7 +73,7 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
               {city.name} Peyzaj Firmaları
             </h1>
             <p className="text-primary-foreground/70 font-body">
-              {city.name} ilinde hizmet veren profesyonel peyzaj firmalarını keşfedin.
+              {city.name} ilinde onaylı peyzaj firmalarını karşılaştırın ve ücretsiz teklif alın. Profesyonel peyzaj hizmetlerini keşfedin.
             </p>
           </div>
         </div>
@@ -68,9 +85,9 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
             {city.name} İlindeki Firmalar
           </h2>
 
-          {isLoading ? (
+          {isLoading && !initialFirms ? (
             <p className="text-muted-foreground">Yükleniyor...</p>
-          ) : firms && firms.length > 0 ? (
+          ) : hasData ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
               {firms.map((firm) => (
                 <FirmCard
@@ -99,6 +116,31 @@ const IlFirmalari = ({ slug }: IlFirmalariProps) => {
               <Link href="/firma/giris">
                 <Button>Firma Olarak Kaydol</Button>
               </Link>
+            </div>
+          )}
+
+          {/* FAQ Section - always rendered for SSR */}
+          {faq && faq.length > 0 && (
+            <div className="mb-16">
+              <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Sık Sorulan Sorular</h2>
+              <div className="max-w-3xl mx-auto space-y-3">
+                {faq.map((item, index) => (
+                  <div key={index} className="bg-card rounded-lg border border-border overflow-hidden">
+                    <button
+                      onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                      className="w-full flex items-center justify-between p-4 text-left font-heading font-semibold text-foreground hover:bg-muted/50 transition-colors"
+                    >
+                      <h3 className="text-base font-heading font-semibold pr-4">{item.question}</h3>
+                      <ChevronDown className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${openFaq === index ? "rotate-180" : ""}`} />
+                    </button>
+                    {openFaq === index && (
+                      <div className="px-4 pb-4">
+                        <p className="text-sm text-muted-foreground font-body leading-relaxed">{item.answer}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

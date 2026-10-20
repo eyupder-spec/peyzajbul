@@ -115,6 +115,23 @@ const HizmetDetay = ({ slug }: HizmetDetayProps) => {
             </div>
           </article>
 
+          {/* FAQ SECTION */}
+          {category.faqs && category.faqs.length > 0 && (
+            <div className="max-w-4xl mx-auto mb-16 px-4">
+              <h2 className="text-2xl font-bold text-foreground mt-16 mb-8 text-center">
+                {category.label} Hakkında Sıkça Sorulan Sorular
+              </h2>
+              <div className="grid gap-4">
+                {category.faqs.map((faq, idx) => (
+                  <div key={idx} className="border border-border rounded-xl p-6 bg-white shadow-sm">
+                    <h3 className="font-bold mb-2 text-foreground">{faq.question}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <LeadFormBanner />
 
           <h2 className="heading-premium-h3 text-2xl font-bold text-foreground mb-6 text-center justify-center">

@@ -52,13 +52,20 @@ type RelatedProject = {
   city: string;
 };
 
-export default function ProjeDetayClient({ params }: { params: { kategori: string; il: string; firma: string; proje: string } }) {
-  const [project, setProject] = useState<ProjectData | null>(null);
-  const [firm, setFirm] = useState<FirmData | null>(null);
-  const [images, setImages] = useState<ProjectImage[]>([]);
-  const [related, setRelated] = useState<RelatedProject[]>([]);
-  const [totalProjects, setTotalProjects] = useState(0);
-  const [loading, setLoading] = useState(true);
+export default function ProjeDetayClient({ params, initialProject, initialFirm, initialImages, initialRelated, initialTotalProjects }: {
+  params: { kategori: string; il: string; firma: string; proje: string };
+  initialProject?: any | null;
+  initialFirm?: any | null;
+  initialImages?: any[];
+  initialRelated?: any[];
+  initialTotalProjects?: number;
+}) {
+  const [project, setProject] = useState<ProjectData | null>(initialProject || null);
+  const [firm, setFirm] = useState<FirmData | null>(initialFirm || null);
+  const [images, setImages] = useState<ProjectImage[]>(initialImages || []);
+  const [related, setRelated] = useState<RelatedProject[]>(initialRelated || []);
+  const [totalProjects, setTotalProjects] = useState(initialTotalProjects || 0);
+  const [loading, setLoading] = useState(!initialProject);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   useEffect(() => {
@@ -193,7 +200,7 @@ export default function ProjeDetayClient({ params }: { params: { kategori: strin
                     <div className="flex -space-x-2">
                       {images.slice(0, 3).map((img, i) => (
                         <div key={i} className="w-6 h-6 rounded-full border-2 border-background overflow-hidden">
-                          <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                          <img src={img.image_url} alt={img.caption || `${project.title} ${i + 1}`} className="w-full h-full object-cover" />
                         </div>
                       ))}
                     </div>

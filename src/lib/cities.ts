@@ -100,7 +100,7 @@ export function getCitySlug(cityName: string): string {
 export function generateCitySeoContent(cityName: string): { title: string; description: string; article: string } {
   return {
     title: `${cityName} Peyzaj Firmaları | En İyi Peyzaj Şirketleri`,
-    description: `${cityName} ilindeki en iyi peyzaj firmalarını karşılaştırın. Bahçe tasarımı, peyzaj mimarlığı, sulama sistemleri ve daha fazlası için ücretsiz teklif alın.`,
+    description: `${cityName} ilinde onaylı peyzaj firmalarını karşılaştırın ve ücretsiz teklif alın. Bahçe tasarımı, peyzaj mimarlığı, sulama sistemleri ve daha fazlası için güvenilir firmaları keşfedin.`,
     article: `
 ## ${cityName} Peyzaj Firmaları ve Profesyonel Bahçe Çözümleri
 
@@ -143,4 +143,25 @@ Bu sorunun cevabı ${cityName}'ın hangi bölgesinde olduğunuzla ilişkilidir. 
 Aşağıda **${cityName} peyzaj firmaları** listemizi inceleyerek, projeniz için en uygun iş ortağını bulabilir ve hızlıca teklif formunu doldurarak ücretsiz keşif talebinde bulunabilirsiniz.
     `.trim(),
   };
+}
+
+export function generateCityFaq(cityName: string): { question: string; answer: string }[] {
+  return [
+    {
+      question: `${cityName} ilinde kaç peyzaj firması bulunuyor?`,
+      answer: `${cityName} ilinde hizmet veren onaylı peyzaj firmalarını yukarıdaki listede bulabilirsiniz. Liste, aktif ve güvenilir firmaları bir araya getirir; firma sayısı zamanla güncellenmektedir.`,
+    },
+    {
+      question: `${cityName} peyzaj firmalarının fiyatları nasıl belirlenir?`,
+      answer: `Peyzaj projelerinin maliyeti; alan büyüklüğü, kullanılacak malzemeler, bitki türleri ve işçilik kapsamına göre değişir. Net bir fiyat almak için firmalardan ücretsiz keşif ve teklif talep etmeniz önerilir.`,
+    },
+    {
+      question: `${cityName} ilinde en iyi peyzaj firmasını nasıl seçerim?`,
+      answer: `Firmanın daha önce tamamladığı projeleri inceleyerek, müşteri yorumlarını okuyarak ve birden fazla firmadan teklif alarak karşılaştırma yapabilirsiniz. Sitemizdeki firma profilleri ve galeri görselleri seçiminizi kolaylaştırır.`,
+    },
+    {
+      question: `${cityName} peyzaj firmalarından teklif alma süreci nasıl işler?`,
+      answer: `Sitemiz üzerinden firma listesini inceleyip dilediğiniz firmaya yönlendirilebilir veya toplu teklif formumuzu doldurarak birden fazla firmadan aynı anda ücretsiz teklif alabilirsiniz. Firmalar size özel çözüm ve fiyatlandırma sunar.`,
+    },
+  ];
 }

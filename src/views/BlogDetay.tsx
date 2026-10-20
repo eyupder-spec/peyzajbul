@@ -12,6 +12,7 @@ import FirmCard from "@/components/FirmCard";
 import Image from "next/image";
 import LeadFormModal from "@/components/lead-form/LeadFormModal";
 import BannerAd from "@/components/BannerAd";
+import BlogComments from "@/components/blog/BlogComments";
 import {
   ArrowLeft,
   Calendar,
@@ -476,6 +477,9 @@ const BlogDetay = ({ post }: BlogDetayProps) => {
                   </Button>
                 </div>
               </div>
+
+              {/* Blog Yorumları Bölümü */}
+              <BlogComments postId={post.id} postTitle={post.title} />
             </div>
 
             <aside className="lg:col-span-1 space-y-8">

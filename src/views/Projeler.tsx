@@ -26,12 +26,21 @@ type Project = {
   };
 };
 
-export default function ProjelerClient() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+interface ProjelerClientProps {
+  initialProjects?: any[];
+}
+
+export default function ProjelerClient({ initialProjects }: ProjelerClientProps) {
+  const [projects, setProjects] = useState<Project[]>(initialProjects as Project[] || []);
+  const [loading, setLoading] = useState(!initialProjects);
   const [formOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
+    // If initial data was provided server-side, no need to refetch
+    if (initialProjects && initialProjects.length > 0) {
+      setLoading(false);
+      return;
+    }
     const fetchProjects = async () => {
       // Sadece `is_approved`, `is_active` ve `is_premium` olan firmaların projelerini listele
       const { data, error } = await (supabase.from as any)("projects")
@@ -52,7 +61,7 @@ export default function ProjelerClient() {
     };
 
     fetchProjects();
-  }, []);
+  }, [initialProjects]);
 
   return (
     <div className="min-h-screen flex flex-col">

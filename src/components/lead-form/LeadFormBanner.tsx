@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, ArrowRight, X } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import LeadFormWidget from "./LeadFormWidget";
+import LeadFormModal from "./LeadFormModal";
 
 export default function LeadFormBanner() {
   const [open, setOpen] = useState(false);
@@ -44,31 +44,7 @@ export default function LeadFormBanner() {
         </div>
       </div>
 
-      {/* Modal Overlay */}
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setOpen(false);
-          }}
-        >
-          <div className="relative w-full max-w-xl">
-            {/* Close button */}
-            <button
-              onClick={() => setOpen(false)}
-              className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center shadow-md hover:bg-muted transition-colors"
-              aria-label="Kapat"
-            >
-              <X className="h-4 w-4" />
-            </button>
-
-            <LeadFormWidget
-              onSuccess={() => setOpen(false)}
-              className="shadow-2xl border-primary/10"
-            />
-          </div>
-        </div>
-      )}
+      <LeadFormModal open={open} onClose={() => setOpen(false)} source="banner" />
     </>
   );
 }

@@ -1,79 +1,131 @@
-import { useState } from "react";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import LeadFormWidget from "./LeadFormWidget";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
+import { track } from "@/lib/analytics";
+import { LEAD_COPY, type LeadFormInitial, type LeadSource } from "@/lib/leadFormData";
+import type { LeadFormProgress } from "./LeadFormWidget";
+
+// Navbar mounts this modal on every page: the form itself is only downloaded once it is opened.
+const LeadFormWidget = dynamic(() => import("./LeadFormWidget"), {
+  ssr: false,
+  loading: () => <p className="p-6 text-sm text-muted-foreground">Yükleniyor…</p>,
+});
 
 interface LeadFormModalProps {
   open: boolean;
   onClose: () => void;
   targetFirmId?: string;
   targetFirmName?: string;
+  source?: LeadSource;
+  initial?: LeadFormInitial;
 }
 
-const LeadFormModal = ({ open, onClose, targetFirmId, targetFirmName }: LeadFormModalProps) => {
-  const [showWarning, setShowWarning] = useState(false);
+const INITIAL_PROGRESS: LeadFormProgress = { step: 1, phase: "form", dirty: false };
 
-  if (!open) return null;
+const LeadFormModal = ({ open, onClose, targetFirmId, targetFirmName, source, initial }: LeadFormModalProps) => {
+  const router = useRouter();
+  const [progress, setProgress] = useState<LeadFormProgress>(INITIAL_PROGRESS);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  const handleCloseAttempt = () => {
-    setShowWarning(true);
+  useEffect(() => {
+    if (!open) {
+      setProgress(INITIAL_PROGRESS);
+      setConfirmOpen(false);
+    }
+  }, [open]);
+
+  const inVerify = progress.phase === "verify";
+  const statusPath = progress.leadId && progress.statusToken ? `/talep/${progress.leadId}?t=${encodeURIComponent(progress.statusToken)}` : null;
+
+  const requestClose = () => {
+    if (!inVerify && !progress.dirty) {
+      onClose();
+      return;
+    }
+    setConfirmOpen(true);
   };
 
-  const confirmClose = () => {
-    setShowWarning(false);
+  const confirmExit = () => {
+    setConfirmOpen(false);
+    track("lead_form_abandon", { step: progress.step, phase: progress.phase });
     onClose();
+    if (inVerify && statusPath) router.push(statusPath);
   };
 
   return (
     <>
-      {/* Full-screen container */}
-      <div className="fixed inset-0 z-[100] bg-background backdrop-blur-sm flex flex-col">
+      <DialogPrimitive.Root
+        open={open}
+        onOpenChange={(next) => {
+          if (!next) requestClose();
+        }}
+      >
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-foreground/50 duration-200 motion-safe:data-[state=open]:animate-in motion-safe:data-[state=open]:fade-in-0" />
+          {/* Centered with auto margins instead of a translate, so the opacity-only entrance cannot fight a transform. */}
+          <DialogPrimitive.Content
+            ref={contentRef}
+            onOpenAutoFocus={(event) => {
+              event.preventDefault();
+              contentRef.current?.focus();
+            }}
+            className="fixed inset-0 z-[100] flex h-[100dvh] flex-col overflow-hidden bg-card outline-none duration-200 motion-safe:data-[state=open]:animate-in motion-safe:data-[state=open]:fade-in-0 md:m-auto md:h-fit md:max-h-[min(46rem,calc(100dvh_-_2rem))] md:w-full md:max-w-xl md:rounded-2xl md:border md:border-border md:shadow-2xl"
+          >
+            <DialogPrimitive.Title className="sr-only">Ücretsiz teklif al</DialogPrimitive.Title>
+            <DialogPrimitive.Description className="sr-only">
+              Üç adımda peyzaj talebinizi oluşturun ve doğrulayın.
+            </DialogPrimitive.Description>
 
-        {/* Small absolute close button - never overlaps content */}
-        <button
-          onClick={handleCloseAttempt}
-          className="absolute top-3 right-3 z-10 p-1.5 bg-muted border border-border rounded-full shadow-md hover:bg-accent/10 transition-colors text-muted-foreground hover:text-foreground"
-          aria-label="Kapat"
-        >
-          <X className="h-4 w-4" />
-        </button>
+            <LeadFormWidget
+              layout="dialog"
+              source={source}
+              initial={initial}
+              targetFirmId={targetFirmId}
+              targetFirmName={targetFirmName}
+              onSuccess={onClose}
+              onProgress={setProgress}
+            />
 
-        {/* Widget fills available screen */}
-        <div className="flex-1 overflow-hidden">
-          <LeadFormWidget
-            onSuccess={onClose}
-            className="shadow-none border-0 rounded-none md:rounded-2xl md:shadow-2xl md:border md:border-primary/20 md:max-w-xl md:mx-auto md:my-8"
-            targetFirmId={targetFirmId}
-            targetFirmName={targetFirmName}
-          />
-        </div>
-      </div>
+            <DialogPrimitive.Close
+              aria-label="Kapat"
+              className="absolute right-2 top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X className="h-5 w-5" aria-hidden="true" />
+            </DialogPrimitive.Close>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
 
-      <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
-        <AlertDialogContent className="z-[110]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Çıkmak istediğinize emin misiniz?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Formu henüz tamamlamadınız. Şimdi çıkarsanız girdiğiniz tüm bilgiler kaybolacak ve firmalardan teklif alamayacaksınız.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowWarning(false)}>Hayır, Devam Et</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmClose} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Evet, Çık
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AlertDialogPrimitive.Root open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogPrimitive.Portal>
+          <AlertDialogPrimitive.Overlay className="fixed inset-0 z-[125] bg-foreground/50" />
+          <AlertDialogPrimitive.Content className="fixed inset-x-4 top-1/2 z-[130] mx-auto max-w-md -translate-y-1/2 space-y-4 rounded-2xl border border-border bg-card p-6 shadow-2xl outline-none">
+            <div className="space-y-2">
+              <AlertDialogPrimitive.Title className="font-heading text-lg font-semibold text-foreground">
+                {inVerify ? "Doğrulamayı tamamlamadan çıkmak istiyor musunuz?" : "Çıkmak istediğinize emin misiniz?"}
+              </AlertDialogPrimitive.Title>
+              <AlertDialogPrimitive.Description className="text-sm leading-relaxed text-muted-foreground">
+                {inVerify ? LEAD_COPY.exitVerify : LEAD_COPY.exitDraft}
+              </AlertDialogPrimitive.Description>
+            </div>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <AlertDialogPrimitive.Cancel className={buttonVariants({ variant: "outline", className: "min-h-11" })}>
+                {inVerify ? "Doğrulamaya dön" : "Devam et"}
+              </AlertDialogPrimitive.Cancel>
+              <AlertDialogPrimitive.Action onClick={confirmExit} className={buttonVariants({ variant: "gold", className: "min-h-11" })}>
+                {inVerify && statusPath ? "Talep sayfasına git" : "Çık"}
+              </AlertDialogPrimitive.Action>
+            </div>
+          </AlertDialogPrimitive.Content>
+        </AlertDialogPrimitive.Portal>
+      </AlertDialogPrimitive.Root>
     </>
   );
 };

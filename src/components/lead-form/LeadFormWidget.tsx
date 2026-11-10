@@ -23,6 +23,7 @@ import {
   type LeadStep,
 } from "@/lib/leadFormData";
 import { cn } from "@/lib/utils";
+import { isLegacyLeadId } from "./legacyBackend";
 import { LeadApiError, applyLeadSession, createLead, uploadLeadPhotos, type CreateLeadResult, type VerifyResult } from "./leadApi";
 import { refCode } from "./leadStatus";
 import StepContact from "./StepContact";
@@ -356,6 +357,8 @@ export default function LeadFormWidget({
     writeSession(DRAFT_STORAGE_KEY, null);
     writeSession(LAST_LEAD_KEY, JSON.stringify({ id: created.leadId, token: token ?? "" }));
     onSuccess?.();
+    // Yedek akışta durum sayfası yok: eski teşekkür sayfasına git.
+    if (isLegacyLeadId(created.leadId)) { router.push("/talebiniz-alindi"); return; }
     router.push(token ? `/talep/${created.leadId}?t=${encodeURIComponent(token)}` : `/talep/${created.leadId}`);
   };
 

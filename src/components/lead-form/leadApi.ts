@@ -17,6 +17,7 @@ import {
   type VerifyResult,
 } from "./leadApiCore";
 import type { LeadStatusDTO } from "./leadStatus";
+import { legacyPhotosDeferred, isBackendMissing, isLegacyLeadId, legacyCreateLead, legacyResendOtp, legacyVerifyOtp } from "./legacyBackend";
 
 export { LeadApiError, buildCreateLeadBody } from "./leadApiCore";
 export type { CreateLeadContext, CreateLeadResult, LeadVerification, SignedUpload, VerifyResult } from "./leadApiCore";
@@ -41,7 +42,12 @@ async function invoke(name: string, body: Record<string, unknown>): Promise<unkn
 export async function createLead(data: LeadFormData, ctx: CreateLeadContext): Promise<CreateLeadResult> {
   const destinationMasked = verifyDestination(data);
   try {
-    const response = await invoke("create-lead", buildCreateLeadBody(data, ctx));
+    const { data: response, error: invokeError } = await supabase.functions.invoke("create-lead", { body: buildCreateLeadBody(data, ctx) });
+    if (invokeError) {
+      // Yeni arka uç (create-lead) henüz yayında değilse eski çalışan akışa düş.
+      if (isBackendMissing(invokeError)) return await legacyCreateLead(data, ctx, destinationMasked);
+      throw await readFunctionError(invokeError);
+    }
     return parseCreateLeadResponse(response, destinationMasked);
   } catch (error) {
     if (error instanceof LeadApiError) {
@@ -55,10 +61,12 @@ export async function createLead(data: LeadFormData, ctx: CreateLeadContext): Pr
 }
 
 export async function resendOtp(args: { leadId: string }): Promise<{ resendAfterSec: number }> {
+  if (isLegacyLeadId(args.leadId)) return legacyResendOtp(args.leadId);
   return parseResendResponse(await invoke("send-otp", { leadId: args.leadId }));
 }
 
 export async function verifyOtp(args: { leadId: string; code: string }): Promise<VerifyResult> {
+  if (isLegacyLeadId(args.leadId)) return legacyVerifyOtp(args.leadId, args.code);
   const response = await invoke("verify-otp", { leadId: args.leadId, code: args.code });
   return parseVerifyResponse(response);
 }
@@ -77,6 +85,8 @@ export async function applyLeadSession(session: NonNullable<VerifyResult["sessio
  * them without metadata. Returns how many uploads failed; never throws, because photos are optional.
  */
 export async function uploadLeadPhotos(files: File[], uploads: SignedUpload[]): Promise<number> {
+  // Yedek akışta fotoğraflar doğrulama sırasında yüklenir (imzalı adres yok).
+  if (uploads.length === 0 && files.length > 0 && legacyPhotosDeferred()) return 0;
   const results = await Promise.allSettled(
     files.map(async (file, index) => {
       const target = uploads[index];

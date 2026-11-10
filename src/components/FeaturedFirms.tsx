@@ -66,37 +66,6 @@ const FeaturedFirms = () => {
                   </div>
                 )}
 
-                {/* New Arrivals Section */}
-                {newFirms.length > 0 && (
-                  <div>
-                    <div className="text-center mb-10">
-                      <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-4">
-                        Aramıza Yeni Katılanlar
-                      </h2>
-                      <p className="text-muted-foreground max-w-xl mx-auto">
-                        Peyzajbul ailesine katılan en yeni işletmeleri keşfedin.
-                      </p>
-                    </div>
-
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-                      {newFirms.map((firm) => (
-                        <FirmCard
-                          key={firm.id}
-                          id={firm.id}
-                          company_name={firm.company_name}
-                          city={firm.city}
-                          district={firm.district}
-                          services={firm.services || []}
-                          description={firm.description}
-                          slug={firm.slug}
-                          logo_url={firm.logo_url}
-                          gallery_images={firm.gallery_images}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {firms?.length === 0 && (
                   <p className="text-center text-muted-foreground">Henüz kayıtlı firma bulunmuyor.</p>
                 )}
@@ -110,6 +79,37 @@ const FeaturedFirms = () => {
               </div>
             </div>
 
+          </div>
+        )}
+
+        {/* New Arrivals Section */}
+        {newFirms.length > 0 && (
+          <div>
+            <div className="text-center mb-10">
+              <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-4">
+                Aramıza Yeni Katılanlar
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Peyzajbul ailesine katılan en yeni işletmeleri keşfedin.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newFirms.map((firm) => (
+                <FirmCard
+                  key={firm.id}
+                  id={firm.id}
+                  company_name={firm.company_name}
+                  city={firm.city}
+                  district={firm.district}
+                  services={firm.services || []}
+                  description={firm.description}
+                  slug={firm.slug}
+                  logo_url={firm.logo_url}
+                  gallery_images={firm.gallery_images}
+                />
+              ))}
+            </div>
           </div>
         )}
 

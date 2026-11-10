@@ -57,6 +57,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'peyzajbul.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.peyzajbul.com',
+      },
     ],
     minimumCacheTTL: 86400,
     formats: ['image/avif', 'image/webp'],

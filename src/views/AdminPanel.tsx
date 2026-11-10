@@ -179,6 +179,18 @@ function AdminSidebar({ tab, setTab, pendingFirmCount }: { tab: string; setTab: 
   );
 }
 
+/** 1 … 4 5 [6] 7 8 … 44 biçiminde kısa sayfa listesi (yüzlerce düğme çizmez). */
+function pageWindow(current: number, total: number): (number | "…")[] {
+  const set = new Set<number>([1, total, current - 2, current - 1, current, current + 1, current + 2]);
+  const nums = [...set].filter((n) => n >= 1 && n <= total).sort((a, b) => a - b);
+  const out: (number | "…")[] = [];
+  nums.forEach((n, i) => {
+    if (i > 0 && n - nums[i - 1] > 1) out.push("…");
+    out.push(n);
+  });
+  return out;
+}
+
 const AdminPanel = () => {
   const router = useRouter();
   const { toast } = useToast();
@@ -1221,18 +1233,22 @@ const AdminPanel = () => {
                       >
                         <ChevronLeft className="h-4 w-4 mr-1" /> Önceki
                       </Button>
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: totalFirmPages }).map((_, i) => (
-                          <Button
-                            key={i}
-                            variant={firmPage === i + 1 ? "default" : "outline"}
-                            size="sm"
-                            className="w-8 h-8 p-0"
-                            onClick={() => setFirmPage(i + 1)}
-                          >
-                            {i + 1}
-                          </Button>
-                        ))}
+                      <div className="flex flex-wrap items-center gap-1">
+                        {pageWindow(firmPage, totalFirmPages).map((p, i) =>
+                          p === "…" ? (
+                            <span key={`gap-${i}`} className="px-1 text-muted-foreground">…</span>
+                          ) : (
+                            <Button
+                              key={p}
+                              variant={firmPage === p ? "default" : "outline"}
+                              size="sm"
+                              className="min-w-8 h-8 px-2"
+                              onClick={() => setFirmPage(p)}
+                            >
+                              {p}
+                            </Button>
+                          ),
+                        )}
                       </div>
                       <Button
                         variant="outline"

@@ -10,7 +10,7 @@ const FeaturedFirms = () => {
 
   // Separate premium and new firms
   const premiumFirms = firms?.filter((f) => f.is_premium).slice(0, 6) || [];
-  const newFirms = firms?.filter((f) => !f.is_premium).slice(0, 6) || [];
+  const newFirms = firms?.filter((f) => !f.is_premium).slice(0, 12) || [];
 
   return (
     <section className="py-20 bg-background">
@@ -78,7 +78,7 @@ const FeaturedFirms = () => {
                       </p>
                     </div>
 
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                       {newFirms.map((firm) => (
                         <FirmCard
                           key={firm.id}
